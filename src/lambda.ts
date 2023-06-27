@@ -7,7 +7,7 @@ import { createServer, Response, proxy } from "aws-serverless-express";
 import { eventContext } from "aws-serverless-express/middleware";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
-const binaryMimeTypes: string[] = [];
+// const binaryMimeTypes: string[] = [];
 
 let cachedServer: Server;
 
@@ -20,7 +20,6 @@ async function bootstrapServer(): Promise<Server> {
 		.setDescription('Api desc')
 		.setVersion('0.01')
 		.addServer('/dev')
-		.addTag('/api')
 		.addBearerAuth()
 		.build();
 	const document = SwaggerModule.createDocument(app, options);
@@ -28,7 +27,8 @@ async function bootstrapServer(): Promise<Server> {
 	app.use(eventContext());
 	app.enableCors();
 	await app.init();
-	return createServer(expressApp, undefined, binaryMimeTypes);
+	// return createServer(expressApp, undefined, binaryMimeTypes);
+	return createServer(expressApp);
 }
 
 export const handler: Handler = async (event: any, context: Context): Promise<Response> => {
