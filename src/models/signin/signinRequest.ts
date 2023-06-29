@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { signinReq } from "../if";
 
-export default class signinRequest {
+export default class signinRequest implements signinReq  {
 	@ApiProperty({
 		description: '使用者名稱',
 	})

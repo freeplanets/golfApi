@@ -10,7 +10,7 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 // const binaryMimeTypes: string[] = [];
 
 let cachedServer: Server;
-
+let isServerStartInProcess = false;
 async function bootstrapServer(): Promise<Server> {
 	const expressApp = require('express')();
 	const adapter = new ExpressAdapter(expressApp);
@@ -33,7 +33,9 @@ async function bootstrapServer(): Promise<Server> {
 
 export const handler: Handler = async (event: any, context: Context): Promise<Response> => {
 	if (!cachedServer) {
+		isServerStartInProcess = true;
 		cachedServer = await bootstrapServer();
+		isServerStartInProcess = false;
 	}
 	return proxy(cachedServer, event, context, 'PROMISE').promise;
 }
