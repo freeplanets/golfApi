@@ -1,5 +1,5 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
-import { signinReq, signinRes } from "../if";
+import { signinReq, signinRes } from "../../if";
 
 
 const loginExampleValue:signinReq = {

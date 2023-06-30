@@ -1,5 +1,5 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
-import { commonResWithData, forgetPassword, rstToken } from "../if";
+import { commonResWithData, forgetPassword, rstToken } from "../../if";
 
 const forgetPasswordExVal:forgetPassword = {
 	username: 'test1',

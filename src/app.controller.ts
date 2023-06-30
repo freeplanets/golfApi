@@ -1,20 +1,28 @@
-import { Body, Controller, Get, Headers, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Param, Patch, Post, Put, Res } from '@nestjs/common';
 import { AppService } from './app.service';
 import signinReq from './models/signin/signinRequest';
 import signinRes from './models/signin/signinResponse';
 import { ApiBody, ApiHeader, ApiResponse } from '@nestjs/swagger';
-import { signinReqEx, signinResRx } from './models/examples/loginEx';
-import { forgetPassword, reToken, verify2fa } from './models/if';
+import { signinReqEx, signinResRx } from './models/examples/signin/loginEx';
+import { forgetPassword, reToken, reset2FA, resetPassword, updatePassword, verify2fa } from './models/if';
 import verify2faRequest from './models/signin/verify2faRequest';
-import { verify2aEx, verify2aResEx } from './models/examples/verify2faEx';
-import verify2faResponse from './models/signin/verify2faResponse';
+import { verify2aEx } from './models/examples/signin/verify2faEx';
+import commonResponse from './models/common/commonResponse';
 import { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import refreshTokenRequest from './models/signin/refreshTokenRequest';
-import { refreshTokenEx } from './models/examples/refreshTokenEx';
+import { refreshTokenEx, refreshTokenResEx } from './models/examples/signin/refreshTokenEx';
 import forgetPasswordRequest from './models/signin/forgetPasswordRequest';
-import { forgetPasswordEx, forgetPasswordResEx } from './models/examples/forgetPasswordEx';
+import { forgetPasswordEx, forgetPasswordResEx } from './models/examples/signin/forgetPasswordEx';
 import forgetPasswordReponse from './models/signin/forgetPasswordResponse';
+import refreshTokenResponse from './models/signin/refreshTokenResponse';
+import { commonResEx } from './models/examples/commonResponseEx';
+import resetPasswordRequest from './models/signin/resetPasswordRequest';
+import { resetPasswordEx } from './models/examples/signin/resetPasswordEx';
+import updatePasswordRequest from './models/signin/updatePasswordRequest';
+import { updatePasswordEx } from './models/examples/signin/updatePasswordEx';
+import reset2FARquest from './models/signin/reset2FARequest';
+import { reset2FAEx } from './models/examples/signin/reset2FAEx';
 
 const jwt = new JwtService();
 @Controller()
@@ -48,30 +56,74 @@ export class AppController {
   @ApiHeader({name: 'www-auth'})
   @ApiBody({description:'2FA驗證 / verify 2fa code', type: verify2faRequest, examples: verify2aEx})
   @ApiResponse({status:200, description:'二步驟認證回傳物件',
-    type: verify2faResponse})
+    type: commonResponse})
   verify2fa(@Body() body:verify2fa, @Headers('www-auth') token:string) {
-      console.log('login:', body); 
-      console.log('login:', token);
-      return verify2aResEx.Response.value;
+      console.log('verify2fa:', body); 
+      console.log('Token:', token);
+      return commonResEx.Response.value;
   }
 
   @Post('refreshToken')
   @ApiHeader({name:'www-auth'})
   @ApiBody({description:'更新token / refresh token', type: refreshTokenRequest, examples: refreshTokenEx})
-  @ApiResponse({status:200, description:'刷新token回傳物件', type: verify2faResponse})
+  @ApiResponse({status:200, description:'刷新token回傳物件', type: refreshTokenResponse})
   refreshToken(@Body() body:reToken, @Headers('www-auth') token:string){
-    console.log('login:', body); 
-    console.log('login:', token);
-    return verify2aResEx.Response.value;
+    console.log('refreshToken:', body); 
+    console.log('Token:', token);
+    return refreshTokenResEx.Response.value;
   }
 
   @Post('forgetPassword')
-  @ApiHeader({name:'www-auth'})
   @ApiBody({description:'忘記密碼 / forget password api', type: forgetPasswordRequest, examples: forgetPasswordEx})
   @ApiResponse({status:200, description:'忘記密碼回傳物件', type: forgetPasswordReponse})
-  forgetPassword(@Body() body:forgetPassword, @Headers('www-auth') token:string){
-    console.log('login:', body); 
-    console.log('login:', token);
+  forgetPassword(@Body() body:forgetPassword){
+    console.log('forgetPassword:', body); 
     return forgetPasswordResEx.Response.value;    
+  }
+
+  @Patch('forgetPassword')
+  @ApiBody({description:'重置密碼 / reset password api', type: resetPasswordRequest, examples: resetPasswordEx})
+  @ApiResponse({status:200, description: '重置密碼回傳物件', type: commonResponse})
+  resetPassword(@Body() body:resetPassword){
+    console.log('resetPassword', body);
+    return commonResEx.Response.value;
+  }
+
+  @Post('password')
+  @ApiHeader({name:'www-auth'})
+  @ApiBody({description:'更改密碼 / change password', type: updatePasswordRequest, examples: updatePasswordEx})
+  @ApiResponse({status:200, description:'更新密碼回傳物件',type:commonResponse})
+  updatePassword(@Body() body:updatePassword, @Headers('www-auth') token:string){
+    console.log('password:', body); 
+    console.log('Token:', token);
+    return commonResEx.Response.value;
+  }
+
+  @Put('2fa')
+  @ApiHeader({name:'www-auth'})
+  @ApiBody({description:'重置2FA / reset 2FA', type:reset2FARquest, examples: reset2FAEx})
+  @ApiResponse({status:200, description:'重置 2FA 回傳物件', type:commonResponse})
+  reset2FA(@Body() body:reset2FA, @Headers('www-auth') token:string){
+    console.log('2fa:', body); 
+    console.log('Token:', token);
+    return commonResEx.Response.value;
+  }
+
+  @Put('2fa/:username')
+  @ApiHeader({name:'www-auth'})
+  @ApiBody({description:'重置2FA / reset 2FA', type:reset2FARquest, examples: reset2FAEx})
+  @ApiResponse({status:200, description:'重置 2FA 回傳物件', type:commonResponse})
+  resetUser2FA(@Body() body:reset2FA, @Param('username') username:string, @Headers('www-auth') token:string){
+    console.log('2fa/username:', body, username); 
+    console.log('Token:', token);
+    return commonResEx.Response.value;
+  }
+
+  @Get('logout')
+  @ApiHeader({name:'www-auth'})
+  @ApiResponse({status:200, description:'登出回傳物件', type:commonResponse})
+  logout(@Headers('www-auth') token:string){
+    console.log('Token:', token);
+    return commonResEx.Response.value;    
   }
 }

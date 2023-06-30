@@ -1,5 +1,5 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
-import { commonResWithData, reToken, tokenObj } from "../if";
+import { commonResWithData, reToken, tokenObj } from "../../if";
 
 const refreshTokenExVal:reToken = {
 	refreshToken: 'xxxxxxxxxxxxxx',
