@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptions } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 import { commonResWithData } from "../if";
 import _errObj from "../common/_errObj";
 import _signinResData from "../common/_signinResData";
@@ -11,8 +11,9 @@ export default class signinResponse implements commonResWithData<_signinResData>
 	errcode: string;
 	@ApiProperty({
 		description: '錯誤訊息物件',
+		required: false,
 	})
-	error: _errObj;
+	error?: _errObj;
 	@ApiProperty({
 		description: '資料物件',
 	})
