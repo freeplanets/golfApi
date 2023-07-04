@@ -1,13 +1,16 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { errObj } from "../if";
+import { AnyObject, errObj } from "../if";
+import { IsString } from "class-validator";
 
 export default class _errObj implements errObj {
 	@ApiProperty({
 		description: "錯誤訊息",
 	})
+	@IsString()
 	message: string;
 	@ApiProperty({
-		description: "訊息物件"
+		description: "訊息物件",
+		required: false,
 	})
-	extra?: { [key: string]: any; };
+	extra?: AnyObject;
 }

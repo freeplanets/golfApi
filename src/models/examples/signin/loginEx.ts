@@ -1,5 +1,5 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
-import { signinReq, signinRes } from "../../if";
+import { commonResWithData, errObj, signinReq, signinResData, tokenObj } from "../../if";
 
 
 const loginExampleValue:signinReq = {
@@ -7,10 +7,23 @@ const loginExampleValue:signinReq = {
   password: 'pass',
   reCAPTCHAToken: '1234',
 }
-const loginResponse:signinRes = {
+const err:errObj = {
+  message: 'error message',
+  extra: {},
+}
+const token: tokenObj = {
+  token: 'token',
+  refreshToken: 'XXXXXX',
+}
+const resdata:signinResData = {
+  tokens: token,
+  twofaqrcode: 'aaaaaa',
+  needfa: true,
+}
+const loginResponse:commonResWithData<signinResData> = {
   errcode: '0',
-  error: 'object',
-  data: 'object',
+  error: err,
+  data: resdata,
 }
 export const signinReqEx:Record<'signin', ExampleObject> = {
   signin: {

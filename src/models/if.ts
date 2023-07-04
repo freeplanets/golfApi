@@ -1,14 +1,12 @@
-import { UserType } from "./enum";
+import { UserType, mapObjectType } from "./enum";
 
+export interface AnyObject {
+  [key:string]: any;
+}
 export interface signinReq {
   username:string;
   password:string;
   reCAPTCHAToken:string;
-}
-export interface signinRes {
-  errcode:string;
-  error:any;
-  data:any;
 }
 export interface commonRes {
   errcode:string;
@@ -19,7 +17,7 @@ export interface commonResWithData<D> extends commonRes {
 }
 export interface errObj {
   message: string;
-  extra?: {[key:string]:any};
+  extra?: AnyObject;
 }
 export interface reToken {
   refreshToken: string; 
@@ -92,14 +90,13 @@ export interface zoneInfo {
   ZoneID:string;
   ZoneName:string;
 }
-
 export interface mapLatLong {
   longitude:number; // 經度
   latitude:number; // 緯度
 }
 export interface mapAssetObject {
   name:string; //名稱	TRUE																				
-  type:string; //		block,image,label,circle	物件類型	TRUE																				
+  type:mapObjectType; //		block,image,label,circle	物件類型	TRUE																				
   x:number; // x座標	TRUE																				
   y:number; // y座標	TRUE																				
   blockWidth?:number; // block寬	FALSE																				
@@ -117,12 +114,19 @@ export interface mapAssetObject {
   circleGap?:number; // circle間距	FALSE																				
   circleMax?:number; // circle最多幾個	FALSE																				
 }
-
+export interface mapObject {
+  src:string; //檔案位置																								
+  memo:string; //備註																								
+  topLeft:mapLatLong; //左上																								
+  topRight:mapLatLong; //右上																								
+  bottomLeft:mapLatLong; //左下																								
+  bottomRight:mapLatLong; //右下																								
+  assets:	mapAssetObject[]; //球道上物件																								
+}
 export interface fairwayInfo {
   ClubID:string; // 球場/俱樂部代號																								
   ZoneID:string; // 區域代號																								
-  FairwayID:string; // 球道代號																								
-  No:number; // 球道序號																								
+  FairwayID:number; // 球道代號																								
   yellowTee?:number; // 金發球台距果嶺距離																								
   blackTee?:number; // 黑發球台距果嶺距離																								
   blueTee?:number;	// 藍發球台距果嶺距離																								
@@ -130,5 +134,14 @@ export interface fairwayInfo {
   redTee?:number; // 紅發球台距果嶺距離																								
   Par:number; // 標準桿桿數																								
   handicap:number; //	差點																								
-  fairwayMap?:string; // 球道圖資訊																								  
+  fairwayMap?:mapObject; // 球道圖資訊																								  
 }
+export interface carPosition {
+  ClubID: string;
+  ZoneID: string;
+  FairwayID: number;
+  carID: number;
+  position: mapLatLong;
+}
+
+ 
