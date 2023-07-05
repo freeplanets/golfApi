@@ -28,28 +28,18 @@ const jwt = new JwtService();
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
-
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
-  @Get('users')
-  getAllUsers() {
-    const users = [{ "Name": "Michael","Age":25 }];
-    return users;
-  }
-
   @Post('signin')
   @ApiBody({description:'登入 / signin', type: signinReq, examples: signinReqEx})
   @ApiResponse({status:200, description: 'A post has been successfully fetched', 
   type: signinRes })
-  async signin(@Body() signin: signinReq, @Res() res:Response) {
+  async signin(@Body() signin: signinReq, @Res({passthrough:true}) res:Response) {
     console.log('login:', signin);
     const jwtstr = await jwt.signAsync(signin, {privateKey: 'test'});
     console.log('', jwtstr);
     res.setHeader('www-auth', jwtstr);
-    res.end(); // or @Res({passthrough:true}) instead
-    return signinResRx.Response.value;
+    res.status(200).json(signinResRx.Response.value);
+    // res.end(); // or @Res({passthrough:true}) instead
+    //return signinResRx.Response.value;
   }
 
   @Post('verify2fa')

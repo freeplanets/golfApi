@@ -143,5 +143,28 @@ export interface carPosition {
   carID: number;
   position: mapLatLong;
 }
-
- 
+export interface gameZones {
+  out:string;
+  in:string;
+}
+export interface client {
+  ID: string;
+  checkInID: string;
+  name: string;
+  swingOrder?:number;
+}
+export interface stepIn {
+  ZoneID:string;
+  FairwayID:number;
+}
+export interface checkInData {
+  ClubID:string;
+  GroupID:string;
+  CarrieID?:string;
+  CarID?:string;
+  zones: gameZones;
+  players: client[];
+  start: stepIn;
+  position?: mapLatLong;
+  inTimestamp?:number;
+} 
