@@ -38,6 +38,13 @@ export default class _checkInData implements checkInData {
 	start: stepIn;
 
 	@ApiProperty({
+		description: '小遊戲列表',
+		isArray:true,
+		type: String,
+	})
+	sidegames: string[];
+
+	@ApiProperty({
 		description:'開始時間戳',
 	})
 	@IsNumber()

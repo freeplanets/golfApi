@@ -6,11 +6,20 @@ import { Context, Handler } from "aws-lambda";
 import { createServer, Response, proxy } from "aws-serverless-express";
 import { eventContext } from "aws-serverless-express/middleware";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { SecuritySchemeObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
 
+const authOption: SecuritySchemeObject = {
+	description: 'JWT token authorization',
+	type: 'apiKey',
+	in: 'header',
+	scheme: 'bearer',
+	bearerFormat: 'JWT',
+	name: 'www-auth',
+}
 // const binaryMimeTypes: string[] = [];
 
 let cachedServer: Server;
-let isServerStartInProcess = false;
+//let isServerStartInProcess = false;
 async function bootstrapServer(): Promise<Server> {
 	const expressApp = require('express')();
 	const adapter = new ExpressAdapter(expressApp);
@@ -20,7 +29,7 @@ async function bootstrapServer(): Promise<Server> {
 		.setDescription('Api desc')
 		.setVersion('0.01')
 		.addServer('/dev')
-		.addBearerAuth()
+		.addBearerAuth(authOption)
 		.build();
 	const document = SwaggerModule.createDocument(app, options);
 	SwaggerModule.setup('api', app, document);	
@@ -33,9 +42,9 @@ async function bootstrapServer(): Promise<Server> {
 
 export const handler: Handler = async (event: any, context: Context): Promise<Response> => {
 	if (!cachedServer) {
-		isServerStartInProcess = true;
+		// isServerStartInProcess = true;
 		cachedServer = await bootstrapServer();
-		isServerStartInProcess = false;
+		// isServerStartInProcess = false;
 	}
 	return proxy(cachedServer, event, context, 'PROMISE').promise;
 }

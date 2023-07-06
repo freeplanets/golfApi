@@ -1,4 +1,4 @@
-import { UserType, mapObjectType } from "./enum";
+import { UserType, mapObjectType, sideGames } from "./enum";
 
 export interface AnyObject {
   [key:string]: any;
@@ -148,9 +148,9 @@ export interface gameZones {
   in:string;
 }
 export interface client {
-  ID: string;
-  checkInID: string;
-  name: string;
+  ID:string;
+  checkInID:string;
+  name:string;
   swingOrder?:number;
 }
 export interface stepIn {
@@ -162,9 +162,22 @@ export interface checkInData {
   GroupID:string;
   CarrieID?:string;
   CarID?:string;
-  zones: gameZones;
-  players: client[];
-  start: stepIn;
-  position?: mapLatLong;
+  zones:gameZones;
+  players:client[];
+  start:stepIn;
+  sidegames:string[];
+  position?:mapLatLong;
   inTimestamp?:number;
 } 
+export interface sideGamePlay {
+  playerID:string;
+  handicap:number;
+  point:number;
+}
+export interface sideGame {
+  name:sideGames;
+  NoHcp:boolean;
+  FullHcp:boolean;
+  HcpDiff:boolean;
+  HcpValue?:sideGamePlay[];
+}

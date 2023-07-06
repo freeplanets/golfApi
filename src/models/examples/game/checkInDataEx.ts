@@ -1,5 +1,6 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
-import { checkInData, client, gameZones, stepIn } from "src/models/if";
+import { sideGamesTW } from "../../enum";
+import { checkInData, client, gameZones, stepIn } from "../../if";
 
 const clt:client = {
 	ID: 'M00001',
@@ -15,12 +16,15 @@ const stepin: stepIn = {
 	ZoneID: 'West',
 	FairwayID: 3,
 }
+const sideGames:string[] = Object.values(sideGamesTW);
+
 const checkDataExVal: checkInData = {
 	ClubID: 'TW01',
 	GroupID: 'group0001',
 	players: [clt],
 	zones: zone,
 	start: stepin,
+	sidegames: sideGames,
 	inTimestamp: 1688486400,
 }
 export const checkDataEx:Record<'Response', ExampleObject> = {

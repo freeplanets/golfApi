@@ -2,7 +2,7 @@ import { Body, Controller, Get, Headers, Param, Patch, Post, Put, Res } from '@n
 import { AppService } from './app.service';
 import signinReq from './models/signin/signinRequest';
 import signinRes from './models/signin/signinResponse';
-import { ApiBody, ApiHeader, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiHeader, ApiResponse } from '@nestjs/swagger';
 import { signinReqEx, signinResRx } from './models/examples/signin/loginEx';
 import { forgetPassword, reToken, reset2FA, resetPassword, updatePassword, verify2fa } from './models/if';
 import verify2faRequest from './models/signin/verify2faRequest';
@@ -25,6 +25,8 @@ import reset2FARquest from './models/signin/reset2FARequest';
 import { reset2FAEx } from './models/examples/signin/reset2FAEx';
 
 const jwt = new JwtService();
+
+@ApiBearerAuth()
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
@@ -43,21 +45,21 @@ export class AppController {
   }
 
   @Post('verify2fa')
-  @ApiHeader({name: 'www-auth'})
   @ApiBody({description:'2FA驗證 / verify 2fa code', type: verify2faRequest, examples: verify2aEx})
   @ApiResponse({status:200, description:'二步驟認證回傳物件',
     type: commonResponse})
-  verify2fa(@Body() body:verify2fa, @Headers('www-auth') token:string) {
+  verify2fa(@Body() body:verify2fa) {
+      const token = Headers('www-auth');
       console.log('verify2fa:', body); 
       console.log('Token:', token);
       return commonResEx.Response.value;
   }
 
   @Post('refreshToken')
-  @ApiHeader({name:'www-auth'})
   @ApiBody({description:'更新token / refresh token', type: refreshTokenRequest, examples: refreshTokenEx})
   @ApiResponse({status:200, description:'刷新token回傳物件', type: refreshTokenResponse})
-  refreshToken(@Body() body:reToken, @Headers('www-auth') token:string){
+  refreshToken(@Body() body:reToken){
+    const token = Headers('www-auth');
     console.log('refreshToken:', body); 
     console.log('Token:', token);
     return refreshTokenResEx.Response.value;
@@ -80,39 +82,39 @@ export class AppController {
   }
 
   @Post('password')
-  @ApiHeader({name:'www-auth'})
   @ApiBody({description:'更改密碼 / change password', type: updatePasswordRequest, examples: updatePasswordEx})
   @ApiResponse({status:200, description:'更新密碼回傳物件',type:commonResponse})
-  updatePassword(@Body() body:updatePassword, @Headers('www-auth') token:string){
+  updatePassword(@Body() body:updatePassword){
+    const token = Headers('www-auth');
     console.log('password:', body); 
     console.log('Token:', token);
     return commonResEx.Response.value;
   }
 
   @Put('2fa')
-  @ApiHeader({name:'www-auth'})
   @ApiBody({description:'重置2FA / reset 2FA', type:reset2FARquest, examples: reset2FAEx})
   @ApiResponse({status:200, description:'重置 2FA 回傳物件', type:commonResponse})
-  reset2FA(@Body() body:reset2FA, @Headers('www-auth') token:string){
+  reset2FA(@Body() body:reset2FA){
+    const token = Headers('www-auth');
     console.log('2fa:', body); 
     console.log('Token:', token);
     return commonResEx.Response.value;
   }
 
   @Put('2fa/:username')
-  @ApiHeader({name:'www-auth'})
   @ApiBody({description:'重置2FA / reset 2FA', type:reset2FARquest, examples: reset2FAEx})
   @ApiResponse({status:200, description:'重置 2FA 回傳物件', type:commonResponse})
-  resetUser2FA(@Body() body:reset2FA, @Param('username') username:string, @Headers('www-auth') token:string){
+  resetUser2FA(@Body() body:reset2FA, @Param('username') username:string){
+    const token = Headers('www-auth');
     console.log('2fa/username:', body, username); 
     console.log('Token:', token);
     return commonResEx.Response.value;
   }
 
   @Get('logout')
-  @ApiHeader({name:'www-auth'})
   @ApiResponse({status:200, description:'登出回傳物件', type:commonResponse})
-  logout(@Headers('www-auth') token:string){
+  logout(){
+    const token = Headers('www-auth');
     console.log('Token:', token);
     return commonResEx.Response.value;    
   }

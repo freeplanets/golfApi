@@ -1,5 +1,5 @@
 import { Body, Controller, Param, Post } from "@nestjs/common";
-import { ApiBody, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from "@nestjs/swagger";
 import commonResponse from "../models/common/commonResponse";
 import { commonResEx } from "../models/examples/commonResponseEx";
 import { InDataTw01 } from "../models/indata/TW01/ifInData";
