@@ -157,6 +157,43 @@ export interface stepIn {
   ZoneID:string;
   FairwayID:number;
 }
+export interface playScore {
+  playerID:string;
+  gross:number;
+  SwingOrder?:number;
+}
+export interface holeScore {
+  ZoneID:string;
+  FairwayID:number;
+  Par:number;
+  Handicap:number;
+  scores: playScore[],
+  PlayOrder:number,
+}
+export interface endScore {
+  gross: number,
+  holes: holeScore[],
+}
+
+export interface score extends playScore {
+  ZoneID:string;
+  FairwayID:number;
+}
+
+export interface sideGameHcp {
+  PlayerID:string;
+  handicap:number;
+}
+
+export interface sideGame {
+  name:sideGames; 
+  NoHcp:boolean;
+  FullHcp:boolean;
+  HcpDiff:boolean;
+  Hcps:sideGameHcp[];
+  scores:endScore;
+}
+
 export interface checkInData {
   ClubID:string;
   GroupID:string;
@@ -165,19 +202,8 @@ export interface checkInData {
   zones:gameZones;
   players:client[];
   start:stepIn;
-  sidegames:string[];
+  scores: endScore;
+  sideGames: sideGame[];
   position?:mapLatLong;
   inTimestamp?:number;
-} 
-export interface sideGamePlay {
-  playerID:string;
-  handicap:number;
-  point:number;
-}
-export interface sideGame {
-  name:sideGames;
-  NoHcp:boolean;
-  FullHcp:boolean;
-  HcpDiff:boolean;
-  HcpValue?:sideGamePlay[];
 }

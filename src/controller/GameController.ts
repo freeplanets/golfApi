@@ -16,6 +16,7 @@ export default class GameController {
 		console.log('getCurcheckInData', token, checkDataEx.Response.value);
 		// res.setHeader('www-auth', token);
 		//res.status(200).json(checkDataEx.Response.value);
+		console.log(checkDataEx.Response.value);
 		return checkDataEx.Response.value;
 	}
 

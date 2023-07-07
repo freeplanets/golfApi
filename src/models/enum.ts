@@ -9,11 +9,18 @@ export enum mapObjectType {
 	Circle = 'circle',
 }
 export enum sideGames {
-	Stableford = 'Stableford',
-	Stroke = 'Stroke',
-	Match = 'Match',
+	Skin = 'Skin',
+	MatchPlay = 'MatchPlay',
+	StrokePlay = 'StrokePlay',
 	Nassau = 'Nassau',
+	Stableford = 'Stableford',
 	ModStableford = 'Mod Stableford',
+	Birdies = 'Birdies',
+	Eagles = 'Eagles',
+	Pars = 'Pars',
+	Sixes = 'Sixes',
+	LasVages = 'LasVages',
+	Hessein = 'Hessein',
 }
 export enum sideGamesTW {
 	SKIN = '逐洞賽',

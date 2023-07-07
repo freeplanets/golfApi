@@ -1,6 +1,6 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
-import { sideGamesTW } from "../../enum";
-import { checkInData, client, gameZones, stepIn } from "../../if";
+ import { checkInData, client, endScore, gameZones, holeScore, playScore, sideGame, sideGameHcp, stepIn } from "../../if";
+import { sideGames } from "../../enum";
 
 const clt:client = {
 	ID: 'M00001',
@@ -16,7 +16,41 @@ const stepin: stepIn = {
 	ZoneID: 'West',
 	FairwayID: 3,
 }
-const sideGames:string[] = Object.values(sideGamesTW);
+const plays:playScore = {
+	playerID: 'M0001',
+	gross: 5,
+	SwingOrder: 2,
+}
+const hole:holeScore = {
+	ZoneID: 'West',
+	FairwayID: 3,
+	Par: 4,
+	Handicap: 8,
+	scores: [plays],
+	PlayOrder: 2,
+}
+const score:endScore = {
+	gross: 81,
+	holes: [hole],
+}
+const sidegameHcp1: sideGameHcp = {
+	PlayerID: 'M0001',
+	handicap: 8,
+}
+const sidegameHcp2: sideGameHcp = {
+	PlayerID: 'M0002',
+	handicap: 5,
+}
+const sideGameEnd: endScore = score;
+
+const sidegame:sideGame = {
+	name: sideGames.Stableford,
+	NoHcp: false,
+	FullHcp: false,
+	HcpDiff: true,
+	Hcps: [sidegameHcp1, sidegameHcp2],
+	scores: sideGameEnd,
+}
 
 const checkDataExVal: checkInData = {
 	ClubID: 'TW01',
@@ -24,7 +58,8 @@ const checkDataExVal: checkInData = {
 	players: [clt],
 	zones: zone,
 	start: stepin,
-	sidegames: sideGames,
+	scores: score,
+	sideGames: [sidegame],
 	inTimestamp: 1688486400,
 }
 export const checkDataEx:Record<'Response', ExampleObject> = {
