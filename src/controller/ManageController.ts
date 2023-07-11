@@ -2,13 +2,13 @@ import { Controller, Post, Headers, Body, Get, Param } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiHeader, ApiResponse, ApiTags } from "@nestjs/swagger";
 import commonResponse from "../models/common/commonResponse";
 import { commonResEx } from "../models/examples/commonResponseEx";
-import { carPosition, clubInfo, createManager, fairwayInfo, updateManager, zoneInfo } from "../models/if";
+import { carPosition, createManager, fairwayInfo, updateManager, zoneInfo } from "../models/if";
 import updateProfileRequest from "../models/manage/updateProfileRequest";
 import { updateManagerEx } from "../models/examples/manage/updateManagerEx";
 import { createManagerEx } from "../models/examples/manage/createManagerEx";
 import createProfileRequest from "../models/manage/createProfileRequest";
 import clubInfoRequest from "../models/manage/clubInfoRequest";
-import { clubInfoEx } from "../models/examples/manage/clubInfoEx";
+import { clubInfoEx } from "../models/examples/club/clubInfoEx";
 import zoneInfoRequest from "../models/manage/zoneInfoRequest";
 import { zoneInfoEx } from "../models/examples/manage/zoneInfoEx";
 import fairwayInfoRequest from "../models/manage/fairwayInfoRequest";
@@ -17,6 +17,7 @@ import fairwayInfoResponse from "../models/manage/fairwayInfoResponse";
 import positionRequest from "../models/manage/positionRequest";
 import { carInFairwayEx, carPositionEx } from "../models/examples/manage/carPositionEx";
 import carInFairwayResponse from "../models/manage/carInFairwayResponse";
+import Club from "src/database/club/club.interface";
 
 @ApiBearerAuth()
 @ApiTags('Manage')
@@ -44,7 +45,7 @@ export class ManageController {
 	@Post('modifyClubInfo')
 	@ApiBody({description:'修改球場資料', type: clubInfoRequest, examples: clubInfoEx})
 	@ApiResponse({status: 200, description:'修改球場資料回傳物件', type: commonResponse})
-	modifyClubInfo(@Body() body:clubInfo){
+	modifyClubInfo(@Body() body:Club){
 		const token = Headers('www-auth');
 		console.log(body, token);
 		return commonResEx.Response.value;

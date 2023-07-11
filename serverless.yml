@@ -29,7 +29,7 @@ custom:
     httpPort: 3000
   dynamodb:
     start:
-      port: 8001
+      port: 8000
       inMemory: true
       migrate: true
     stages: "dev"

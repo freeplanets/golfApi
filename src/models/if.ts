@@ -72,19 +72,6 @@ export interface updateManager {
   mobile?:string;
   enable2FA?:boolean;
 }
-export interface clubInfo {
-  ClubID:string;  //球場代號
-  ClubName:string; //球場名稱
-  ClubMembership?:string; //會員型態
-  NumberOfHoles:number; //總洞數
-  Address?:string; //地址
-  City?:string; //所在鄉鎮市
-  State?:string; // 所在城市/州(省)
-  Country?:string; //	國家
-  PostalCode?:string // 郵遞區號
-  phone?:string; //	電話
-  WebSite?:string; // 首頁網址
-}
 export interface zoneInfo {
   ClubID:string;
   ZoneID:string;
