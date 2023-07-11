@@ -17,18 +17,6 @@ export default class _holeScore implements holeScore {
 	FairwayID: number;
 
 	@ApiProperty({
-		description: '標準桿數',
-	})
-	@IsNumber()
-	Par: number;
-
-	@ApiProperty({
-		description: '差點',
-	})
-	@IsNumber()
-	Handicap: number;
-
-	@ApiProperty({
 		description: '來賓擊球結果',
 		isArray:true,
 		type: _playScore,
@@ -40,5 +28,5 @@ export default class _holeScore implements holeScore {
 		description: '來賓實際進行球洞順序',
 	})
 	@IsNumber()
-	PlayOrder: number;
+	PlayOrder: number;	
 }

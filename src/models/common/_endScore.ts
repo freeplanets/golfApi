@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { endScore, holeScore } from "../if";
+import { endScore, holeScoreWithInfo } from "../if";
 import { IsNumber } from "class-validator";
-import _holeScore from "./_holeScore";
+import _holeScore from "./_holeScoreWithInfo";
 
 export default class _endScore implements endScore {
 	@ApiProperty({
@@ -15,5 +15,5 @@ export default class _endScore implements endScore {
 		isArray: true,
 		type: _holeScore,
 	})
-	holes: holeScore[];
+	holes: holeScoreWithInfo[];
 }

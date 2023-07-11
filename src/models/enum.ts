@@ -36,3 +36,7 @@ export enum sideGamesTW {
 	LAS_VEGAS = '拉斯維加斯',
 	HESSEIN = '打海珊',
 }
+export enum ReportType {
+	URL = 'URL',
+	JSON = 'JSON',
+}

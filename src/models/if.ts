@@ -165,14 +165,16 @@ export interface playScore {
 export interface holeScore {
   ZoneID:string;
   FairwayID:number;
+  scores: playScore[],
+  PlayOrder:number,  
+}
+export interface holeScoreWithInfo extends holeScore {
   Par:number;
   Handicap:number;
-  scores: playScore[],
-  PlayOrder:number,
 }
 export interface endScore {
   gross: number,
-  holes: holeScore[],
+  holes: holeScoreWithInfo[],
 }
 
 export interface score extends playScore {
@@ -194,16 +196,32 @@ export interface sideGame {
   scores:endScore;
 }
 
-export interface checkInData {
-  ClubID:string;
+export interface sideGamesData {
   GroupID:string;
+  sideGames: sideGame[],
+}
+
+export interface checkInData extends sideGamesData{
+  ClubID:string;
+  // GroupID:string;
   CarrieID?:string;
   CarID?:string;
   zones:gameZones;
   players:client[];
   start:stepIn;
   scores: endScore;
-  sideGames: sideGame[];
+  // sideGames: sideGame[];
   position?:mapLatLong;
   inTimestamp?:number;
+}
+
+export interface swingResult {
+  GroupID:string,
+  scores: holeScore[],
+}
+
+export interface partialResult {
+  GroupID: string,
+  scores: endScore,
+  sideGameScores: endScore,
 }

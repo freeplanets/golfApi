@@ -1,24 +1,19 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { checkInData, client, endScore, gameZones, sideGame, stepIn } from "../if";
+import { checkInData, client, endScore, gameZones, stepIn } from "../if";
 import { IsNumber, IsString } from "class-validator";
 import _client from "./_client";
 import _gameZone from "./_gameZone";
 import _stepIn from "./_stepIn";
 import _endScore from "./_endScore";
 import _sideGame from "./_sideGame";
+import _signinResData from "./_sideGameData";
 
-export default class _checkInData implements checkInData {
+export default class _checkInData extends _signinResData implements checkInData {
 	@ApiProperty({
 		description: '球場代號',
 	})
 	@IsString()
 	ClubID: string;
-
-	@ApiProperty({
-		description: '組別編號',
-	})
-	@IsString()
-	GroupID: string;
 
 	@ApiProperty({
 		description: '分區組合',
@@ -44,13 +39,6 @@ export default class _checkInData implements checkInData {
 		type: _endScore,
 	})
 	scores: endScore;
-
-	@ApiProperty({
-		description: '小遊戲列表',
-		isArray:true,
-		type: _sideGame,
-	})
-	sideGames: sideGame[];
 
 	@ApiProperty({
 		description:'開始時間戳',
