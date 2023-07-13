@@ -40,3 +40,9 @@ export enum ReportType {
 	URL = 'URL',
 	JSON = 'JSON',
 }
+export enum HcpType {
+	NoHcp = 'NoHcp',
+  FullHcp = 'FullHcp',
+  HcpDiff = 'HcpDiff',
+	Handicap = 'Handicap',
+}

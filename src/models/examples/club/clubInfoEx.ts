@@ -1,5 +1,5 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
-import Club from "../../../database/club/club.interface";
+import Club from "../../../database/db.interface";
 import { commonResWithData } from "src/models/if";
 
 const clubInfoExVal:Club = {

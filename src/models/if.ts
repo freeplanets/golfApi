@@ -1,4 +1,4 @@
-import { UserType, mapObjectType, sideGames } from "./enum";
+import { HcpType, UserType, mapObjectType, sideGames } from "./enum";
 
 export interface AnyObject {
   [key:string]: any;
@@ -176,9 +176,10 @@ export interface sideGameHcp {
 
 export interface sideGame {
   name:sideGames; 
-  NoHcp:boolean;
-  FullHcp:boolean;
-  HcpDiff:boolean;
+  //NoHcp:boolean;
+  //FullHcp:boolean;
+  //HcpDiff:boolean;
+  HcpType: HcpType;
   Hcps:sideGameHcp[];
   scores:endScore;
 }

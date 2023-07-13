@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { sideGames } from "../enum";
+import { HcpType, sideGames } from "../enum";
 import { endScore, sideGame, sideGameHcp } from "../if";
 import { IsBoolean, IsString } from "class-validator";
 import _sideGameHcp from "./_sideGameHcp";
@@ -13,6 +13,13 @@ export default class _sideGame implements sideGame {
 	name: sideGames;
 
 	@ApiProperty({
+		description: '差點採用方法',
+		enum: HcpType,
+		enumName: '差點選項',
+	})
+	HcpType: HcpType;
+	/*
+	@ApiProperty({
 		description: '是否採用差點',
 		default: false,
 	})
@@ -25,12 +32,14 @@ export default class _sideGame implements sideGame {
 	})
 	@IsBoolean()
 	FullHcp = false;
+
 	@ApiProperty({
 		description: '採用差點差額',
 		default: false,
 	})
 	@IsBoolean()
 	HcpDiff: boolean;
+	*/
 
 	@ApiProperty({
 		description: '各來賓差點',

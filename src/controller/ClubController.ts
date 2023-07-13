@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Headers, Param, Post } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
-import Club from "../database/club/club.interface";
+import Club from "../database/db.interface";
 import ClubService from "../database/club/club.service";
 import { clubInfoEx } from "../models/examples/club/clubInfoEx";
 import clubInfoRequest from "../models/manage/clubInfoRequest";
@@ -22,7 +22,7 @@ export default class ClubController {
 	@ApiResponse({status: 200, description:'回傳物件', type: commonResponse})
 	async add(@Body() body:Club){
 		const token = Headers('www-auth');
-		console.log(body, token)
+		console.log(body, token);
 		const response:commonResWithData<Partial<Club>> = {
 			errcode: '0',
 		};
@@ -54,6 +54,8 @@ export default class ClubController {
 	@ApiParam({name: 'id', description:'球場代號'})
 	@ApiResponse({status:200, description:'回傳球場資料', type:responseWithData<Club> })
 	async getOne(@Param('id') id:string){
+		const token = Headers();
+		console.log(id, token)
 		const response = new responseWithData<Club>();
 		response.errcode = '0';
 		if (id) {

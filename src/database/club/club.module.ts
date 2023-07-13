@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { DynamooseModule } from "nestjs-dynamoose";
-import { ClubSchema } from "./club.schema";
+import ClubSchema from "./club.schema";
 import ClubService from "./club.service";
 import ClubController from "../../controller/ClubController";
 

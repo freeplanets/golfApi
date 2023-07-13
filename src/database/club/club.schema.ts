@@ -1,6 +1,6 @@
 import { Schema } from "dynamoose";
 
-export const ClubSchema = new Schema({
+const ClubSchema = new Schema({
 	id: {
 		type: String,
 		hashKey: true,
@@ -44,4 +44,5 @@ export const ClubSchema = new Schema({
 		type: String,
 		required: false,
 	}
-})
+});
+export default ClubSchema;

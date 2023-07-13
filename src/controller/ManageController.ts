@@ -17,7 +17,7 @@ import fairwayInfoResponse from "../models/manage/fairwayInfoResponse";
 import positionRequest from "../models/manage/positionRequest";
 import { carInFairwayEx, carPositionEx } from "../models/examples/manage/carPositionEx";
 import carInFairwayResponse from "../models/manage/carInFairwayResponse";
-import Club from "src/database/club/club.interface";
+import Club from "../database/db.interface";
 
 @ApiBearerAuth()
 @ApiTags('Manage')

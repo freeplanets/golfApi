@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel, Model } from "nestjs-dynamoose";
-import Club from "./club.interface";
-import { dbDefaultMethod, defaultKey } from "../db.interface";
+import Club from "../db.interface";
+import { defaultMethod, defaultKey } from "../db.interface";
 
 @Injectable()
-export default class ClubService implements dbDefaultMethod<Club, defaultKey>{
+export default class ClubService implements defaultMethod<Club, defaultKey>{
 	constructor(
 		@InjectModel('Club')
 		private clubModel:Model<Club, defaultKey>,

@@ -1,6 +1,6 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
  import { checkInData, client, endScore, gameZones, holeScore, holeScoreWithInfo, partialResult, playScore, sideGame, sideGameHcp, sideGamesData, stepIn, swingResult } from "../../if";
-import { sideGames } from "../../enum";
+import { HcpType, sideGames } from "../../enum";
 
 const clt:client = {
 	ID: 'M00001',
@@ -48,9 +48,10 @@ const sideGameEnd: endScore = score;
 
 const sidegame:sideGame = {
 	name: sideGames.Stableford,
-	NoHcp: false,
-	FullHcp: false,
-	HcpDiff: true,
+	// NoHcp: false,
+	// FullHcp: false,
+	// HcpDiff: true,
+	HcpType: HcpType.Handicap,
 	Hcps: [sidegameHcp1, sidegameHcp2],
 	scores: sideGameEnd,
 }

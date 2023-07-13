@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNumber } from "class-validator";
-import Club from "src/database/club/club.interface";
+import Club from "../../database/db.interface";
 
 export default class clubInfoRequest implements Club {
 	@ApiProperty({

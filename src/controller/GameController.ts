@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Headers, Param, Post } from "@nestjs/common";
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags, ApiParamOptions } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags, ApiParamOptions, ApiHeader } from "@nestjs/swagger";
 import { checkDataEx, partialResultEx, sideGameRegEx, swingResultEx } from "../models/examples/game/checkInDataEx";
 import checkInDataResponse from "../models/game/checkInDataResponse";
 import _sideGameData from "../models/common/_sideGameData";
@@ -12,6 +12,7 @@ import { ReportType } from "../models/enum";
 import getResultResponse from "../models/game/getResultResponse";
 
 @ApiBearerAuth()
+@ApiHeader({name: 'www-auth', required:false})
 @ApiTags('Game')
 @Controller('game')
 export default class GameController {

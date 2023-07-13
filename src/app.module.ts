@@ -6,6 +6,8 @@ import InDataController from './controller/InDataController';
 import GameController from './controller/GameController';
 import { DynamooseModule, DynamooseModuleOptions } from 'nestjs-dynamoose';
 import awsOptions from './aws.info';
+import ZoneModule from './database/zone/zone.module';
+import ZoneController from './controller/manage/ZoneController';
 import ClubModule from './database/club/club.module';
 import ClubController from './controller/ClubController';
 
@@ -18,8 +20,9 @@ if(process.env.IS_OFFLINE) {
   imports: [
     DynamooseModule.forRoot(options),
     ClubModule,
+    ZoneModule,
   ],
-  controllers: [AppController, ManageController, InDataController, GameController, ClubController],
+  controllers: [AppController, ManageController, InDataController, GameController, ClubController, ZoneController],
   providers: [ AppService ],
 })
 export class AppModule {}
