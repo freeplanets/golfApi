@@ -2,7 +2,8 @@ import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.int
 import { Zone } from "src/database/db.interface";
 
 const zoneExVal:Zone = {
-	id: '01',
+	id: '',
+	zoneid: '01',
 	clubid: 'linkougolf',
 	name: 'West',
 }

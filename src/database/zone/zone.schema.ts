@@ -5,9 +5,15 @@ const ZoneSchema = new Schema({
 		type: String,
 		hashKey: true,
 	},
+	zoneid: {
+		type: String,
+		required: true,
+		index: true,
+	},
 	clubid: {
 		type: String,
 		required: true,
+		index:true,
 	},
 	name: {
 		type: String,

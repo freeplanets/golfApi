@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { mapLatLong } from "../if";
+import { mapLatLong } from "../../database/db.interface"; 
 import { IsLatLong, IsLongitude, IsNumber } from "class-validator";
 
 export default class _mapLatLong implements mapLatLong {

@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { carPosition, mapLatLong } from "../if";
+import { carPosition, mapLatLong } from "../../database/db.interface";
 import { IsNumber, IsString } from "class-validator";
 import _mapLatLong from "../common/_mapLatLong";
 

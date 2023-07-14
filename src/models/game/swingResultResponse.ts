@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import commonResponse from "../common/commonResponse";
-import { commonResWithData, partialResult, sideGamesData, swingResult } from "../if";
+import { commonResWithData } from "../if";
+import {partialResult} from "../../database/db.interface";
 
 export default class swingResultResponse extends commonResponse implements commonResWithData<partialResult> {
 	@ApiProperty({

@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { gameZones } from "../if";
+import { gameZones } from "../../database/db.interface";
 import { IsString } from "class-validator";
 
 export default class _gameZone implements gameZones {

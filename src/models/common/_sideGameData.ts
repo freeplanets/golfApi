@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { sideGame, sideGamesData } from "../if";
+import { sideGame, sideGamesData } from "../../database/db.interface";
 import { IsString } from "class-validator";
 import _sideGame from "./_sideGame";
 

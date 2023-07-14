@@ -1,16 +1,15 @@
 import { Controller, Post, Headers, Body, Get, Param } from "@nestjs/common";
-import { ApiBearerAuth, ApiBody, ApiHeader, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from "@nestjs/swagger";
 import commonResponse from "../models/common/commonResponse";
 import { commonResEx } from "../models/examples/commonResponseEx";
-import { carPosition, createManager, fairwayInfo, updateManager, zoneInfo } from "../models/if";
+import { createManager,  updateManager } from "../models/if";
+import { fairwayInfo, carPosition } from "../database/db.interface";
 import updateProfileRequest from "../models/manage/updateProfileRequest";
 import { updateManagerEx } from "../models/examples/manage/updateManagerEx";
 import { createManagerEx } from "../models/examples/manage/createManagerEx";
 import createProfileRequest from "../models/manage/createProfileRequest";
 import clubInfoRequest from "../models/manage/clubInfoRequest";
 import { clubInfoEx } from "../models/examples/club/clubInfoEx";
-import zoneInfoRequest from "../models/manage/zoneInfoRequest";
-import { zoneInfoEx } from "../models/examples/manage/zoneInfoEx";
 import fairwayInfoRequest from "../models/manage/fairwayInfoRequest";
 import { fairwayInfoEx, fairwayInfoResEx } from "../models/examples/manage/fairwayInfoEx";
 import fairwayInfoResponse from "../models/manage/fairwayInfoResponse";
@@ -51,15 +50,6 @@ export class ManageController {
 		return commonResEx.Response.value;
 	}
 	
-	@Post('modifyZoneInfo')
-	@ApiBody({description:'修改球場分區資料', type: zoneInfoRequest, examples: zoneInfoEx})
-	@ApiResponse({status: 200, description:'修改球場分區資料回傳物件', type: commonResponse})
-	modifyZoneInfo(@Body() body:zoneInfo){
-		const token = Headers('www-auth');
-		console.log(body, token);
-		return commonResEx.Response.value;
-	}
-
 	@Post('modifyFairwayInfo')
 	@ApiBody({description:'球道資料新增/修改', type: fairwayInfoRequest, examples: fairwayInfoEx})
 	@ApiResponse({status: 200, description:'球道資料新增/修改回傳物件', type: commonResponse})

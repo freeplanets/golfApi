@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { HcpType, sideGames } from "../enum";
-import { endScore, sideGame, sideGameHcp } from "../if";
+import { endScore, sideGame, sideGameHcp } from "../../database/db.interface";
 import { IsBoolean, IsString } from "class-validator";
 import _sideGameHcp from "./_sideGameHcp";
 import _endScore from "./_endScore";

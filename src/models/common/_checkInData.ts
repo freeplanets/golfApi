@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { checkInData, client, endScore, gameZones, stepIn } from "../if";
+import { checkInData, client, endScore, gameZones, stepIn } from "../../database/db.interface";
 import { IsNumber, IsString } from "class-validator";
 import _client from "./_client";
 import _gameZone from "./_gameZone";

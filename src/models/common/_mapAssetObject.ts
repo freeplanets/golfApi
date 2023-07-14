@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { mapAssetObject } from "../if";
+import { mapAssetObject } from "../../database/db.interface";
 import { IsBoolean, IsLocale, IsNumber, IsString } from "class-validator";
 import { mapObjectType } from "../enum";
 

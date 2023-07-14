@@ -21,4 +21,7 @@ export default class ZoneService implements defaultMethod<Zone, defaultKey> {
 	findAll(): Promise<Zone[]> {
 		return this.zoneModel.scan().exec();
 	}
+	query(keys:Partial<Zone>){
+		return this.zoneModel.query(keys).exec();
+	}
 }

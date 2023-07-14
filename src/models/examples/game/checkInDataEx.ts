@@ -1,5 +1,5 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
- import { checkInData, client, endScore, gameZones, holeScore, holeScoreWithInfo, partialResult, playScore, sideGame, sideGameHcp, sideGamesData, stepIn, swingResult } from "../../if";
+ import { checkInData, client, endScore, gameZones, holeScore, holeScoreWithInfo, partialResult, playScore, sideGame, sideGameHcp, sideGamesData, stepIn, swingResult } from "../../../database/db.interface";
 import { HcpType, sideGames } from "../../enum";
 
 const clt:client = {

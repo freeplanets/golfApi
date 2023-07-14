@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { holeScore, swingResult } from "../if";
+import { holeScore, swingResult } from "../../database/db.interface";
 import _holeScore from "./_holeScore";
 
 export default class _swingResult implements swingResult {

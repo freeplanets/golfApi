@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { endScore, holeScoreWithInfo } from "../if";
+import { endScore, holeScoreWithInfo } from "../../database/db.interface";
 import { IsNumber } from "class-validator";
 import _holeScore from "./_holeScoreWithInfo";
 

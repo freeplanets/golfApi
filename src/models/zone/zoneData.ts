@@ -4,10 +4,17 @@ import { Zone } from "src/database/db.interface";
 
 export default class zoneData implements Zone {
 	@ApiProperty({
-		description: '球場分區代號',
+		description: '資料 hashKey, do not change it',
+		required: false,
 	})
 	@IsString()
 	id: string;
+
+	@ApiProperty({
+		description: '球場分區代號',
+	})
+	@IsString()
+	zoneid: string;
 
 	@ApiProperty({
 		description: '球場代號',

@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { endScore, partialResult } from "../if";
+import { endScore, partialResult } from "../../database/db.interface";
 import { IsString } from "class-validator";
 import _endScore from "./_endScore";
 

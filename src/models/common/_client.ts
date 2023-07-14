@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { client } from "../if";
+import { client } from "../../database/db.interface";
 import { IsNumber, IsString } from "class-validator";
 
 export default class _client implements client {

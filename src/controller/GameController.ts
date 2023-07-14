@@ -4,7 +4,7 @@ import { checkDataEx, partialResultEx, sideGameRegEx, swingResultEx } from "../m
 import checkInDataResponse from "../models/game/checkInDataResponse";
 import _sideGameData from "../models/common/_sideGameData";
 import commonResponse from "../models/common/commonResponse";
-import { sideGamesData, swingResult } from "../models/if";
+import { sideGamesData, swingResult } from "../database/db.interface";
 import { commonResEx } from "../models/examples/commonResponseEx";
 import _swingResult from "../models/common/_swingResult";
 import swingResultResponse from "../models/game/swingResultResponse";

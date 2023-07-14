@@ -1,7 +1,7 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
 import { mapObjectType } from "../../enum";
-import { commonResWithData, fairwayInfo, mapAssetObject, mapLatLong, mapObject } from "src/models/if";
-
+import { commonResWithData,  } from "../../if";
+import { fairwayInfo, mapAssetObject, mapLatLong, mapObject } from "../../../database/db.interface";
 const topLeft:mapLatLong = {
 	latitude: 121.479379,
 	longitude: 25.088817,
@@ -42,9 +42,10 @@ const mapObj: mapObject = {
 }
 
 const fairwayInfoExVal: fairwayInfo = {
-	ClubID: 'TW01',
-	ZoneID: 'WEST',
-	FairwayID: 1,
+	id: '',
+	clubid: 'linkougolf',
+	zoneid: '01',
+	fairwayid: 1,
 	Par: 4,
 	handicap: 8,
 	blueTee: 156,

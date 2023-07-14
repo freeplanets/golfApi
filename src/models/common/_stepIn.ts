@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { stepIn } from "../if";
+import { stepIn } from "../../database/db.interface";
 import { IsNumber, IsString } from "class-validator";
 
 export default class _stepIn implements stepIn {

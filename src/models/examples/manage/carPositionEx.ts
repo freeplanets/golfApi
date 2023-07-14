@@ -1,5 +1,6 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
-import { carPosition, commonResWithData, mapLatLong } from "src/models/if";
+import { commonResWithData } from "../../if";
+import { carPosition, mapLatLong } from "../../../database/db.interface";
 const position:mapLatLong = {
 	latitude: 121.479379,
 	longitude: 25.088817,
