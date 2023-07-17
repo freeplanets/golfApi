@@ -7,7 +7,7 @@ export default class _playScore implements playScore {
 		description: '來賓代號',
 	})
 	@IsString()
-	playerID: string;
+	playerid: string;
 	
 	@ApiProperty({
 		description: '桿數/sidegame分數'

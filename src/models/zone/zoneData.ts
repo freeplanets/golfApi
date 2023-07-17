@@ -4,7 +4,7 @@ import { Zone } from "src/database/db.interface";
 
 export default class zoneData implements Zone {
 	@ApiProperty({
-		description: '資料 hashKey, do not change it',
+		description: '資料 hashKey, 空白為新增資料, do not change it',
 		required: false,
 	})
 	@IsString()

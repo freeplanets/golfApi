@@ -1,5 +1,5 @@
 import { Schema } from "dynamoose";
-import mapLatLong from "./mapLatLong.schema";
+import mapLatLong from "../common/mapLatLong.schema";
 import mapAsset from "./mapAsset.schema";
 
 const mapObject = new Schema({

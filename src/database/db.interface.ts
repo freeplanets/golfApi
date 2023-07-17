@@ -1,15 +1,19 @@
+import { QueryResponse } from "nestjs-dynamoose";
 import { HcpType, mapObjectType, sideGames } from "../models/enum";
 import { AnyObject } from "../models/if";
 
 export interface defaultKey {
-  id: string,
+  id: string;
+  clubid?: string;
+  ModifyID?: string;
 }
 export interface defaultMethod<T,K> {
   create(data:T):Promise<T>;
   update(key:K, data:Partial<T>):Promise<T>;
   findOne(key:K):Promise<T>;
   findAll():Promise<T[]>;
-  // query(data:Partial<T>):Promise<T>;
+  query(key:Partial<T>):Promise<QueryResponse<T>>;
+  delete(key:K):Promise<void>;
 }
 
 export default interface Club extends defaultKey {
@@ -91,24 +95,34 @@ export interface fairwayInfo extends defaultKey {
   modifyID?:string; //修改人員代號
 }
 export interface carPosition {
-  ClubID: string;
-  ZoneID: string;
-  FairwayID: number;
-  carID: number;
+  groupid: string,
+  clubid: string;
+  zoneid: string;
+  fairwayid: number;
+  carid: number;
   position: mapLatLong;
 }
+export interface carPositionHistory {
+  groupid: string,
+  clubid: string;
+  zoneid: string;
+  fairwayid: number;
+  carid: number;
+  position: mapLatLong;
+  tm:number,
+}
 export interface stepIn {
-  ZoneID:string;
-  FairwayID:number;
+  zoneid:string;
+  fairwayid:number;
 }
 export interface playScore {
-  playerID:string;
+  playerid:string;
   gross:number;
   SwingOrder?:number;
 }
 export interface holeScore {
-  ZoneID:string;
-  FairwayID:number;
+  zoneid:string;
+  fairwayid:number;
   scores: playScore[],
   PlayOrder:number,  
 }
@@ -122,12 +136,12 @@ export interface endScore {
 }
 
 export interface score extends playScore {
-  ZoneID:string;
-  FairwayID:number;
+  zoneid:string;
+  fairwayid:number;
 }
 
 export interface sideGameHcp {
-  PlayerID:string;
+  playerid:string;
   handicap:number;
 }
 

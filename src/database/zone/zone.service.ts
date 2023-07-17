@@ -1,8 +1,18 @@
 import { Injectable } from "@nestjs/common";
-import { Zone, defaultMethod, defaultKey } from "../db.interface";
+import { Zone, defaultKey } from "../db.interface";
 import { InjectModel, Model } from "nestjs-dynamoose";
+import defaultService from "../common/defaultService";
 
 @Injectable()
+export default class ZoneService extends defaultService<Zone, defaultKey> {
+	constructor(
+		@InjectModel('Zone')
+		private zoneModel:Model<Zone, defaultKey>,
+	){
+		super(zoneModel);
+	}
+}
+/*
 export default class ZoneService implements defaultMethod<Zone, defaultKey> {
 	constructor(
 		@InjectModel('Zone')
@@ -25,3 +35,4 @@ export default class ZoneService implements defaultMethod<Zone, defaultKey> {
 		return this.zoneModel.query(keys).exec();
 	}
 }
+*/

@@ -13,17 +13,17 @@ const zone:gameZones = {
 	in: 'South',
 }
 const stepin: stepIn = {
-	ZoneID: 'West',
-	FairwayID: 3,
+	zoneid: 'West',
+	fairwayid: 3,
 }
 const plays:playScore = {
-	playerID: 'M0001',
+	playerid: 'M0001',
 	gross: 5,
 	SwingOrder: 2,
 }
 const holeS: holeScore = {
-	ZoneID: 'West',
-	FairwayID: 3,
+	zoneid: 'West',
+	fairwayid: 3,
 	scores: [plays],
 	PlayOrder: 2,	
 }
@@ -37,11 +37,11 @@ const score:endScore = {
 	holes: [holeSWI],
 }
 const sidegameHcp1: sideGameHcp = {
-	PlayerID: 'M0001',
+	playerid: 'M0001',
 	handicap: 8,
 }
 const sidegameHcp2: sideGameHcp = {
-	PlayerID: 'M0002',
+	playerid: 'M0002',
 	handicap: 5,
 }
 const sideGameEnd: endScore = score;

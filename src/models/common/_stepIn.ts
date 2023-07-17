@@ -7,11 +7,11 @@ export default class _stepIn implements stepIn {
 		description: '分區代號',
 	})
 	@IsString()
-	ZoneID: string;
+	zoneid: string;
 
 	@ApiProperty({
 		description: '球道編號',
 	})
 	@IsNumber()
-	FairwayID: number;
+	fairwayid: number;
 }

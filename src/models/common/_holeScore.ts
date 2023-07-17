@@ -8,13 +8,13 @@ export default class _holeScore implements holeScore {
 		description: '區域代號',
 	})
 	@IsString()
-	ZoneID: string;
+	zoneid: string;
 
 	@ApiProperty({
 		description: '球道號碼',
 	})
 	@IsNumber()
-	FairwayID: number;
+	fairwayid: number;
 
 	@ApiProperty({
 		description: '來賓擊球結果',

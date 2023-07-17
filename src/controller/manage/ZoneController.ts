@@ -1,8 +1,8 @@
-import { Body, Controller, Headers, Post, Get, Param } from "@nestjs/common";
-import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Zone, defaultKey } from "../../database/db.interface";
+import { Body, Controller, Headers, Post, Get, Param, Delete } from "@nestjs/common";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Zone } from "../../database/db.interface";
 import ZoneService from "../../database/zone/zone.service";
-import { hashKey, modifyTableData, tokenCheck } from "../../function/Commands";
+import { deleteTableData, modifyTableData, queryTable } from "../../function/Commands";
 import zoneData from "../../models/zone/zoneData";
 import { zoneEx } from "../../models/examples/zone/zoneEx";
 import zoneModifyResponse from "../../models/zone/zoneModifyResponse";
@@ -10,7 +10,7 @@ import zoneAllResponse from "../../models/zone/zoneAllResponse";
 import { commonResWithData } from "src/models/if";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
-
+import commonResponse from "../../models/common/commonResponse";
 
 @ApiBearerAuth()
 @ApiTags('Manage')
@@ -19,32 +19,12 @@ export default class ZoneController {
 	constructor(private readonly zoneService:ZoneService){}
 
 	@Post('modify')
+	@ApiOperation({summary: '球道分區資料新增/修改', description: '球場分區資料新增/修改'})
 	@ApiBody({description: '球場分區管理', type: zoneData, examples: zoneEx})
 	@ApiResponse({status: 200, description: '回傳物件', type: zoneModifyResponse })
 	async modify(@Body() body:Zone, @Headers('www-auth') token: Record<string, string> ){
 		// const token = Headers('www-auth');
-		console.log('hashKey:', hashKey());
-		const user = tokenCheck(String(token));
-		let resp:commonResWithData<Zone>;
-		if (user) {
-			body.clubid = user.siteid;
-			body.modifyID = user.uid;
-			if (body.zoneid) {
-				resp = await modifyTableData(this.zoneService, body);
-			} else {
-				resp = {
-					errcode: ErrCode.MISS_PARAMETER,
-					error: {
-						message: errorMsg('MISS_PARAMETER', 'zoneid'),
-					}
-				}
-			}
-		} else {
-			resp.errcode = ErrCode.TOKEN_ERROR;
-			resp.error = {
-				message: errorMsg('TOKEN_ERROR'),
-			}			
-		}
+		const resp  = modifyTableData(String(token), this.zoneService, body);
 		return resp;
 	}
 
@@ -87,31 +67,49 @@ export default class ZoneController {
 	}
 	*/
 	
-	@Get('all')
+	@Get('all/:clubid')
+	@ApiOperation({ summary: '回傳球場所有分區資料', description: '回傳球場所有分區資料'})
 	@ApiResponse({status: 200, description: '回傳物件', type: zoneAllResponse })
-	async listAll(@Headers('www-auth') token:Record<string, string>){
-		console.log('listAll');
-		const resp = await this.query(String(token));
+	async listAll(@Param('clubid') clubid:string,@Headers('www-auth') token:Record<string, string>){
+		const resp = await this.query(String(token), clubid);
 		return resp;
 	}
 
-	async query(token:string) {
+	async query(token:string, clubid: string) {
 		let resp:commonResWithData<Zone[]> = {
 			errcode: '0',
 		}
+		if (!clubid) {
+			resp.errcode = ErrCode.MISS_PARAMETER;
+			resp.error = {
+				message: errorMsg('MISS_PARAMETER', 'clubid'),
+			}
+		} else {
+			resp = await queryTable<Zone>(token, this.zoneService ,{clubid: clubid});
+		}
+		return resp;
+		/*
 		const user = tokenCheck(String(token));
 		if (user) {
-			try {
-				const keys:Partial<Zone> = {
-					clubid: user.siteid,
+			console.log(clubid, user);
+			if (clubid && isMyClub(user, clubid)) {
+				try {
+					const keys:Partial<Zone> = {
+						clubid: clubid,
+					}
+					resp.data = await this.zoneService.query(keys);
+				} catch(e) {
+					resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
+					resp.error = {
+						message: errorMsg('DATABASE_ACCESS_ERROR'),
+						extra: e,
+					}					
 				}
-				resp.data = await this.zoneService.query(keys);
-			} catch(e) {
-				resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
+			} else {
+				resp.errcode = ErrCode.ERROR_PARAMETER,
 				resp.error = {
-					message: errorMsg('DATABASE_ACCESS_ERROR'),
-					extra: e,
-				}					
+					message: errorMsg('ERROR_PARAMETER', 'clubid'),
+				}
 			}
 		} else {
 			resp.errcode = ErrCode.TOKEN_ERROR;
@@ -120,5 +118,14 @@ export default class ZoneController {
 			}			
 		}
 		return resp;
-	}	
+		*/
+	}
+
+	@Delete('/:id')
+	@ApiOperation({ summary: '刪除分區資料', description: '刪除分區資料'})
+	@ApiResponse({status: 200, description:'刪除分區回傳物件', type: commonResponse})
+	async removeData(@Param('id') id:string, @Headers('www-auth') token:Record<string, string>){
+		const resp = deleteTableData(String(token), this.zoneService, id);
+		return resp;
+	}
 }

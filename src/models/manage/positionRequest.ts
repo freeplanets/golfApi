@@ -5,20 +5,31 @@ import _mapLatLong from "../common/_mapLatLong";
 
 export default class positionRequest implements carPosition {
 	@ApiProperty({
+		description: '來賓報到編組號碼',
+	})
+	groupid: string;
+
+	@ApiProperty({
 		description: '球場代號'
 	})
 	@IsString()
-	ClubID: string;
+	clubid: string;
 	@ApiProperty({
 		description: '區域代號'
 	})
 	@IsString()	
-	ZoneID: string;
+	zoneid: string;
 	@ApiProperty({
 		description: '球道代號'
 	})
 	@IsNumber()
-	FairwayID: number;
+	fairwayid: number;
+
+	@ApiProperty({
+		description: '球車編號',
+	})
+	carid: number;
+
 	@ApiProperty({
 		description: '球車代號',
 	})

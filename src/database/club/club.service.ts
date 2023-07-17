@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { InjectModel, Model } from "nestjs-dynamoose";
+import { InjectModel, Model, QueryResponse } from "nestjs-dynamoose";
 import Club from "../db.interface";
 import { defaultMethod, defaultKey } from "../db.interface";
 
@@ -21,5 +21,11 @@ export default class ClubService implements defaultMethod<Club, defaultKey>{
 	}
 	findAll() {
 		return this.clubModel.scan().exec();
+	}
+	query(key: Partial<Club>): Promise<QueryResponse<Club>> {
+		return this.clubModel.query(key).exec();
+	}
+	delete(key: defaultKey): Promise<void> {
+		return this.clubModel.delete(key);
 	}
 }

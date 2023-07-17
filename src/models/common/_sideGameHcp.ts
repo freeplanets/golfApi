@@ -7,7 +7,7 @@ export default class _sideGameHcp implements sideGameHcp {
 		description: '來賓編號',
 	})
 	@IsString()
-	PlayerID: string;
+	playerid: string;
 
 	@ApiProperty({
 		description: '差點',
