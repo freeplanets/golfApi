@@ -6,12 +6,17 @@ const CarPositionHistorySchema = new Schema({
 		type: String,
 		hashKey: true,
 	},
-	carid: {
+	clubid: {
 		type: String,
 		index: true,
 	},
+	carid: {
+		type: Number,
+		index: true,
+	},
 	location: {
-		type: mapLatLong,
+		type: Object,
+		schema: mapLatLong,
 	}
 }, {timestamps: {createdAt: null}});
 export default CarPositionHistorySchema;

@@ -6,19 +6,24 @@ const CarPositionSchema = new Schema({
 		type: String,
 		hashKey: true,
 	},
+	clubid: {
+		type: String,
+		index: true,
+	},
 	zoneid: {
 		type: String,
 		index: true,
 	},
-	farywairid: {
+	fairwayid: {
 		type: Number,
 		index: true,
 	},
 	carid: {
-		type: String,
+		type: Number,
 	},
 	location: {
-		type: mapLatLong,
+		type:Object,
+		schema: mapLatLong,
 	}
 }, {timestamps: true});
 export default CarPositionSchema;

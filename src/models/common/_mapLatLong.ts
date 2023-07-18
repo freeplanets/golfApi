@@ -9,6 +9,7 @@ export default class _mapLatLong implements mapLatLong {
 	@IsNumber()
 	@IsLongitude()
 	longitude: number;
+	
 	@ApiProperty({
 		description: '緯度',
 	})

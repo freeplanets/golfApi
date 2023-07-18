@@ -1,9 +1,10 @@
-import { defaultKey, defaultMethod, platformUser } from "../database/db.interface";
+import { carPositionHistory, defaultKey, defaultMethod, platformUser } from "../database/db.interface";
 import { ErrCode } from "../models/enumError";
 import { commonRes, commonResWithData } from "../models/if";
 import { errorMsg } from "./Errors";
 import {v4 as uuidv4} from 'uuid';
 import { JwtService } from "@nestjs/jwt";
+import CarPositionService from "src/database/carPosition/CarPosition.service";
 
 const jwt = new JwtService();
 const pfSite = 'union';
@@ -34,6 +35,35 @@ export async function FuncWithTockenCheck<D extends defaultKey>(token:string, F:
 	}
 	return resp;
 }
+export async function getCarTrack(token:string, service:CarPositionService, clubid:string, carid:string){
+	let resp:commonResWithData<carPositionHistory[]> = {
+		errcode: '0',		
+	}	
+	const user = tokenCheck(token);
+	if (user) {
+		try {
+			const key:Partial<carPositionHistory> = {
+				clubid: clubid,
+				carid: Number(carid),
+			}
+			console.log('getCarTrack:', key);
+			resp.data = await service.queryHistory(key);
+		} catch(e) {
+			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
+			resp.error = {
+				message: errorMsg('DATABASE_ACCESS_ERROR'),
+				extra: e,
+			}
+		}
+	} else {
+		resp.errcode = ErrCode.TOKEN_ERROR,
+		resp.error = {
+			message: errorMsg('TOKEN_ERROR'),
+		}		
+	}
+	return resp;	
+}
+
 export async function deleteTableData<D extends defaultKey>(token:string, dbservice:any, id:string) {
 	let resp:commonRes = {
 		errcode: '0',		
@@ -83,7 +113,7 @@ export async function deleteTableData<D extends defaultKey>(token:string, dbserv
 	}
 	return resp;	
 }
-export async function queryTable<D extends defaultKey>(token:string, dbservice:any, key: Partial<D>) {
+export async function queryTable<D extends defaultKey>(token:string, dbservice:any, key: Partial<D>, addClubid = false) {
 	let resp:commonResWithData<D[]> = {
 		errcode: '0',		
 	}	
@@ -91,6 +121,7 @@ export async function queryTable<D extends defaultKey>(token:string, dbservice:a
 	if (user) {
 		const service  = (dbservice as defaultMethod<D, defaultKey>);
 		try {
+			if (addClubid) key.clubid = user.siteid;
 			resp.data = await service.query(key);
 		} catch(e) {
 			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;

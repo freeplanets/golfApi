@@ -5,9 +5,9 @@ import _mapLatLong from "../common/_mapLatLong";
 
 export default class positionRequest implements carPosition {
 	@ApiProperty({
-		description: '來賓報到編組號碼',
+		description: 'hashkey',
 	})
-	groupid: string;
+	id: string;
 
 	@ApiProperty({
 		description: '球場代號'
@@ -39,5 +39,5 @@ export default class positionRequest implements carPosition {
 		description: '經緯度物件',
 		type: _mapLatLong,
 	})
-	position: mapLatLong;
+	location: mapLatLong;
 }

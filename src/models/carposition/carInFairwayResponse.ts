@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import commonResponse from "../common/commonResponse";
 import { commonResWithData } from "../if";
 import { carPosition } from "../../database/db.interface";
-import positionRequest from "./positionRequest";
+import positionRequest from "../manage/positionRequest";
 
 export default class carInFairwayResponse extends commonResponse implements commonResWithData<carPosition[]> {
 	@ApiProperty({

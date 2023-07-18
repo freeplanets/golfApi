@@ -5,6 +5,8 @@ import { AnyObject } from "../models/if";
 export interface defaultKey {
   id: string;
   clubid?: string;
+  zoneid?: string;
+  fairwayid?: number;
   ModifyID?: string;
 }
 export interface defaultMethod<T,K> {
@@ -94,22 +96,17 @@ export interface fairwayInfo extends defaultKey {
   greens?:greenObject[]; // 果嶺資料
   modifyID?:string; //修改人員代號
 }
-export interface carPosition {
-  groupid: string,
+export interface carPosition extends defaultKey {
   clubid: string;
   zoneid: string;
   fairwayid: number;
   carid: number;
-  position: mapLatLong;
+  location: mapLatLong;
 }
-export interface carPositionHistory {
-  groupid: string,
-  clubid: string;
-  zoneid: string;
-  fairwayid: number;
+export interface carPositionHistory extends defaultKey {
+  clubid: string,
   carid: number;
-  position: mapLatLong;
-  tm:number,
+  location: mapLatLong;
 }
 export interface stepIn {
   zoneid:string;
@@ -192,6 +189,18 @@ export interface partialResult {
   GroupID: string,
   scores: endScore,
   sideGameScores: endScore,
+}
+
+export interface courses extends defaultKey {
+  clubid:string;
+  name:string;
+  outZone:string;
+  inZone?:string;
+  Holes?:number;
+  Par?:number;
+  Type?:string;
+  Architect?:string;
+  OpenDate?:string;
 }
 
 export interface platformUser extends AnyObject {

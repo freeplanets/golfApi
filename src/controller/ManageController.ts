@@ -14,8 +14,8 @@ import fairwayInfoRequest from "../models/manage/fairwayInfoRequest";
 import { fairwayInfoEx, fairwayInfoResEx } from "../models/examples/manage/fairwayInfoEx";
 import fairwayInfoResponse from "../models/manage/fairwayInfoResponse";
 import positionRequest from "../models/manage/positionRequest";
-import { carInFairwayEx, carPositionEx } from "../models/examples/manage/carPositionEx";
-import carInFairwayResponse from "../models/manage/carInFairwayResponse";
+import { carInFairwayEx, carPositionEx } from "../models/examples/carposition/carPositionEx";
+import carInFairwayResponse from "../models/carposition/carInFairwayResponse";
 import Club from "../database/db.interface";
 
 @ApiBearerAuth()

@@ -1,17 +1,17 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
 import { commonResWithData } from "../../if";
 import { carPosition, mapLatLong } from "../../../database/db.interface";
-const position:mapLatLong = {
+const loc:mapLatLong = {
 	latitude: 121.479379,
 	longitude: 25.088817,
 }
 const carPositionExVal:carPosition = {
-	groupid: 'D12134356',
-	clubid: 'TW01',
-	zoneid: 'WEST',
+	id: '',
+	clubid: 'linkougolf',
+	zoneid: '01',
 	fairwayid: 1,
 	carid: 1,
-	position: position,
+	location: loc,
 }
 export const carPositionEx:Record<'Request', ExampleObject> = {
 	Request: {
