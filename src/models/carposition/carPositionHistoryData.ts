@@ -17,4 +17,9 @@ export default class carPositionHistoryData extends _defaultKeyWithClubId implem
 		type: _mapLatLong,
 	})
 	location: mapLatLong;
+
+	@ApiProperty({
+		description: '時間戳/timestamps'
+	})
+	ts?: string;
 }

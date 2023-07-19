@@ -18,6 +18,10 @@ const ZoneSchema = new Schema({
 	name: {
 		type: String,
 	},
+	tees: {
+		type: Array,
+		schema: [String],
+	},
 	Par: {
 		type: Number,
 		default: 36,

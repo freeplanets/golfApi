@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Headers, Param, Post } from "@nestjs/common";
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import CoursesService from "../../database/courses/courses.service";
 import { courses } from "../../database/db.interface";
 import { deleteTableData, modifyTableData, queryTable } from "../../function/Commands";
@@ -25,6 +25,7 @@ export default class CoursesController {
 
 	@Get('all/:clubid')
 	@ApiOperation({summary: '回傳球場球道組合', description:'回傳球場球道組合'})
+	@ApiParam({name:'clubid', description:'球場代號'})
 	@ApiResponse({status: 200, type: coursesResponse})
 	async listAll(@Param('clubid') clubid:string, @Headers('www-auth') token:Record<string, string>){
 		const resp = await queryTable(String(token), this.coursesService, { clubid: clubid });
@@ -33,6 +34,7 @@ export default class CoursesController {
 
 	@Delete(':id')
 	@ApiOperation({summary: '刪除球道組合', description:'刪除球道組合'})
+	@ApiParam({name:'id', description:'球道組合維一編碼/hashkey'})
 	@ApiResponse({status:200, type:commonResponse})
 	async removeData(@Param('id') id:string, @Headers('www-auth') token:Record<string, string>){
 		const resp = await deleteTableData(String(token), this.coursesService, id);

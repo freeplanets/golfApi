@@ -1,7 +1,7 @@
 import { Model, QueryResponse } from "nestjs-dynamoose";
 import { defaultMethod } from "../db.interface";
 
-export default abstract class defaultService<T, K> implements defaultMethod<T, K> {
+export default abstract class defaultService<T extends K, K> implements defaultMethod<T, K> {
 	constructor(protected model:Model<T, K>){}
 	create(data: T): Promise<T> {
 		return this.model.create(data);
@@ -15,10 +15,10 @@ export default abstract class defaultService<T, K> implements defaultMethod<T, K
 	findAll(): Promise<T[]> {
 		return this.model.scan().exec();
 	}
-	query(key: Partial<T>): Promise<QueryResponse<T>> {
+	query(key: Partial<K>): Promise<QueryResponse<T>> {
 		return this.model.query(key).exec();
 	}
-	delete(key: K): Promise<void> {
+	delete(key:K): Promise<void> {
 		return this.model.delete(key);
 	}
 }

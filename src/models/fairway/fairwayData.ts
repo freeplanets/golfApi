@@ -1,30 +1,18 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { fairwayInfo, mapObject } from "../../database/db.interface";
+import { fairwayInfo, greenObject, mapObject, tee } from "../../database/db.interface";
 import { IsNumber, IsString } from "class-validator";
 import _mapObject from "../common/_mapObject";
+import _defaultKeyWithFairwayId from "../common/_defaultKeyWithFairwayId";
+import _greenObject from "./_greenObject";
+import _teeObject from "./_teeObject";
 
-export default class fairwayInfoRequest implements fairwayInfo {
+export default class fairwayData extends _defaultKeyWithFairwayId  implements fairwayInfo {
 	@ApiProperty({
-		description: '球道 hashKey'
+		description:'T台',
+		isArray:true,
+		type: _teeObject,
 	})
-	id: string;
-	@ApiProperty({
-		description: '球場/俱樂部代號',
-	})
-	@IsString()
-	clubid: string;
-
-	@ApiProperty({
-		description: '區域代號',
-	})
-	@IsString()
-	zoneid: string;
-
-	@ApiProperty({
-		description: '球道號碼',
-	})
-	@IsNumber()
-	fairwayid: number;
+	tees: tee[];
 
 	@ApiProperty({
 		description: '標準桿桿數',
@@ -79,4 +67,11 @@ export default class fairwayInfoRequest implements fairwayInfo {
 		type: _mapObject,
 	})
 	fairwayMap?: mapObject;
+
+	@ApiProperty({
+		description:'果領資料',
+		isArray:true,
+		type: _greenObject,
+	})
+	greens?: greenObject[];
 }

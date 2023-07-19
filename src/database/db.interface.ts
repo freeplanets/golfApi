@@ -7,14 +7,15 @@ export interface defaultKey {
   clubid?: string;
   zoneid?: string;
   fairwayid?: number;
+  carid?:number;
   ModifyID?: string;
 }
-export interface defaultMethod<T,K> {
+export interface defaultMethod<T extends K,K> {
   create(data:T):Promise<T>;
   update(key:K, data:Partial<T>):Promise<T>;
   findOne(key:K):Promise<T>;
   findAll():Promise<T[]>;
-  query(key:Partial<T>):Promise<QueryResponse<T>>;
+  query(key:Partial<K>):Promise<QueryResponse<T>>;
   delete(key:K):Promise<void>;
 }
 
@@ -31,11 +32,17 @@ export default interface Club extends defaultKey {
 	phone?:string,	// 電話
 	website?:string, // 首頁網址
 }
+//發球台
+export interface Tee {
+  name:string,
+  distance?:number,
+}
 
 export interface Zone extends defaultKey {
   zoneid: string;
   clubid: string;
   name:string;
+  tees:string[];
   Par?:number;
   modifyID?:string;
   modifyTiime?:number;
@@ -43,10 +50,14 @@ export interface Zone extends defaultKey {
 
 export interface greenObject {
   sno:string;  //果嶺代號
-  topEdge:number; //距上邊界距離
-  leftEdge:number; //距左邊界距離
-  rightEdge:number; //距右邊界距離
-  bottomEdge:number; //距下邊界距離
+  topEdge?:number; //距上邊界距離
+  leftEdge?:number; //距左邊界距離
+  rightEdge?:number; //距右邊界距離
+  bottomEdge?:number; //距下邊界距離
+  assets:mapAssetObject[]; //球道上物件
+  width:number; //圖片寛度
+  height:number; //圖片高度
+  widthDistance:number; // 寛度的距離長度(米)
 }
 export interface mapLatLong {
   longitude:number; // 經度
@@ -85,11 +96,12 @@ export interface fairwayInfo extends defaultKey {
   clubid:string; // 球場/俱樂部代號																								
   zoneid:string; // 區域代號																								
   fairwayid:number; // 球道代號/序號																							
-  yellowTee?:number; // 金發球台距果嶺距離																								
-  blackTee?:number; // 黑發球台距果嶺距離																								
-  blueTee?:number;	// 藍發球台距果嶺距離																								
-  whiteTee?:number; // 白發球台距果嶺距離																								
-  redTee?:number; // 紅發球台距果嶺距離																								
+  // yellowTee?:number; // 金發球台距果嶺距離																								
+  // blackTee?:number; // 黑發球台距果嶺距離																								
+  // blueTee?:number;	// 藍發球台距果嶺距離																								
+  // whiteTee?:number; // 白發球台距果嶺距離																								
+  // redTee?:number; // 紅發球台距果嶺距離																								
+  tees: tee[];
   Par:number; // 標準桿桿數																								
   handicap:number; //	差點																								
   fairwayMap?:mapObject; // 球道圖資訊
@@ -107,6 +119,7 @@ export interface carPositionHistory extends defaultKey {
   clubid: string,
   carid: number;
   location: mapLatLong;
+  ts?:string;
 }
 export interface stepIn {
   zoneid:string;
@@ -201,6 +214,9 @@ export interface courses extends defaultKey {
   Type?:string;
   Architect?:string;
   OpenDate?:string;
+
+  slope?:number;
+  rate?:number;
 }
 
 export interface platformUser extends AnyObject {
@@ -245,3 +261,8 @@ export interface ItemObjectFromSchemaSettings {
   mapAttributes?: boolean;
 }
 */
+
+export interface tee {
+  name:string,
+  distance?:number,
+}

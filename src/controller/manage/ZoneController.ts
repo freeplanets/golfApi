@@ -1,5 +1,5 @@
 import { Body, Controller, Headers, Post, Get, Param, Delete } from "@nestjs/common";
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Zone } from "../../database/db.interface";
 import ZoneService from "../../database/zone/zone.service";
 import { deleteTableData, modifyTableData, queryTable } from "../../function/Commands";
@@ -69,6 +69,7 @@ export default class ZoneController {
 	
 	@Get('all/:clubid')
 	@ApiOperation({ summary: '回傳球場所有分區資料', description: '回傳球場所有分區資料'})
+	@ApiParam({name:'clubid', description:'球場代號'})
 	@ApiResponse({status: 200, description: '回傳物件', type: zoneAllResponse })
 	async listAll(@Param('clubid') clubid:string,@Headers('www-auth') token:Record<string, string>){
 		const resp = await this.query(String(token), clubid);
@@ -123,6 +124,7 @@ export default class ZoneController {
 
 	@Delete('/:id')
 	@ApiOperation({ summary: '刪除分區資料', description: '刪除分區資料'})
+	@ApiParam({name:'id', description:'分區維一編碼/hashkey'})
 	@ApiResponse({status: 200, description:'刪除分區回傳物件', type: commonResponse})
 	async removeData(@Param('id') id:string, @Headers('www-auth') token:Record<string, string>){
 		const resp = deleteTableData(String(token), this.zoneService, id);

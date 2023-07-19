@@ -1,15 +1,15 @@
 import { Body, Controller, Delete, Get, Headers, Param, Post } from "@nestjs/common";
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import FairwayService from "../../database/fairway/fairway.service";
 import { fairwayInfoEx } from "../../models/examples/manage/fairwayInfoEx";
-import fairwayInfoRequest from "../../models/manage/fairwayInfoRequest";
+import fairwayInfoRequest from "../../models/fairway/fairwayData";
 import commonResponse from "../../models/common/commonResponse";
 import { fairwayInfo } from "../../database/db.interface";
 import { deleteTableData, isMyClub, modifyTableData, tokenCheck } from "../../function/Commands";
 import { commonResWithData } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
-import fairwayInfoResponse from "../../models/manage/fairwayInfoResponse";
+import fairwayInfoResponse from "../../models/fairway/fairwayInfoResponse";
 
 @ApiBearerAuth()
 @ApiTags('Manage')
@@ -28,6 +28,7 @@ export default class FairwayController {
 
 	@Get(':clubid')
 	@ApiOperation({description: '傳回指定球場所有球道資料', summary: '傳回指定球場所有球道資料'})
+	@ApiParam({name:'clubid', description:'球場代號'})
 	@ApiResponse({status: 200, description:'回傳資料', type: fairwayInfoResponse})	
 	async getClubFairway(@Param('clubid') clubid:string, @Headers('www-auth') token:Record<string, string>){
 		const resp = await this.query(String(token), clubid);
@@ -36,6 +37,8 @@ export default class FairwayController {
 
 	@Get(':clubid/:zoneid')
 	@ApiOperation({description: '傳回指定分區所有球道資料', summary: '傳回指定分區所有球道資料'})
+	@ApiParam({name:'clubid', description:'球場代號'})
+	@ApiParam({name:'zoneid', description:'球場分區代號'})
 	@ApiResponse({status: 200, description:'回傳資料', type: fairwayInfoResponse})
 	async getZonefairway(@Param('clubid') clubid:string, @Param('zoneid') zoneid:string, @Headers('www-auth') token:Record<string, string>){
 		const resp = await this.query(String(token), clubid, zoneid);
@@ -44,6 +47,9 @@ export default class FairwayController {
 
 	@Get(':clubid/:zoneid/:fairwayid')
 	@ApiOperation({description: '傳回指定球道資料', summary: '傳回指定球道資料'})
+	@ApiParam({name:'clubid', description:'球場代號'})
+	@ApiParam({name:'zoneid', description:'球場分區代號'})
+	@ApiParam({name:'fairwayid', description: '球道編號'})	
 	@ApiResponse({status: 200, description:'回傳資料', type: fairwayInfoResponse})
 	async getfairway(@Param('clubid') clubid:string, @Param('zoneid') zoneid:string, @Param('fairwayid') fairwayid:string, @Headers('www-auth') token:Record<string, string>){
 		const fwayid = fairwayid ? Number(fairwayid) : 0;
@@ -52,7 +58,8 @@ export default class FairwayController {
 	}
 
 	@Delete('/:id')
-	@ApiOperation({ summary: '刪除分區資料', description: '刪除分區資料'})
+	@ApiOperation({ summary: '刪除球道資料', description: '刪除球道資料'})
+	@ApiParam({name:'id', description:'球道維一編碼/hashkey'})
 	@ApiResponse({status: 200, description:'刪除分區回傳物件', type: commonResponse})
 	async removeData(@Param('id') id:string, @Headers('www-auth') token:Record<string, string>){
 		const resp = deleteTableData(String(token), this.fairwayService, id);

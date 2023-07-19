@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { commonResWithData } from "../if";
 import { fairwayInfo } from "../../database/db.interface";
 import commonResponse from "../common/commonResponse";
-import fairwayInfoRequest from "./fairwayInfoRequest";
+import fairwayInfoRequest from "./fairwayData";
 
 export default class fairwayInfoResponse extends commonResponse implements commonResWithData<fairwayInfo[]> {
 	@ApiProperty({

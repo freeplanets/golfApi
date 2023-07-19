@@ -30,6 +30,13 @@ export default class zoneData implements Zone {
 	name: string;
 
 	@ApiProperty({
+		description: '所有T台種類',
+		isArray:true,
+		type: String,
+	})
+	tees: string[];
+
+	@ApiProperty({
 		description:'球場分區標準標',
 		required: false,
 	})

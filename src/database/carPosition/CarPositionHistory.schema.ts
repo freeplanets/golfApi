@@ -18,5 +18,5 @@ const CarPositionHistorySchema = new Schema({
 		type: Object,
 		schema: mapLatLong,
 	}
-}, {timestamps: {createdAt: null}});
+}, {timestamps: {createdAt: 'ts'}});
 export default CarPositionHistorySchema;

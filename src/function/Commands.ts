@@ -17,7 +17,7 @@ export function hashKey() {
 export function tokenCheck(token:string): platformUser | false {
 	const user = jwt.decode(token) as platformUser;
 	// console.log('tokenCheck:', user);
-	if (user.active) return user;
+	if (user && user.active) return user;
 	return false;
 }
 export async function FuncWithTockenCheck<D extends defaultKey>(token:string, F:Function) {
@@ -73,9 +73,9 @@ export async function deleteTableData<D extends defaultKey>(token:string, dbserv
 		if (user) {
 			const service = dbservice as defaultMethod<D, defaultKey>;
 			try {
-				const searchKey:defaultKey = {
-					id: id,
-				}
+				const searchKey = {
+					id: id
+				};
 				const f = await service.findOne(searchKey);
 				if (f) {
 					if (isMyClub(user, f.clubid)) {
@@ -171,6 +171,16 @@ export async function modifyTableData<D extends defaultKey>(token:string, dbserv
 					}
 				}				
 			} else {
+				if (data.carid) {
+					const skey = {
+						clubid: data.clubid,
+						carid: data.carid,
+					}
+					const f = await service.query(skey);
+					if (f.count > 0) {
+						await service.delete({id:f[0].id});
+					}
+				}
 				data.id = hashKey();
 				resp.data = await service.create(data);
 			}
