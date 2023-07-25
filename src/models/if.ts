@@ -2,6 +2,7 @@ import { UserType } from "./enum";
 
 export interface AnyObject {
   [key:string]: any;
+  modifyid?:string;
 }
 export interface signinReq {
   username:string;

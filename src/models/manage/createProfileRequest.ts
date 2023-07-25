@@ -8,11 +8,13 @@ export default class createProfileRequest extends updateManagerRequest implement
 		description: '球場代號',
 	})
 	ClubID: string;
+
 	@ApiProperty({
 		description: '密碼',
 		required: true,
 	})
 	password: string;
+	
 	@ApiProperty({
 		description:'管理人員類別',
 		enum: UserType,

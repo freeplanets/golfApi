@@ -1,6 +1,6 @@
 import { Schema } from "dynamoose";
 
-const mapLatLong = new Schema({
+const mapLatLongSchema = new Schema({
 	longitude: {
 		type: Number,
 	}, //	經度																					
@@ -8,4 +8,4 @@ const mapLatLong = new Schema({
 		type: Number,
 	}, // 緯度																						
 });
-export default mapLatLong;
+export default mapLatLongSchema;

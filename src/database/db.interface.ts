@@ -1,51 +1,71 @@
 import { QueryResponse } from "nestjs-dynamoose";
-import { HcpType, mapObjectType, sideGames } from "../models/enum";
+import { HcpType, mapAssetObjectType, sideGames } from "../models/enum";
 import { AnyObject } from "../models/if";
 
 export interface defaultKey {
-  id: string;
-  clubid?: string;
+  siteid?: string;
   zoneid?: string;
-  fairwayid?: number;
-  carid?:number;
-  ModifyID?: string;
+  // fairwayno?: number;
+  cartid?:string;
+  courseid?:string;
+  deviceid?:string;
+  gameid?:string;
+  modifyid?: string;
 }
-export interface defaultMethod<T extends K,K> {
+export interface defaultMethod<T extends K, K extends defaultKey> {
   create(data:T):Promise<T>;
-  update(key:K, data:Partial<T>):Promise<T>;
+  update(key:K, data:Partial<T>, cond?:Partial<T>):Promise<T>;
   findOne(key:K):Promise<T>;
   findAll():Promise<T[]>;
-  query(key:Partial<K>):Promise<QueryResponse<T>>;
+  query(key:Partial<T>):Promise<QueryResponse<T>>;
   delete(key:K):Promise<void>;
 }
 
-export default interface Club extends defaultKey {
-	//id 球場代號
-	name:string,	// 球場名稱
-	membership?:string, // 會員型態
-	numberOfHoles?:number, // 總洞數
-	address?:string, // 地址
-	city?:string, // 所在鄉鎮市
-	state?:string, // 所在城市/州(省)
-	country?:string, // 國家
-	postalCode?:string, // 郵遞區號
-	phone?:string,	// 電話
-	website?:string, // 首頁網址
-}
 //發球台
-export interface Tee {
-  name:string,
+export interface teeObject {
+  teeName:string;
+  teeColor:string;
   distance?:number,
 }
 
-export interface Zone extends defaultKey {
-  zoneid: string;
-  clubid: string;
-  name:string;
-  tees:string[];
-  Par?:number;
-  modifyID?:string;
-  modifyTiime?:number;
+export interface mapLatLong {
+  longitude:number; // 經度
+  latitude:number; // 緯度
+}
+export interface mapAssetObject {
+  name:string; //名稱	TRUE
+  type:mapAssetObjectType; // block,image,label,circle	物件類型	TRUE
+  show:boolean; // 顯示與否	TRUE
+  x:number; // x座標	TRUE
+  y:number; // y座標	TRUE
+  width?:number; // block寬	FALSE
+  height?:number; // block高	FALSE
+  icon?:string; // label圖示
+  color?:string; //	block顏色	FALSE
+  bgColor?:string; // 底色
+  borderColor?:string; // 邊框顏色
+  font?:string; // label字體(含大小)	FALSE
+  image:string; // 圖片	TRUE																				
+  label?:string; // 標籤文字i18n key	FALSE																				
+  circleRadius?:number; //	circle起始半徑	FALSE																				
+  circleColor?:string; // circle顏色	FALSE																				
+  circleDashline?:boolean; // circle 虛線	FALSE																				
+  circleGap?:number; // circle間距	FALSE																				
+  circleMax?:number; // circle最多幾個	FALSE																				
+}
+
+export interface mapObject {
+  image:string; //檔案位置																								
+  memo:string; //備註																								
+  topLeft?:mapLatLong; //左上																								
+  topRight?:mapLatLong; //右上																								
+  bottomLeft?:mapLatLong; //左下																								
+  bottomRight:mapLatLong; //右下																								
+  assets:	mapAssetObject[]; //球道上物件
+  width:number; //圖片寬度
+  height:number; //圖片高度
+  widthDistance:number; //寬度的距離長度(米)
+  heading:number; //方向
 }
 
 export interface greenObject {
@@ -58,101 +78,81 @@ export interface greenObject {
   width:number; //圖片寛度
   height:number; //圖片高度
   widthDistance:number; // 寛度的距離長度(米)
+  memo?:string; //備註
 }
-export interface mapLatLong {
-  longitude:number; // 經度
-  latitude:number; // 緯度
-}
-export interface mapAssetObject {
-  name:string; //名稱	TRUE																				
-  type:mapObjectType; //		block,image,label,circle	物件類型	TRUE																				
-  x:number; // x座標	TRUE																				
-  y:number; // y座標	TRUE																				
-  blockWidth?:number; // block寬	FALSE																				
-  blockHeight?:number; // block高	FALSE																				
-  blockColor?:string; //	block顏色	FALSE																				
-  show:boolean; // 顯示與否	TRUE																				
-  image:string; // 圖片	TRUE																				
-  labelText?:string; // 標籤文字i18n key	FALSE																				
-  labelFont?:string; // label字體(含大小)	FALSE																				
-  labelIcon?:string; // label圖示	FALSE																				
-  labelColor?:string; // label顏色	FALSE																				
-  circleRadius?:number; //	circle起始半徑	FALSE																				
-  circleColor?:string; // circle顏色	FALSE																				
-  circleDashline?:boolean; // circle 虛線	FALSE																				
-  circleGap?:number; // circle間距	FALSE																				
-  circleMax?:number; // circle最多幾個	FALSE																				
-}
-export interface mapObject {
-  src:string; //檔案位置																								
-  memo:string; //備註																								
-  topLeft:mapLatLong; //左上																								
-  topRight:mapLatLong; //右上																								
-  bottomLeft:mapLatLong; //左下																								
-  bottomRight:mapLatLong; //右下																								
-  assets:	mapAssetObject[]; //球道上物件																								
-}
-export interface fairwayInfo extends defaultKey {
-  clubid:string; // 球場/俱樂部代號																								
-  zoneid:string; // 區域代號																								
-  fairwayid:number; // 球道代號/序號																							
-  // yellowTee?:number; // 金發球台距果嶺距離																								
-  // blackTee?:number; // 黑發球台距果嶺距離																								
-  // blueTee?:number;	// 藍發球台距果嶺距離																								
-  // whiteTee?:number; // 白發球台距果嶺距離																								
-  // redTee?:number; // 紅發球台距果嶺距離																								
-  tees: tee[];
-  Par:number; // 標準桿桿數																								
+
+export interface fairwayObject {
+  fairwayno:number; // 球道代號/序號																							
+  tees: teeObject[];
+  par:number; // 標準桿桿數																								
   handicap:number; //	差點																								
   fairwayMap?:mapObject; // 球道圖資訊
   greens?:greenObject[]; // 果嶺資料
-  modifyID?:string; //修改人員代號
 }
+
+export interface zoneKey extends defaultKey {
+  zoneid:string;
+}
+
+export interface zones extends zoneKey {
+  siteid:string;
+  name:string;
+  tees:teeObject[];
+  fairways:fairwayObject[];
+  modifyID?:string;
+  modifyTime?:number;
+}
+
+export interface cartKey extends defaultKey {
+  cartid: string;
+}
+
+export interface carts extends cartKey {
+  cartName:string;
+  siteid:string;
+  zoneid?:string;
+  fairwayno?:number;
+  status:string;
+  location?:mapLatLong;
+  distance?:number;
+  loctm?:number;
+  deviceid?:string;
+  deviceName?:string;
+  deviceType?:string;
+}
+
+export interface deviceKey extends defaultKey {
+  deviceid: string;
+}
+
+export interface devices extends deviceKey {
+  deviceName: string;
+  deviceType: string;
+  status: string;
+  siteid: string;
+  cartid?: string;
+}
+
 export interface carPosition extends defaultKey {
-  clubid: string;
+  siteid: string;
   zoneid: string;
   fairwayid: number;
-  carid: number;
+  // cartid: number;
   location: mapLatLong;
 }
 export interface carPositionHistory extends defaultKey {
-  clubid: string,
+  siteid: string,
   carid: number;
   location: mapLatLong;
   ts?:string;
 }
-export interface stepIn {
-  zoneid:string;
-  fairwayid:number;
-}
-export interface playScore {
-  playerid:string;
-  gross:number;
-  SwingOrder?:number;
-}
-export interface holeScore {
-  zoneid:string;
-  fairwayid:number;
-  scores: playScore[],
-  PlayOrder:number,  
-}
-export interface holeScoreWithInfo extends holeScore {
-  Par:number;
-  Handicap:number;
-}
-export interface endScore {
-  gross: number,
-  holes: holeScoreWithInfo[],
-}
 
-export interface score extends playScore {
+export interface score {
+  holeNo:number;
   zoneid:string;
-  fairwayid:number;
-}
-
-export interface sideGameHcp {
-  playerid:string;
-  handicap:number;
+  fairwayno:number;
+  scores: number;
+  extraInfo?:AnyObject;
 }
 
 export interface sideGame {
@@ -165,28 +165,51 @@ export interface sideGame {
   scores:endScore;
 }
 
-export interface sideGamesData {
-  GroupID:string;
-  sideGames: sideGame[],
+export interface player {
+  playerName: string;
+  Hcp: string;
+  tee: string;
+  playerOrder:number;
+  gross:number;
+  holes: score[],
+  extra: AnyObject,
 }
-export interface gameZones {
-  out:string;
-  in:string;
+export interface playerDefault {
+  playerName: string;
+  tee?: string;
+  fullHcp: string;
+  allowance: number;
+  Hcp: string;
+  hcpRound: boolean;  
 }
-export interface client {
-  ID:string;
-  checkInID:string;
-  name:string;
-  swingOrder?:number;
+export interface caddie {
+  caddieid:string,
+  caddieName:string,
 }
-export interface checkInData extends sideGamesData{
-  ClubID:string;
-  // GroupID:string;
-  CarrieID?:string;
-  CarID?:string;
-  zones:gameZones;
-  players:client[];
-  start:stepIn;
+
+export interface gameKey extends defaultKey {
+  gameid:string;
+}
+export interface games extends gameKey {
+  siteid:string;
+  // from course data
+  courseid:string;
+  outZone:string;
+  inZone:string;
+  par:number;
+  rating:number;
+  slope:number;
+  // end from course data
+  cartid:string;
+  stepInZone:string;
+  stepInFairway:string;
+  esttimatedStartTime: number;
+  startTime: number;
+  endTime: number;
+  players: player[];
+  caddies: caddie[];
+  playerDefaults: ;
+  
   scores: endScore;
   // sideGames: sideGame[];
   position?:mapLatLong;
@@ -203,20 +226,22 @@ export interface partialResult {
   scores: endScore,
   sideGameScores: endScore,
 }
-
-export interface courses extends defaultKey {
-  clubid:string;
-  name:string;
+export interface courseKey extends defaultKey {
+  courseid: string;
+}
+export interface courses extends courseKey {
+  siteid:string;
+  courseName:string;
   outZone:string;
   inZone?:string;
-  Holes?:number;
-  Par?:number;
-  Type?:string;
-  Architect?:string;
-  OpenDate?:string;
-
+  holes:number;
+  par:number;
   slope?:number;
-  rate?:number;
+  rating?:number;
+  courseType?:string;
+  courseArchitect?:string;
+  courseOpenDate?:string;
+  openDate?:string;
 }
 
 export interface platformUser extends AnyObject {
@@ -261,8 +286,3 @@ export interface ItemObjectFromSchemaSettings {
   mapAttributes?: boolean;
 }
 */
-
-export interface tee {
-  name:string,
-  distance?:number,
-}

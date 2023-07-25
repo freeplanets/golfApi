@@ -13,7 +13,7 @@ export default class positionRequest implements carPosition {
 		description: '球場代號'
 	})
 	@IsString()
-	clubid: string;
+	siteid: string;
 	@ApiProperty({
 		description: '區域代號'
 	})
@@ -30,11 +30,6 @@ export default class positionRequest implements carPosition {
 	})
 	carid: number;
 
-	@ApiProperty({
-		description: '球車代號',
-	})
-	@IsNumber()
-	carID: number;	
 	@ApiProperty({
 		description: '經緯度物件',
 		type: _mapLatLong,

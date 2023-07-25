@@ -6,7 +6,7 @@ const CarPositionSchema = new Schema({
 		type: String,
 		hashKey: true,
 	},
-	clubid: {
+	siteid: {
 		type: String,
 		index: true,
 	},
@@ -14,7 +14,7 @@ const CarPositionSchema = new Schema({
 		type: String,
 		index: true,
 	},
-	fairwayid: {
+	fairwayno: {
 		type: Number,
 		index: true,
 	},

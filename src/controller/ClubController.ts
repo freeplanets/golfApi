@@ -21,7 +21,7 @@ export default class ClubController {
 	@ApiBody({description:'球場資料管理', type: clubInfoRequest, examples: clubInfoEx})
 	@ApiResponse({status: 200, description:'回傳物件', type: commonResponse})
 	async add(@Body() body:Club){
-		const token = Headers('www-auth');
+		const token = Headers('WWW-AUTH');
 		console.log(body, token);
 		const response:commonResWithData<Partial<Club>> = {
 			errcode: '0',

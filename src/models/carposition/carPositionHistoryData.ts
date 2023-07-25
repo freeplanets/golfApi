@@ -3,7 +3,7 @@ import _defaultKey from "../common/_defaultKey";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNumber } from "class-validator";
 import _mapLatLong from "../common/_mapLatLong";
-import _defaultKeyWithClubId from "../common/_defaultKeyWithClubId";
+import _defaultKeyWithClubId from "../common/_KeySiteId";
 
 export default class carPositionHistoryData extends _defaultKeyWithClubId implements carPositionHistory {
 	@ApiProperty({

@@ -9,7 +9,7 @@ export default class _mapObject implements mapObject {
 		description: '檔案位置',
 	})
 	@IsString()
-	src: string;
+	image: string;
 
 	@ApiProperty({
 		description: '備註',
@@ -47,4 +47,24 @@ export default class _mapObject implements mapObject {
 		type: _mapAssetObject,
 	})
 	assets: mapAssetObject[];
+
+	@ApiProperty({
+		description: '圖片寬度',
+	})
+	width: number;
+
+	@ApiProperty({
+		description: '圖片高度',
+	})
+	height: number;
+
+	@ApiProperty({
+		description: '寬度的距離長度(碼)',	
+	})
+	widthDistance: number;
+
+	@ApiProperty({
+		description: '方向',
+	})
+	heading: number;
 }

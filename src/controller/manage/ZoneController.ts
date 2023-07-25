@@ -1,133 +1,71 @@
-import { Body, Controller, Headers, Post, Get, Param, Delete } from "@nestjs/common";
+import { Body, Controller, Headers, Post, Get, Param, Delete, Put, Patch } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Zone } from "../../database/db.interface";
-import ZoneService from "../../database/zone/zone.service";
-import { deleteTableData, modifyTableData, queryTable } from "../../function/Commands";
-import zoneData from "../../models/zone/zoneData";
-import { zoneEx } from "../../models/examples/zone/zoneEx";
+import { zoneKey, zones } from "../../database/db.interface";
+import ZoneService from "../../database/zone/zones.service";
+import zoneData from "../../models/zone/zonesData";
+import { zoneEx, zonesResEx } from "../../models/examples/zone/zoneEx";
 import zoneModifyResponse from "../../models/zone/zoneModifyResponse";
-import zoneAllResponse from "../../models/zone/zoneAllResponse";
-import { commonResWithData } from "src/models/if";
-import { ErrCode } from "../../models/enumError";
-import { errorMsg } from "../../function/Errors";
 import commonResponse from "../../models/common/commonResponse";
+import zoneResponse from "../../models/zone/zoneResponse";
+import queryZonesRequest from "../../models/zone/queryZonesRequest";
+import { queryZonesRequestEx } from "../../models/examples/zone/queryZonesRequestEx";
+import zonesResponse from "../../models/zone/zonesResponse";
+import { createTableData, deleteTableData, getTableData, hashKey, queryTable, updateTableData } from "../../function/Commands";
 
 @ApiBearerAuth()
 @ApiTags('Manage')
-@Controller('manage/zone')
+@Controller('manage')
 export default class ZoneController {
 	constructor(private readonly zoneService:ZoneService){}
 
-	@Post('modify')
-	@ApiOperation({summary: '球道分區資料新增/修改', description: '球場分區資料新增/修改'})
-	@ApiBody({description: '球場分區管理', type: zoneData, examples: zoneEx})
+	@Put('zone')
+	@ApiOperation({summary: '球道分區資料新增', description: '球場分區資料新增'})
+	@ApiBody({description: '球道分區資料新增', type: zoneData, examples: zoneEx})
 	@ApiResponse({status: 200, description: '回傳物件', type: zoneModifyResponse })
-	async modify(@Body() body:Zone, @Headers('www-auth') token: Record<string, string> ){
-		// const token = Headers('www-auth');
-		const resp  = modifyTableData(String(token), this.zoneService, body);
+	async add(@Body() body:zones,@Headers('WWW-AUTH') token: Record<string, string>){
+		console.log('zone Put', body, token);
+		body.zoneid = hashKey();
+		const resp = await createTableData<zones, zoneKey>(String(token), this.zoneService, body);
 		return resp;
 	}
 
-	/*
-	@Get(':id')
-	@ApiResponse({status: 200, description: '回傳物件', type: zoneModifyResponse })
-	async getOne(@Param('id') id:string, @Headers('www-auth') token:Record<string, string>){
-		const resp:commonResWithData<Zone> = {
-			errcode: '0',
-		};
-		if (id) {
-			// const user = jwt.decode(String(token)) as platformUser;	
-			const user = tokenCheck(String(token))
-			if (user) {
-				try {
-					const searchKey:defaultKey = {
-						id: id,
-					};
-					resp.data = await this.zoneService.findOne(searchKey);
-				} catch(e) {
-					resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
-					resp.error = {
-						message: errorMsg('DATABASE_ACCESS_ERROR'),
-						extra: e,
-					}
-				}
-			} else {
-				resp.errcode = ErrCode.TOKEN_ERROR;
-				resp.error = {
-					message: errorMsg('TOKEN_ERROR'),
-				}
-			}
-		} else {
-			resp.errcode = ErrCode.MISS_PARAMETER;
-			resp.error = {
-				message: errorMsg('MISS_PARAMETER', 'id'),
-			}
+	@Patch('zone/:zoneid')
+	@ApiOperation({summary: '球道分區資料修改', description: '球場分區資料修改'})
+	@ApiParam({name:'zoneid', description:'球區代號'})
+	@ApiBody({description: '球道分區資料新增', type: zoneData, examples: zoneEx})
+	@ApiResponse({status: 200, description: '回傳物件', type: zoneModifyResponse, schema: {examples: zonesResEx} })
+	async update(@Param('zoneid') zoneid:string, @Body() body:Partial<zones>,@Headers('WWW-AUTH') token: Record<string, string>){
+		const keys = {
+			zoneid: zoneid,
 		}
-		return resp;
-	}
-	*/
-	
-	@Get('all/:clubid')
-	@ApiOperation({ summary: '回傳球場所有分區資料', description: '回傳球場所有分區資料'})
-	@ApiParam({name:'clubid', description:'球場代號'})
-	@ApiResponse({status: 200, description: '回傳物件', type: zoneAllResponse })
-	async listAll(@Param('clubid') clubid:string,@Headers('www-auth') token:Record<string, string>){
-		const resp = await this.query(String(token), clubid);
+		const resp = await updateTableData<zones, zoneKey>(String(token), this.zoneService, body, keys);
 		return resp;
 	}
 
-	async query(token:string, clubid: string) {
-		let resp:commonResWithData<Zone[]> = {
-			errcode: '0',
-		}
-		if (!clubid) {
-			resp.errcode = ErrCode.MISS_PARAMETER;
-			resp.error = {
-				message: errorMsg('MISS_PARAMETER', 'clubid'),
-			}
-		} else {
-			resp = await queryTable<Zone>(token, this.zoneService ,{clubid: clubid});
-		}
+	@Get('zone/:zoneid')
+	@ApiOperation({ summary: '回傳單筆球場分區資料', description: '回傳單筆球場分區資料'})
+	@ApiParam({name:'zoneid', description:'球區代號'})
+	@ApiResponse({status: 200, description: '回傳物件', type: zoneResponse })
+	async getOne(@Param('zoneid') zoneid:string,@Headers('WWW-AUTH') token:Record<string, string>){
+		const resp = await getTableData(String(token), this.zoneService, {zoneid: zoneid});
 		return resp;
-		/*
-		const user = tokenCheck(String(token));
-		if (user) {
-			console.log(clubid, user);
-			if (clubid && isMyClub(user, clubid)) {
-				try {
-					const keys:Partial<Zone> = {
-						clubid: clubid,
-					}
-					resp.data = await this.zoneService.query(keys);
-				} catch(e) {
-					resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
-					resp.error = {
-						message: errorMsg('DATABASE_ACCESS_ERROR'),
-						extra: e,
-					}					
-				}
-			} else {
-				resp.errcode = ErrCode.ERROR_PARAMETER,
-				resp.error = {
-					message: errorMsg('ERROR_PARAMETER', 'clubid'),
-				}
-			}
-		} else {
-			resp.errcode = ErrCode.TOKEN_ERROR;
-			resp.error = {
-				message: errorMsg('TOKEN_ERROR'),
-			}			
-		}
-		return resp;
-		*/
 	}
 
-	@Delete('/:id')
+	@Delete('zone/:zoneid')
 	@ApiOperation({ summary: '刪除分區資料', description: '刪除分區資料'})
-	@ApiParam({name:'id', description:'分區維一編碼/hashkey'})
+	@ApiParam({name:'zoneid', description:'球區代號'})
 	@ApiResponse({status: 200, description:'刪除分區回傳物件', type: commonResponse})
-	async removeData(@Param('id') id:string, @Headers('www-auth') token:Record<string, string>){
-		const resp = deleteTableData(String(token), this.zoneService, id);
+	async delete(@Param('zoneid') zoneid:string, @Headers('WWW-AUTH') token:Record<string, string>){
+		const resp = await deleteTableData(String(token), this.zoneService, {zoneid: zoneid});
+		return resp;
+	}
+
+	@Post('zone')
+	@ApiOperation({ summary: '回傳球場分區資料', description: '回傳球場分區資料'})
+	@ApiBody({description: '查詢球區修件', type: queryZonesRequest, examples: queryZonesRequestEx})
+	@ApiResponse({status: 200, description:'球區回傳物件', type: zonesResponse})
+	async query(@Body() body:Partial<zones>, @Headers('WWW-AUTH') token:Record<string, string>){
+		const resp = await queryTable(String(token), this.zoneService, body);
 		return resp;
 	}
 }

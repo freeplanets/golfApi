@@ -26,7 +26,7 @@ const awsOptions: DynamooseModuleOptions = {
 		create: true,
 		prefix: `golf-${process.env.STAGE}-`,
 		suffix: '',
-		throughput: 'ON_DEMAND',
+		// throughput: 'ON_DEMAND',
 	}
 }
 export default awsOptions;

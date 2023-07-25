@@ -45,7 +45,7 @@ export default class CarPositionService implements defaultMethod<carPosition, de
 	}
 	async getCarsInFairway(data:Partial<carPosition>):Promise<carPosition[]> {
 		const keys:Partial<carPosition> = {
-			clubid: data.clubid,
+			siteid: data.siteid,
 			zoneid: data.zoneid,
 			fairwayid: data.fairwayid,
 		}
@@ -54,7 +54,7 @@ export default class CarPositionService implements defaultMethod<carPosition, de
 	private createHistoryData(data:carPosition):carPositionHistory {
 		return {
 			id: hashKey(),
-			clubid: data.clubid,
+			siteid: data.siteid,
 			carid: data.carid,
 			location: data.location,
 		}

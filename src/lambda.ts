@@ -14,7 +14,7 @@ const authOption: SecuritySchemeObject = {
 	in: 'header',
 	scheme: 'bearer',
 	bearerFormat: 'JWT',
-	name: 'www-auth',
+	name: 'WWW-AUTH',
 }
 // const binaryMimeTypes: string[] = [];
 

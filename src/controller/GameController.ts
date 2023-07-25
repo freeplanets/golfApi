@@ -12,7 +12,7 @@ import { ReportType } from "../models/enum";
 import getResultResponse from "../models/game/getResultResponse";
 
 @ApiBearerAuth()
-@ApiHeader({name: 'www-auth', required:false})
+@ApiHeader({name: 'WWW-AUTH', required:false})
 @ApiTags('Game')
 @Controller('game')
 export default class GameController {
@@ -21,9 +21,9 @@ export default class GameController {
 	@ApiOperation({description: '取得當下來賓報到資料',summary: '取得當下來賓報到資料'})
 	@ApiResponse({status:200, description: '回傳當下來賓報到資料', type:checkInDataResponse})
 	getCurCheckInData(){
-		const token = Headers('www-auth');
+		const token = Headers('WWW-AUTH');
 		console.log('getCurcheckInData', token, checkDataEx.Response.value);
-		// res.setHeader('www-auth', token);
+		// res.setHeader('WWW-AUTH', token);
 		//res.status(200).json(checkDataEx.Response.value);
 		console.log(checkDataEx.Response.value);
 		return checkDataEx.Response.value;
@@ -34,7 +34,7 @@ export default class GameController {
 	@ApiBody({description: '小遊戲登錄', type:_sideGameData, examples: sideGameRegEx })
 	@ApiResponse({status: 200, description: '小遊戲登錄回傳物件', type: commonResponse})
 	sideGameRegister(@Body() body:sideGamesData){
-		const token = Headers('www-auth');
+		const token = Headers('WWW-AUTH');
 		console.log('sideGameRegister', body, token)
 		return commonResEx.Response.value;
 	}
@@ -44,7 +44,7 @@ export default class GameController {
 	@ApiBody({description: '', type: _swingResult, examples: swingResultEx})
 	@ApiResponse({status:200, description:'回傳目前結果', type:swingResultResponse})
 	updateGamePoint(@Body() body:swingResult){
-		const token = Headers('www-auth');
+		const token = Headers('WWW-AUTH');
 		console.log('updateGamePoint', body, token)
 		return partialResultEx.Response.value;
 	}
@@ -55,7 +55,7 @@ export default class GameController {
 	@ApiParam({name: 'GroupID', description:'組別編號', type: 'string'})
 	@ApiParam({name: 'ReportType', description: '報表型式', enum: ReportType})
 	getResult(@Param('GroupID') groupid:string, @Param('ReportType') reportType:ReportType){
-		const token = Headers('www-auth');
+		const token = Headers('WWW-AUTH');
 		console.log('sideGameRegister', groupid, reportType, token);
 		let rpt: any;
 		switch(reportType) {

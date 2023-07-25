@@ -1,18 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import InDataController from './controller/InDataController';
-import GameController from './controller/GameController';
 import { DynamooseModule, DynamooseModuleOptions } from 'nestjs-dynamoose';
 import awsOptions from './aws.info';
-import ZoneModule from './database/zone/zone.module';
-import ZoneController from './controller/manage/ZoneController';
-import FairwayModule from './database/fairway/fairway.module';
-import FairwayController from './controller/manage/FairwayController';
-import CarPositionModule from './database/carPosition/CarPosition.module';
-import CarPositionController from './controller/manage/CarPositionController';
-import CouresModule from './database/courses/courses.module';
-import CoursesController from './controller/manage/CoursesController';
+import { AppController } from './app.controller';
+import ZonesModule from './database/zone/zones.module';
+import CouresModule from './database/course/courses.module';
+import CartsModule from './database/cart/carts.module';
+import DevicesModule from './database/device/devices.module';
 
 let options:DynamooseModuleOptions = awsOptions;
 if(process.env.IS_OFFLINE) {
@@ -22,12 +16,14 @@ if(process.env.IS_OFFLINE) {
 @Module({
   imports: [
     DynamooseModule.forRoot(options),
-    ZoneModule,
-    FairwayModule,
+    ZonesModule,
+    // FairwayModule,
     CouresModule,
-    CarPositionModule,
+    // CarPositionModule,
+    CartsModule,
+    DevicesModule,
   ],
-  controllers: [AppController, ZoneController, FairwayController, InDataController, GameController, CoursesController, CarPositionController],
+  controllers: [AppController],
   providers: [ AppService ],
 })
 export class AppModule {}

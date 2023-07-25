@@ -7,7 +7,7 @@ const loc:mapLatLong = {
 }
 const carPositionExVal:carPosition = {
 	id: '',
-	clubid: 'linkougolf',
+	siteid: 'linkougolf',
 	zoneid: '01',
 	fairwayid: 1,
 	carid: 1,

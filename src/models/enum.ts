@@ -2,25 +2,25 @@ export enum UserType {
 	Manage = 'Manage',
 	Caddie = 'Caddie',
 }
-export enum mapObjectType {
+export enum mapAssetObjectType {
 	Block = 'block',
 	Image = 'image',
 	Label = 'label',
 	Circle = 'circle',
 }
 export enum sideGames {
-	Skin = 'Skin',
-	MatchPlay = 'MatchPlay',
-	StrokePlay = 'StrokePlay',
-	Nassau = 'Nassau',
-	Stableford = 'Stableford',
-	ModStableford = 'Mod Stableford',
-	Birdies = 'Birdies',
-	Eagles = 'Eagles',
-	Pars = 'Pars',
-	Sixes = 'Sixes',
-	LasVages = 'LasVages',
-	Hessein = 'Hessein',
+	SKIN = 'Skin',
+	MATCH_PLAY = 'MatchPlay',
+	STROKE_PLAY = 'StrokePlay',
+	NASSAU = 'Nassau',
+	STABLEFORD = 'Stableford',
+	MODIFIED_STABLEFORD = 'ModStableford',
+	BIRDIES = 'Birdies',
+	EAGLES = 'Eagles',
+	PARS = 'Pars',
+	SIXES = 'Sixes',
+	LAS_VEGAS = 'LasVages',
+	HESSEIN = 'Hessein',
 }
 export enum sideGamesTW {
 	SKIN = '逐洞賽',

@@ -1,14 +1,27 @@
 import { courses } from "src/database/db.interface";
-import _defaultKeyWithClubId from "../common/_defaultKeyWithClubId";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsDate, IsNumber, IsString } from "class-validator";
+import _KeySiteId from "../common/_KeySiteId";
 
-export default class courseData extends _defaultKeyWithClubId implements courses {
+export default class courseData implements courses {
+	@ApiProperty({
+		description: '球道組合代號',
+	})
+	@IsString()
+	courseid: string;
+
+	@ApiProperty({
+		description: '球場代號',
+		required: false,
+	})
+	@IsString()
+	siteid: string;
+
 	@ApiProperty({
 		description: '球道組合名稱',
 	})
 	@IsString()
-	name: string;
+	courseName: string;
 
 	@ApiProperty({
 		description: '起始區',
@@ -26,29 +39,41 @@ export default class courseData extends _defaultKeyWithClubId implements courses
 		description: '總洞數',
 	})
 	@IsNumber()
-  Holes:number;
+  holes: number;
 
 	@ApiProperty({
 		description: '標準桿',
 	})
 	@IsNumber()
-  Par?:number;
+  par: number;
+
+	@ApiProperty({
+		description: '斜度指數',
+	})
+	@IsNumber()
+	slope?: number;
+
+	@ApiProperty({
+		description: '難度指數',
+	})
+	@IsNumber()
+	rating?: number;
 
 	@ApiProperty({
 		description: '球道型態',
 	})
 	@IsString()
-  Type?:string;
+  courseType?:string;
 
 	@ApiProperty({
 		description: '球道設計師',
 	})
 	@IsString()
-  Architect?:string;
+  courseArchitect?:string;
 
 	@ApiProperty({
 		description: '開放日期',
 	})
 	@IsDate()
-  OpenDate?:string;
+  openDate?:string;
 }

@@ -2,16 +2,18 @@ import { carPositionHistory, defaultKey, defaultMethod, platformUser } from "../
 import { ErrCode } from "../models/enumError";
 import { commonRes, commonResWithData } from "../models/if";
 import { errorMsg } from "./Errors";
-import {v4 as uuidv4} from 'uuid';
+// import {v4 as uuidv4} from 'uuid';
 import { JwtService } from "@nestjs/jwt";
 import CarPositionService from "src/database/carPosition/CarPosition.service";
+
 
 const jwt = new JwtService();
 const pfSite = 'union';
 const pfSiteDev = 'union-dev';
+const uuid62 = require('uuid62');
 
 export function hashKey() {
-	return uuidv4();
+	return uuid62.v4() as string;
 }
 
 export function tokenCheck(token:string): platformUser | false {
@@ -20,13 +22,12 @@ export function tokenCheck(token:string): platformUser | false {
 	if (user && user.active) return user;
 	return false;
 }
-export async function FuncWithTockenCheck<D extends defaultKey>(token:string, F:Function) {
+export async function FuncWithTockenCheck<D>(token:string, P:Promise<D>) {
 	let resp:commonResWithData<D> = {
 		errcode: '0',		
 	}	
-	const user = tokenCheck(token);
-	if (user) {
-		resp = await F()
+	if (tokenCheck(token)) {
+		resp = await P.then();
 	} else {
 		resp.errcode = ErrCode.TOKEN_ERROR,
 		resp.error = {
@@ -35,7 +36,7 @@ export async function FuncWithTockenCheck<D extends defaultKey>(token:string, F:
 	}
 	return resp;
 }
-export async function getCarTrack(token:string, service:CarPositionService, clubid:string, carid:string){
+export async function getCarTrack(token:string, service:CarPositionService, siteid:string, carid:string){
 	let resp:commonResWithData<carPositionHistory[]> = {
 		errcode: '0',		
 	}	
@@ -43,7 +44,7 @@ export async function getCarTrack(token:string, service:CarPositionService, club
 	if (user) {
 		try {
 			const key:Partial<carPositionHistory> = {
-				clubid: clubid,
+				siteid: siteid,
 				carid: Number(carid),
 			}
 			console.log('getCarTrack:', key);
@@ -64,26 +65,23 @@ export async function getCarTrack(token:string, service:CarPositionService, club
 	return resp;	
 }
 
-export async function deleteTableData<D extends defaultKey>(token:string, dbservice:any, id:string) {
+export async function deleteTableData<D extends defaultKey>(token:string, dbservice:any, keys:defaultKey) {
 	let resp:commonRes = {
 		errcode: '0',		
 	}	
-	if (id) {
+	if (keys) {
 		const user = tokenCheck(token);
 		if (user) {
 			const service = dbservice as defaultMethod<D, defaultKey>;
 			try {
-				const searchKey = {
-					id: id
-				};
-				const f = await service.findOne(searchKey);
+				const f = await service.findOne(keys);
 				if (f) {
-					if (isMyClub(user, f.clubid)) {
-						await service.delete(searchKey);
+					if (isMyClub(user, f.siteid)) {
+						await service.delete(keys);
 					} else {
 						resp.errcode = ErrCode.ERROR_PARAMETER;
 						resp.error = {
-							message: errorMsg('ERROR_PARAMETER', 'clubid'),
+							message: errorMsg('ERROR_PARAMETER', 'siteid'),
 						}					
 					}
 				} else {
@@ -113,15 +111,15 @@ export async function deleteTableData<D extends defaultKey>(token:string, dbserv
 	}
 	return resp;	
 }
-export async function queryTable<D extends defaultKey>(token:string, dbservice:any, key: Partial<D>, addClubid = false) {
+export async function queryTable<D extends K, K>(token:string, dbservice:any, key: Partial<D>) {
 	let resp:commonResWithData<D[]> = {
 		errcode: '0',		
 	}	
 	const user = tokenCheck(token);
 	if (user) {
-		const service  = (dbservice as defaultMethod<D, defaultKey>);
+		const service  = (dbservice as defaultMethod<D, K>);
 		try {
-			if (addClubid) key.clubid = user.siteid;
+			// if (addClubid) key.siteid = user.siteid;
 			resp.data = await service.query(key);
 		} catch(e) {
 			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
@@ -138,51 +136,67 @@ export async function queryTable<D extends defaultKey>(token:string, dbservice:a
 	}
 	return resp;
 }
-export async function modifyTableData<D extends defaultKey>(token:string, dbservice:any, data:D):Promise<commonResWithData<D>> {
+export async function getTableData<D extends K, K extends defaultKey>(token:string, dbservice:any, keys:K):Promise<commonResWithData<D>> {
 	const resp:commonResWithData<D> = {
 		errcode: '0',		
 	}
 	const user = tokenCheck(token);
 	if (user) {
-		data.ModifyID = user.uid;
-		const service = (dbservice as defaultMethod<D, defaultKey>);
+		const service = (dbservice as defaultMethod<D, K>);
 		try {
-			let key:defaultKey;
-			if (data.id) {
-				key = {
-					id: data.id,
-				}
-				delete data.id;
-				const f = await service.findOne(key);
-				if (f) {
-					// 更改資料時檢查是否為同球場
-					if (isMyClub(user, f.clubid)) {
-						resp.data = await service.update(key, data);
-					} else { 
-						resp.errcode = ErrCode.ERROR_PARAMETER;
-						resp.error = {
-							message: errorMsg('ERROR_PARAMETER', 'clubid'),
-						}
-					}
-				} else {
-					resp.errcode = ErrCode.ITEM_NOT_FOUND;
-					resp.error = {
-						message: errorMsg('ITEM_NOT_FOUND'),
-					}
-				}				
+			console.log('findkey', keys);
+			const f = await service.findOne(keys);
+			if (f) {
+				// 更改資料時檢查是否為同球場
+					resp.data = f;
 			} else {
-				if (data.carid) {
-					const skey = {
-						clubid: data.clubid,
-						carid: data.carid,
-					}
-					const f = await service.query(skey);
-					if (f.count > 0) {
-						await service.delete({id:f[0].id});
+				resp.errcode = ErrCode.ITEM_NOT_FOUND;
+				resp.error = {
+					message: errorMsg('ITEM_NOT_FOUND'),
+				}
+			}
+		} catch (e) {
+			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
+			resp.error = {
+				message: errorMsg('DATABASE_ACCESS_ERROR'),
+				extra: e,				 
+			}
+			console.log(e);
+		}
+	} else {
+		resp.errcode = ErrCode.TOKEN_ERROR,
+		resp.error = {
+			message: errorMsg('TOKEN_ERROR'),
+		}
+	}
+	return resp;	
+}
+export async function updateTableData<D extends K, K extends defaultKey>(token:string, dbservice:any, data:Partial<D>, keys:K, filter?:Partial<D>):Promise<commonResWithData<D>> {
+	const resp:commonResWithData<D> = {
+		errcode: '0',		
+	}
+	const user = tokenCheck(token);
+	if (user) {
+		data.modifyid = user.uid;
+		const service = (dbservice as defaultMethod<D, K>);
+		try {
+			console.log('findkey', keys);
+			const f = await service.findOne(keys);
+			if (f) {
+				// 更改資料時檢查是否為同球場
+				if (isMyClub(user, f.siteid)) {
+					resp.data = await service.update(keys, data, filter);
+				} else { 
+					resp.errcode = ErrCode.ERROR_PARAMETER;
+					resp.error = {
+						message: errorMsg('ERROR_PARAMETER', 'siteid'),
 					}
 				}
-				data.id = hashKey();
-				resp.data = await service.create(data);
+			} else {
+				resp.errcode = ErrCode.ITEM_NOT_FOUND;
+				resp.error = {
+					message: errorMsg('ITEM_NOT_FOUND'),
+				}
 			}
 		} catch (e) {
 			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
@@ -201,9 +215,43 @@ export async function modifyTableData<D extends defaultKey>(token:string, dbserv
 	return resp;
 }
 
-export function isMyClub(user:platformUser, clubid:string):boolean {
+export async function createTableData<D extends K, K extends defaultKey>(token:string, dbservice:any, data:D):Promise<commonResWithData<D>> {
+	const resp:commonResWithData<D> = {
+		errcode: '0',		
+	}
+	const user = tokenCheck(token);
+	if (user) {
+		data.modifyid = user.uid;
+		const service = (dbservice as defaultMethod<D, K>);
+		try {
+			if (data.siteid){
+				resp.data = await service.create(data);
+			} else { 
+				resp.errcode = ErrCode.ERROR_PARAMETER;
+				resp.error = {
+					message: errorMsg('ERROR_PARAMETER', 'siteid'),
+				}
+			}
+		} catch (e) {
+			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
+			resp.error = {
+				message: errorMsg('DATABASE_ACCESS_ERROR'),
+				extra: e,				 
+			}
+			console.log(e);
+		}
+	} else {
+		resp.errcode = ErrCode.TOKEN_ERROR,
+		resp.error = {
+			message: errorMsg('TOKEN_ERROR'),
+		}
+	}
+	return resp;
+}
+
+export function isMyClub(user:platformUser, siteid:string):boolean {
 	let ans = false;
-	if (user.siteid === clubid ) {
+	if (user.siteid === siteid ) {
 		return true;
 	} else if (user.siteid === pfSiteDev || user.siteid === pfSite) {
 		return true;
