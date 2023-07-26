@@ -1,23 +1,27 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { HcpType, sideGames } from "../enum";
-import { endScore, sideGame, sideGameHcp } from "../../database/db.interface";
-import { IsBoolean, IsString } from "class-validator";
-import _sideGameHcp from "./_sideGameHcp";
-import _endScore from "./_endScore";
+import { playerGameData, sideGame } from "../../database/db.interface";
+import { IsString } from "class-validator";
+// import _sideGameHcp from "./_sideGameHcp";
+// import _endScore from "./_endScore";
 
 export default class _sideGame implements sideGame {
 	@ApiProperty({
 		description: '小遊戲名稱',
 	})
 	@IsString()
-	name: sideGames;
+	sideGameName: sideGames;
 
 	@ApiProperty({
 		description: '差點採用方法',
 		enum: HcpType,
 		enumName: '差點選項',
 	})
-	HcpType: HcpType;
+	hcpType: HcpType;
+	format: string;
+	wager: number;
+	wagerMax?: number;
+	playerGameData: playerGameData[];
 	/*
 	@ApiProperty({
 		description: '是否採用差點',
@@ -40,17 +44,4 @@ export default class _sideGame implements sideGame {
 	@IsBoolean()
 	HcpDiff: boolean;
 	*/
-
-	@ApiProperty({
-		description: '各來賓差點',
-		isArray: true,
-		type: _sideGameHcp,
-	})
-	Hcps: sideGameHcp[];
-
-	@ApiProperty({
-		description: '結果',
-		type: _endScore,
-	})
-	scores: endScore;
 }

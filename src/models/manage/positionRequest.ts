@@ -4,6 +4,8 @@ import { IsNumber, IsString } from "class-validator";
 import _mapLatLong from "../common/_mapLatLong";
 
 export default class positionRequest implements carPosition {
+	cartid: string;
+	fairwayno: number;
 	@ApiProperty({
 		description: 'hashkey',
 	})

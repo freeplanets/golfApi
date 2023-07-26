@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { InDataExtra, player, tee } from "./checkin.interface";
+import { checkinExtra, player, tee } from "./checkin.interface";
 import { IsString } from "class-validator";
 import _tee from "./_tee";
 import _extra from "./_extra";
@@ -19,5 +19,5 @@ export default class _player implements player {
 		description: '來賓資料',
 		type: _extra,
 	})
-	extra: InDataExtra;
+	extra: checkinExtra;
 }

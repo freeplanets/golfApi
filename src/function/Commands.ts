@@ -1,10 +1,9 @@
-import { carPositionHistory, defaultKey, defaultMethod, platformUser } from "../database/db.interface";
+import { defaultKey, defaultMethod, platformUser } from "../database/db.interface";
 import { ErrCode } from "../models/enumError";
 import { commonRes, commonResWithData } from "../models/if";
 import { errorMsg } from "./Errors";
 // import {v4 as uuidv4} from 'uuid';
 import { JwtService } from "@nestjs/jwt";
-import CarPositionService from "src/database/carPosition/CarPosition.service";
 
 
 const jwt = new JwtService();
@@ -36,35 +35,6 @@ export async function FuncWithTockenCheck<D>(token:string, P:Promise<D>) {
 	}
 	return resp;
 }
-export async function getCarTrack(token:string, service:CarPositionService, siteid:string, carid:string){
-	let resp:commonResWithData<carPositionHistory[]> = {
-		errcode: '0',		
-	}	
-	const user = tokenCheck(token);
-	if (user) {
-		try {
-			const key:Partial<carPositionHistory> = {
-				siteid: siteid,
-				carid: Number(carid),
-			}
-			console.log('getCarTrack:', key);
-			resp.data = await service.queryHistory(key);
-		} catch(e) {
-			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
-			resp.error = {
-				message: errorMsg('DATABASE_ACCESS_ERROR'),
-				extra: e,
-			}
-		}
-	} else {
-		resp.errcode = ErrCode.TOKEN_ERROR,
-		resp.error = {
-			message: errorMsg('TOKEN_ERROR'),
-		}		
-	}
-	return resp;	
-}
-
 export async function deleteTableData<D extends defaultKey>(token:string, dbservice:any, keys:defaultKey) {
 	let resp:commonRes = {
 		errcode: '0',		

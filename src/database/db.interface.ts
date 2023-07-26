@@ -133,14 +133,14 @@ export interface devices extends deviceKey {
   cartid?: string;
 }
 
-export interface carPosition extends defaultKey {
+export interface carPosition extends cartKey {
   siteid: string;
   zoneid: string;
-  fairwayid: number;
+  fairwayno: number;
   // cartid: number;
   location: mapLatLong;
 }
-export interface carPositionHistory extends defaultKey {
+export interface carPositionHistory extends cartKey {
   siteid: string,
   carid: number;
   location: mapLatLong;
@@ -151,23 +151,32 @@ export interface score {
   holeNo:number;
   zoneid:string;
   fairwayno:number;
-  scores: number;
+  gross: number;
   extraInfo?:AnyObject;
 }
 
+export interface playerGameData {
+  selected:boolean;
+  playerName: string;
+  hcp:string
+  betterballGroup:string;
+  points:number;
+  holes:score[];
+}
+
 export interface sideGame {
-  name:sideGames; 
-  //NoHcp:boolean;
-  //FullHcp:boolean;
-  //HcpDiff:boolean;
-  HcpType: HcpType;
-  Hcps:sideGameHcp[];
-  scores:endScore;
+  sideGameName:sideGames;
+  format:string | null;
+  wager:number;
+  wagerMax?:number;
+  carryOver?:boolean;
+  hcpType: HcpType;
+  playerGameData:playerGameData[]; 
 }
 
 export interface player {
   playerName: string;
-  Hcp: string;
+  hcp: string;
   tee: string;
   playerOrder:number;
   gross:number;
@@ -179,7 +188,7 @@ export interface playerDefault {
   tee?: string;
   fullHcp: string;
   allowance: number;
-  Hcp: string;
+  hcp: string;
   hcpRound: boolean;  
 }
 export interface caddie {
@@ -200,7 +209,7 @@ export interface games extends gameKey {
   rating:number;
   slope:number;
   // end from course data
-  cartid:string;
+  carts:string[];
   stepInZone:string;
   stepInFairway:string;
   esttimatedStartTime: number;
@@ -208,24 +217,10 @@ export interface games extends gameKey {
   endTime: number;
   players: player[];
   caddies: caddie[];
-  playerDefaults: ;
-  
-  scores: endScore;
-  // sideGames: sideGame[];
-  position?:mapLatLong;
-  inTimestamp?:number;
+  playerDefaults: playerDefault[];
+  sideGames:sideGame[];
 }
 
-export interface swingResult {
-  GroupID:string,
-  scores: holeScore[],
-}
-
-export interface partialResult {
-  GroupID: string,
-  scores: endScore,
-  sideGameScores: endScore,
-}
 export interface courseKey extends defaultKey {
   courseid: string;
 }

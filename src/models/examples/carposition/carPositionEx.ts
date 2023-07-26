@@ -6,11 +6,10 @@ const loc:mapLatLong = {
 	longitude: 25.088817,
 }
 const carPositionExVal:carPosition = {
-	id: '',
+	cartid: 'cartid',
 	siteid: 'linkougolf',
 	zoneid: '01',
-	fairwayid: 1,
-	carid: 1,
+	fairwayno: 1,
 	location: loc,
 }
 export const carPositionEx:Record<'Request', ExampleObject> = {

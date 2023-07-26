@@ -1,7 +1,7 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
-import { InDataTw01 } from "./checkin.interface";
+import { checkinLinkouGolf } from "./checkin.interface";
 
-const inDataExVal:InDataTw01 = {
+const inDataExVal:checkinLinkouGolf = {
 	caddie: { number: '01'},
 	zones: [
 		{number:0},

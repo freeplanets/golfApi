@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { mapAssetObject } from "../../database/db.interface";
-import { IsBoolean, IsLocale, IsNumber, IsString } from "class-validator";
-import { mapObjectType } from "../enum";
+import { IsBoolean, IsNumber, IsString } from "class-validator";
+import { mapAssetObjectType } from "../enum";
 
 export default class _mapAssetObject implements mapAssetObject {
 	@ApiProperty({
@@ -9,12 +9,15 @@ export default class _mapAssetObject implements mapAssetObject {
 	})
 	@IsString()
 	name: string;
+	
 	@ApiProperty({
 		description: '物件類型',
-		enum: mapObjectType,
+		enum: mapAssetObjectType,
 	})
 	@IsString()
-	type: mapObjectType;
+	type: mapAssetObjectType;
+	
+
 	@ApiProperty({
 		description: 'x座標',
 	})

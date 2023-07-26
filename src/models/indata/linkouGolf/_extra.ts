@@ -1,8 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { InDataExtra } from "./checkin.interface";
+import { checkinExtra } from "./checkin.interface";
 import { IsString } from "class-validator";
 
-export default class _extra implements InDataExtra {
+export default class _extra implements checkinExtra {
 	@ApiProperty({
 		description: '來賓代號',
 	})

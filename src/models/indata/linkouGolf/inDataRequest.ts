@@ -1,11 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { InDataTw01, caddie, player, zone } from "./checkin.interface";
+import { checkinLinkouGolf, caddie, player, zone } from "./checkin.interface";
 import _caddie from "./_caddie";
 import _zone from "./_zone";
 import _player from "./_player";
 import { IsNumber } from "class-validator";
 
-export default class inDataRequest implements InDataTw01 {
+export default class inDataRequest implements checkinLinkouGolf {
 	@ApiProperty({
 		description: '第一位桿弟資料',
 		type: _caddie,

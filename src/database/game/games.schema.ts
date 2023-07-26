@@ -12,13 +12,13 @@ const GamesSchema = new Schema({
         name: 'siteidcourseidGlobalIndex',
 				type: 'global',
         // global: true,
-        rangeKey: 'courseid'
+        rangeKey: 'courseid',
       },
       {
-        name: 'siteidcartidGlobalIndex',
+        name: 'siteidesttimatedstarttimeGlobalIndex',
 				type: 'global',
         // global: true,
-        rangeKey: 'cartid'
+        rangeKey: 'esttimatedStartTime',
       }
     ]
   },
@@ -41,12 +41,9 @@ const GamesSchema = new Schema({
   stepInFairway: {
     type: Number
   },
-  cartid: {
-    type: String,
-    index: {
-			type: 'global',
-      // global: true
-    }
+  carts: {
+    type: Array,
+    schema: String,
   },
   par: {
     type: Number
@@ -179,10 +176,12 @@ const GamesSchema = new Schema({
             type: Number
           },
           wagerMax: {
-            type: Number
+            type: Number,
+            required: false,
           },
           carryOver: {
-            type: Boolean
+            type: Boolean,
+            required: false,
           },
           hcpType: {
             type: String
@@ -199,7 +198,7 @@ const GamesSchema = new Schema({
                   playerName: {
                     type: String
                   },
-                  handicap: {
+                  hcp: {
                     type: String
                   },
                   betterballGroup: {

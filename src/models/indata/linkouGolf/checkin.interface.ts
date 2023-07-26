@@ -1,13 +1,15 @@
+import { AnyObject } from "src/models/if";
+
 export interface caddie {
   number: string;
 }
-export interface zones {
+export interface zone {
   number: number;
 }
 export interface tee {
   name: string;
 }
-export interface checkinExtra {
+export interface checkinExtra extends AnyObject {
   memberId: string;
   checkInId: string;
 }
@@ -19,7 +21,7 @@ export interface player {
 export interface checkinLinkouGolf {
   caddie: caddie;
   caddie2?: caddie;
-	zones: zones[];
+	zones: zone[];
 	players: player[];
 	teeOffTimestamp: number;
 }
