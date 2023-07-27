@@ -1,5 +1,5 @@
 import { QueryResponse } from "nestjs-dynamoose";
-import { HcpType, mapAssetObjectType, sideGames } from "../models/enum";
+import { HcpType, mapAssetObjectType, sideGameFormat, sideGameGroup, sideGames } from "../models/enum";
 import { AnyObject } from "../models/if";
 
 export interface defaultKey {
@@ -159,14 +159,14 @@ export interface playerGameData {
   selected:boolean;
   playerName: string;
   hcp:string
-  betterballGroup:string;
+  betterballGroup:sideGameGroup;
   points:number;
   holes:score[];
 }
 
 export interface sideGame {
   sideGameName:sideGames;
-  format:string | null;
+  format:sideGameFormat | null;
   wager:number;
   wagerMax?:number;
   carryOver?:boolean;
@@ -181,7 +181,7 @@ export interface player {
   playerOrder:number;
   gross:number;
   holes: score[],
-  extra: AnyObject,
+  extra?: AnyObject,
 }
 export interface playerDefault {
   playerName: string;
@@ -193,7 +193,7 @@ export interface playerDefault {
 }
 export interface caddie {
   caddieid:string,
-  caddieName:string,
+  caddieName?:string,
 }
 
 export interface gameKey extends defaultKey {
@@ -201,17 +201,15 @@ export interface gameKey extends defaultKey {
 }
 export interface games extends gameKey {
   siteid:string;
-  // from course data
   courseid:string;
   outZone:string;
   inZone:string;
   par:number;
   rating:number;
   slope:number;
-  // end from course data
   carts:string[];
   stepInZone:string;
-  stepInFairway:string;
+  stepInFairway:number;
   esttimatedStartTime: number;
   startTime: number;
   endTime: number;

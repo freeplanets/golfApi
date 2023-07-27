@@ -1,75 +1,30 @@
-import { UserType } from "./enum";
+import { mapLatLong } from "src/database/db.interface";
 
 export interface AnyObject {
-  [key:string]: any;
   modifyid?:string;
+  memberid?:string;
+  checkInId?:string;
+  [key:string]: any;
 }
-export interface signinReq {
-  username:string;
-  password:string;
-  reCAPTCHAToken:string;
-}
-export interface commonRes {
-  errcode:string;
-  error?:errObj;
-}
-export interface commonResWithData<D> extends commonRes {
-  data?:D;
-}
+
 export interface errObj {
   message: string;
   extra?: AnyObject;
 }
-export interface reToken {
-  refreshToken: string; 
+
+export interface commonRes {
+  errcode:string;
+  error?:errObj;
 }
-export interface rstToken {
-  resetToken: string;
+
+export interface commonResWithData<D> extends commonRes {
+  data?:D;
 }
-export interface tokenObj {
-  token?: string;
-  refreshToken?: string;
-}
-export interface signinResData {
-  tokens?: tokenObj;
-  twofaqrcode?:string;
-  needfa?:boolean;
-}
-export interface verify2fa {
-  twoFAcode: string;
-}
-export interface forgetPassword {
-  username: string;
-  mobile: string;
-}
-export interface resetPassword extends rstToken {
-  smsCode:string;
-  newPassword:string;
-}
-export interface updatePassword {
-  oldPassword:string;
-  newPassword:string;
-  newPassword2:string;
-}
-export interface reset2FA {
-  password:string;
-}
-export interface timeSection {
-  start:string;
-  end:string;
-}
-export interface createManager extends updateManager {
-  ClubID:string;
-  password:string;
-  userType: UserType;
-}
-export interface updateManager {
-  account:string;
-  nickname?:string;
-  password?:string;
-  title?:string;
-  userType?:UserType;
-  workSection?:timeSection;
-  mobile?:string;
-  enable2FA?:boolean;
+
+export interface positonReq {
+  cartid:string; // 球車代號	TRUE
+  zoneid:string; // 分區代號
+  fairwayno:number; //球道代號	TRUE
+  position:mapLatLong; // 經緯度物件	TRUE																				
+  distance:number; // 離發球區距離																					  
 }

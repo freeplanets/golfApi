@@ -20,7 +20,7 @@ export default class DeviceController {
 	@ApiBody({description: '裝置資料新增', type: deviceData, examples: deviceEx})
 	@ApiResponse({status: 200, description: '回傳物件', type: deviceReponse })
 	async add(@Body() body:devices,@Headers('WWW-AUTH') token: Record<string, string>){
-		console.log('device Put', body, token);
+		// console.log('device Put', body, token);
 		body.deviceid = hashKey();
 		const resp = await createTableData<devices, deviceKey>(String(token), this.devicesService, body);
 		return resp;

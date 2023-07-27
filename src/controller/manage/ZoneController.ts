@@ -23,7 +23,7 @@ export default class ZoneController {
 	@ApiBody({description: '球道分區資料新增', type: zoneData, examples: zoneEx})
 	@ApiResponse({status: 200, description: '回傳物件', type: zoneModifyResponse })
 	async add(@Body() body:zones,@Headers('WWW-AUTH') token: Record<string, string>){
-		console.log('zone Put', body, token);
+		// console.log('zone Put', body, token);
 		body.zoneid = hashKey();
 		const resp = await createTableData<zones, zoneKey>(String(token), this.zoneService, body);
 		return resp;

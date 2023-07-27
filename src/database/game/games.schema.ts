@@ -154,7 +154,8 @@ const GamesSchema = new Schema({
             type: String
           },
           hcpRound: {
-            type: Boolean
+            type: Boolean,
+            default: false,
           }
         }
       }

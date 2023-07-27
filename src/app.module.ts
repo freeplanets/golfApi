@@ -7,6 +7,7 @@ import ZonesModule from './database/zone/zones.module';
 import CouresModule from './database/course/courses.module';
 import CartsModule from './database/cart/carts.module';
 import DevicesModule from './database/device/devices.module';
+import DataTransController from './controller/api/DataTransController';
 
 let options:DynamooseModuleOptions = awsOptions;
 if(process.env.IS_OFFLINE) {
@@ -23,7 +24,7 @@ if(process.env.IS_OFFLINE) {
     CartsModule,
     DevicesModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, DataTransController],
   providers: [ AppService ],
 })
 export class AppModule {}

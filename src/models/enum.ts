@@ -46,3 +46,13 @@ export enum HcpType {
   HcpDiff = 'HcpDiff',
 	Handicap = 'Handicap',
 }
+export enum sideGameGroup {
+	NONE = '',
+	A = 'A',
+	B = 'B',
+}
+export enum sideGameFormat {
+	individual = 'individual',
+	betterball = 'better ball', 
+	team = 'team',
+}
