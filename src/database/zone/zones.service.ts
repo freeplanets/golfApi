@@ -6,7 +6,7 @@ import defaultService from "../common/defaultService";
 @Injectable()
 export default class ZonesService extends defaultService<zones, zoneKey> {
 	constructor(
-		@InjectModel('Zone')
+		@InjectModel('Zones')
 		private zoneModel:Model<zones, zoneKey>,
 	){
 		super(zoneModel);

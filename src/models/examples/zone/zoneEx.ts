@@ -1,5 +1,5 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
-import { teeObject, zones } from "../../../database/db.interface";
+import { fairwayObject, teeObject, zones } from "../../../database/db.interface";
 import { fairwayInfoEx } from "./fairwayInfoEx";
 import { commonResWithData } from "src/models/if";
 const tee1:teeObject = {
@@ -19,7 +19,8 @@ const zoneExVal:Partial<zones> = {
 	name: 'West',
 	siteid: 'linkougolf',
 	tees: [tee1, tee2, tee3],
-	fairways:[fairwayInfoEx.Request.value],
+	fairways: createFairways(),
+	refNo: 0,
 }
 const zonesResExVal:commonResWithData<Partial<zones>> = {
 	errcode: '0',
@@ -38,4 +39,14 @@ export const zonesResEx:Record<'Response', ExampleObject> = {
 	Response: {
 		value: zonesResExVal,
 	}
+}
+
+function createFairways():fairwayObject[] {
+	const fways:fairwayObject[]=[];
+	for (let i=0; i<9; i+=1) {
+		const fway:fairwayObject = { ...fairwayInfoEx.Request.value };
+		fway.fairwayno = i + 1;
+		fways.push(fway);
+	}
+	return fways;
 }

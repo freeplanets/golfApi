@@ -37,4 +37,9 @@ export default class zonesData implements zones {
 		type: _fairwayObject
 	})
 	fairways: fairwayObject[];
+
+	@ApiProperty({
+		description: '球場參照編號',
+	})
+	refNo: number;
 }

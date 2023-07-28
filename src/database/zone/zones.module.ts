@@ -7,7 +7,7 @@ import ZonesService from "./zones.service";
 @Module({
 	imports:[
 		DynamooseModule.forFeature([{
-			name: 'Zone',
+			name: 'Zones',
 			schema: ZonesSchema,
 			options: {
 				throughput: 'ON_DEMAND',

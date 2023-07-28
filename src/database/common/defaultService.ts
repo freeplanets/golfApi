@@ -1,6 +1,7 @@
 import { Model, QueryResponse } from "nestjs-dynamoose";
 import { defaultKey, defaultMethod } from "../db.interface";
 import { Condition } from "dynamoose";
+import { ConditionInitializer } from "dynamoose/dist/Condition";
 
 export default abstract class defaultService<T extends K, K extends defaultKey> implements defaultMethod<T, K> {
 	constructor(protected model:Model<T, K>){}
@@ -30,5 +31,15 @@ export default abstract class defaultService<T extends K, K extends defaultKey> 
 	}
 	delete(key:K): Promise<void> {
 		return this.model.delete(key);
+	}
+	queryWithCondition(cond:ConditionInitializer, field?:string[]):Promise<QueryResponse<T>>{
+		const query = this.model.query(cond);
+		if (field && field.length > 0) {
+			query.attributes(['zoneid','refNo']);
+		}
+		return query.exec();
+	}
+	getModel() {
+		return this.model;
 	}
 }

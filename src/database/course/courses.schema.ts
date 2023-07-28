@@ -16,10 +16,15 @@ const CoursesSchema = new Schema({
     type: String
   },
   outZone: {
-    type: String
+    type: String,
+    index: {
+      name: 'outzoneinzoneGlobalIndex',
+      type: 'global',
+      rangeKey: 'inZone',
+    }
   },
   inZone: {
-    type: String
+    type: String,
   },
   holes: {
     type: Number

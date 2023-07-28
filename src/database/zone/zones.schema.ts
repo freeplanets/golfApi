@@ -8,17 +8,15 @@ const ZonesSchema = new Schema({
   siteid: {
     type: String,
     index: {
+      // name : 'siteidrefnoGlobalIndex',
 			type: 'global',
+      // rangeKey: 'refNo',
       // global: true,
     }
   },
   name: {
     type: String,
   },
-	modifyid: {
-		type: String,
-		required: false,
-	},
   tees: {
     type: Array,
     schema: [
@@ -313,7 +311,14 @@ const ZonesSchema = new Schema({
         }
       }
     ]
-  }
+  },
+  refNo: {
+    type: Number,
+  },
+  modifyid: {
+		type: String,
+		required: false,
+	},
 }, { 
 timestamps: true, 
 saveUnknown: false })

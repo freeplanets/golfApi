@@ -99,6 +99,7 @@ export interface zones extends zoneKey {
   name:string;
   tees:teeObject[];
   fairways:fairwayObject[];
+  refNo:number;
   modifyID?:string;
   modifyTime?:number;
 }

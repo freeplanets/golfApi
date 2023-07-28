@@ -8,6 +8,7 @@ import CouresModule from './database/course/courses.module';
 import CartsModule from './database/cart/carts.module';
 import DevicesModule from './database/device/devices.module';
 import DataTransController from './controller/api/DataTransController';
+import GamesModule from './database/game/games.module';
 
 let options:DynamooseModuleOptions = awsOptions;
 if(process.env.IS_OFFLINE) {
@@ -17,14 +18,15 @@ if(process.env.IS_OFFLINE) {
 @Module({
   imports: [
     DynamooseModule.forRoot(options),
-    ZonesModule,
+    // ZonesModule,
     // FairwayModule,
-    CouresModule,
+    // CouresModule,
     // CarPositionModule,
     CartsModule,
     DevicesModule,
+    GamesModule,
   ],
-  controllers: [AppController, DataTransController],
+  controllers: [AppController],
   providers: [ AppService ],
 })
 export class AppModule {}
