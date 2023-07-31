@@ -5,9 +5,15 @@ import GamesSchema from "./games.schema";
 import GamesService from "./games.service";
 import ZonesModule from "../zone/zones.module";
 import CouresModule from "../course/courses.module";
+import GameController from "../../controller/manage/GameController";
+import CartsModule from "../cart/carts.module";
+import DevicesModule from "../device/devices.module";
+import InCartController from "../../controller/cart/InCartController";
 
 @Module({
 	imports: [
+		CartsModule,
+    DevicesModule,
 		ZonesModule,
 		CouresModule,
 		DynamooseModule.forFeature([
@@ -20,7 +26,7 @@ import CouresModule from "../course/courses.module";
 			}
 		])
 	],
-	controllers: [DataTransController],
+	controllers: [DataTransController, GameController, InCartController],
 	providers: [GamesService],
 	exports: [GamesService],
 })

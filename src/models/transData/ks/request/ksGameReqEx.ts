@@ -27,6 +27,26 @@ const ksGameReqExVal:ksGameReq = {
 				memberId: "M00002",
 				checkInId: "D00002"
 			}
+		},
+		{
+			name: "王大大",
+			tee: {
+				name: "White"
+			},
+			extra: {
+				memberId: "M00003",
+				checkInId: "D00003"
+			}
+		},
+		{
+			name: "周明人",
+			tee: {
+				name: "Red"
+			},
+			extra: {
+				memberId: "G00001",
+				checkInId: "D00004"
+			}
 		}		
 	],
 	teeOffTimestamp: 1620029793,

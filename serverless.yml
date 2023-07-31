@@ -25,16 +25,16 @@ provider:
 plugins:
   - serverless-plugin-typescript
   - serverless-offline
-  - serverless-dynamodb-local
+#  - serverless-dynamodb-local
 custom:
   serverless-offline:
     httpPort: 3000
-  dynamodb:
-    start:
-      port: 8000
-      inMemory: true
-      migrate: true
-    stages: "dev"
+#  dynamodb:
+#    stages: "dev"
+#    start:
+#      port: 8000
+#      inMemory: true
+
 functions:
   main:
     handler: src/lambda.handler

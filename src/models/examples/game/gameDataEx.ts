@@ -1,7 +1,7 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
-import { caddie, games, player, playerDefault, playerGameData, score, sideGame } from "src/database/db.interface";
-import { HcpType, sideGameFormat, sideGameGroup, sideGames } from "src/models/enum";
-import { commonResWithData } from "src/models/if";
+import siteDateReq, { caddie, games, player, playerDefault, playerGameData, score, sideGame } from "../../../database/db.interface";
+import { HcpType, sideGameFormat, sideGameGroup, sideGames } from "../../../models/enum";
+import { commonResWithData } from "../../../models/if";
 
 const caddies:caddie[] = [
 	{
@@ -47,8 +47,7 @@ const sideGameO:sideGame = {
   hcpType: HcpType.FullHcp,
   playerGameData:[playerGD],	
 }
-const gameDataExVal: games = {
-	gameid: 'gamehashkey',
+const gameDataPartialExVal: Partial<games> = {
   siteid: 'linkougolf',
   courseid: 'courseid',
   outZone: 'zoneid1',
@@ -67,6 +66,26 @@ const gameDataExVal: games = {
   playerDefaults: [playerD],
   sideGames: [sideGameO],	
 }
+const gameDataExVal: games = {
+	gameid: 'gamehashkey',
+  siteid: 'linkougolf',
+  courseid: 'courseid',
+  outZone: 'zoneid1',
+  inZone: 'zoneid2',
+  par: 72,
+  rating: 75,
+  slope: 56,
+  carts: ['cartid'],
+  stepInZone: 'zoneid1',
+  stepInFairway: 1,
+  esttimatedStartTime: 1690387200,
+  startTime: 0,
+  endTime: 0,
+  players: [playerO],
+  caddies: caddies,
+  playerDefaults: [playerD],
+  sideGames: [sideGameO],
+}
 
 const gameRexExVal:commonResWithData<games> = {
 	errcode: '0',
@@ -77,8 +96,31 @@ const gameRexExVal:commonResWithData<games> = {
 	data: gameDataExVal,
 }
 
+const siteDateExVal:siteDateReq = {
+  siteid: 'linkougolf',
+  queryDate: '2023-07-31',
+}
+
 export const gameResEx:Record<'Response', ExampleObject> = {
 	Response: {
 		value: gameRexExVal,
 	}
+}
+
+export const gameReqEx:Record<'Request', ExampleObject> = {
+  Request: {
+    value: gameRexExVal,
+  }
+}
+
+export const gamePartialReqEx:Record<'Request', ExampleObject> = {
+  Request: {
+    value: gameDataPartialExVal,
+  }
+}
+
+export const getGamesReqEx:Record<'Request', ExampleObject> = {
+  Request: {
+    value: siteDateExVal,
+  }
 }

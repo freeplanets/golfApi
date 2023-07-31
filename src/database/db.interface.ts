@@ -1,6 +1,7 @@
 import { QueryResponse } from "nestjs-dynamoose";
 import { HcpType, mapAssetObjectType, sideGameFormat, sideGameGroup, sideGames } from "../models/enum";
 import { AnyObject } from "../models/if";
+import { ConditionInitializer } from "dynamoose/dist/Condition";
 
 export interface defaultKey {
   siteid?: string;
@@ -17,7 +18,8 @@ export interface defaultMethod<T extends K, K extends defaultKey> {
   update(key:K, data:Partial<T>, cond?:Partial<T>):Promise<T>;
   findOne(key:K):Promise<T>;
   findAll():Promise<T[]>;
-  query(key:Partial<T>):Promise<QueryResponse<T>>;
+  query(key:Partial<T>, field?:string[]):Promise<QueryResponse<T>>;
+  queryWithCondition(cond:ConditionInitializer, field?:string[]):Promise<QueryResponse<T>>;
   delete(key:K):Promise<void>;
 }
 
@@ -218,6 +220,12 @@ export interface games extends gameKey {
   caddies: caddie[];
   playerDefaults: playerDefault[];
   sideGames:sideGame[];
+}
+
+// for game search
+export default interface siteDateReq {
+  siteid: string,
+  queryDate: string,
 }
 
 export interface courseKey extends defaultKey {

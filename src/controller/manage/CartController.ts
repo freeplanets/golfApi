@@ -7,7 +7,7 @@ import zoneResponse from "../../models/zone/zoneResponse";
 import { createTableData, deleteTableData, getTableData, hashKey, queryTable, updateTableData } from "../../function/Commands";
 import CartsService from "../../database/cart/carts.service";
 import cartData from "../../models/cart/cartData";
-import { cartEx, cartResEx } from "../../models/examples/cart/cartEx";
+import { cartEx, cartQueryEx, cartResEx } from "../../models/examples/cart/cartEx";
 import cartResponse from "../../models/cart/cartResponse";
 import queryCartsRequest from "../../models/cart/queryCartsRequest";
 import cartsResponse from "../../models/cart/cartsResponse";
@@ -61,10 +61,10 @@ export default class CartController {
 
 	@Post('cart')
 	@ApiOperation({ summary: '查詢球車資料', description: '查詢球車資料'})
-	@ApiBody({description: '查詢球車資料', type: queryCartsRequest, examples: cartEx})
+	@ApiBody({description: '查詢球車資料', type: queryCartsRequest, examples: cartQueryEx})
 	@ApiResponse({status: 200, description:'球車回傳物件', type: cartsResponse})
 	async query(@Body() body:Partial<carts>, @Headers('WWW-AUTH') token:Record<string, string>){
-		console.log('cart query', body);
+		// console.log('cart query', body);
 		const resp = await queryTable(String(token), this.cartService, body);
 		return resp;
 	}

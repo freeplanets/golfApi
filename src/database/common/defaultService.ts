@@ -3,7 +3,7 @@ import { defaultKey, defaultMethod } from "../db.interface";
 import { Condition } from "dynamoose";
 import { ConditionInitializer } from "dynamoose/dist/Condition";
 
-export default abstract class defaultService<T extends K, K extends defaultKey> implements defaultMethod<T, K> {
+export default class defaultService<T extends K, K extends defaultKey> implements defaultMethod<T, K> {
 	constructor(protected model:Model<T, K>){}
 	create(data: T): Promise<T> {
 		return this.model.create(data);
@@ -26,8 +26,10 @@ export default abstract class defaultService<T extends K, K extends defaultKey> 
 	findAll(): Promise<T[]> {
 		return this.model.scan().exec();
 	}
-	query(key: Partial<T>): Promise<QueryResponse<T>> {
-		return this.model.query(key).exec();
+	query(key: Partial<T>, field?:string[]): Promise<QueryResponse<T>> {
+		 const query = this.model.query(key);
+		 if (field && field.length > 0) query.attributes(field);
+		 return query.exec();
 	}
 	delete(key:K): Promise<void> {
 		return this.model.delete(key);
@@ -35,7 +37,7 @@ export default abstract class defaultService<T extends K, K extends defaultKey> 
 	queryWithCondition(cond:ConditionInitializer, field?:string[]):Promise<QueryResponse<T>>{
 		const query = this.model.query(cond);
 		if (field && field.length > 0) {
-			query.attributes(['zoneid','refNo']);
+			query.attributes(field);
 		}
 		return query.exec();
 	}

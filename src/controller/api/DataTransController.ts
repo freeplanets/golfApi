@@ -11,10 +11,12 @@ import CoursesService from "../../database/course/courses.service";
 import GamesService from "../../database/game/games.service";
 // import { courses } from "src/database/db.interface";
 import { Condition } from "dynamoose";
-import { courses, player } from "src/database/db.interface";
-import gameData from "src/models/game/gameData";
-import { hashKey } from "src/function/Commands";
-import _playerObject from "src/models/game/_playerObject";
+import { courses, games, player, playerDefault, score, zones } from "src/database/db.interface";
+import gameData from "../../models/game/gameData";
+import { hashKey } from "../../function/Commands";
+import _playerObject from "../../models/game/_playerObject";
+import { commonResWithData } from "../../models/if";
+import { HcpType } from "../../models/enum";
 
 @ApiTags('Api')
 @Controller('ksapi')
@@ -29,10 +31,9 @@ export default class DataTransController {
 	@ApiResponse({status: 200, description:'球場傳入來賓進場資料回傳物件', type: commonResponse})
 	async saveData(@Body() body:ksGameReq){
 		const siteid = 'linkougolf';
-		console.log( body);
-		const ans = await this.createGames(siteid, body);
-		console.log('ans:', ans);
-		return commonResEx.Response.value;
+		// console.log( body);
+		const resp = await this.createGames(siteid, body);
+		return resp;
 	}
 
 	@Post('result/:start/:end')
@@ -45,7 +46,10 @@ export default class DataTransController {
 		return commonResEx.Response.value;	
 	}
 	
-	async createGames(siteid:string, data:ksGameReq){
+	async createGames(siteid:string, data:ksGameReq):Promise<commonResWithData<games>>{
+		const resp:commonResWithData<games> = {
+			errcode: '0',
+		}
 		const zones:number[] = [data.zones[0].number];
 		if (data.zones[1] && data.zones[1].number !== undefined) {
 			zones.push(data.zones[1].number);
@@ -53,29 +57,38 @@ export default class DataTransController {
 		const subCond = new Condition('refNo').in(zones);
 		const cond = new Condition('siteid').eq(siteid).parenthesis(subCond);
 		const ans = await this.zonesService.queryWithCondition(cond);
-		console.log(ans);	
 		if (ans.count>0) {
 			const zoneids: string[] = [];
 			ans.forEach((itm) => {
-				console.log('itm:',itm);
+				// console.log('itm:',itm);
 				zoneids[itm.refNo] = itm.zoneid;
 			});
-			console.log(zoneids);
+			// console.log(zoneids);
 			const searchCourseKey:Partial<courses> = {
 				outZone: zoneids[zones[0]],
 			}
 			if (zones[1] !== undefined) {
 				searchCourseKey.inZone = zoneids[zones[1]];
 			}
-			console.log(searchCourseKey);
+			// console.log(searchCourseKey);
 			const ans1 = await this.coursesService.query(searchCourseKey)
 			// return ans1;
 			const course = ans1[0];
+			const zone = [];
+			if (ans[0].refNo === data.zones[0].number) {
+				zone.push(ans[0]);
+				if (ans[1]) {
+					zone.push(ans[1]);
+				}
+			} else {
+				zone.push(ans[1]);
+				zone.push(ans[0]);
+			}
 			const game = new gameData();
 			game.gameid = hashKey();
-			game.caddies = [ {caddieid: `caddie${data.caddie.number}`} ];
+			game.caddies = [ {caddieid: `caddie${data.caddie.number}`, caddieName:`caddie${data.caddie.number}`} ];
 			if (data.caddie2) {
-				game.caddies.push({caddieid: `caddie${data.caddie2.number}`});
+				game.caddies.push({caddieid: `caddie${data.caddie2.number}`, caddieName:`caddie${data.caddie2.number}`});
 			}
 			game.siteid = siteid;
 			game.courseid = course.courseid;
@@ -89,17 +102,43 @@ export default class DataTransController {
 			game.esttimatedStartTime = data.teeOffTimestamp;
 			game.startTime = 0;
 			game.endTime = 0;
-			const players = data.players.map((itm, idx) => {
+			game.playerDefaults = [];
+			game.players = data.players.map((itm, idx) => {
+				let holes:score[] = [];
+				let no = 0;
+				zone.forEach((z) => {
+					z.fairways.forEach((f) => {
+						no+=1;
+						const sco:score = {
+							zoneid: z.zoneid,
+							fairwayno: f.fairwayno,
+							holeNo: no,
+							gross: 0,
+						};
+						holes.push(sco);
+					})
+				});
 				const tmp:player = {
 					playerName: itm.name,
 					tee: itm.tee.name,
 					hcp: '0',
 					playerOrder: idx,
 					gross: 0,
-					holes: []
+					holes,
+					extra: itm.extra,
+				};
+				const pDef:playerDefault = {
+					playerName: itm.name,
+					fullHcp: HcpType.NoHcp,
+					allowance: 100,
+					hcp: '',
+					hcpRound: false,
 				}
-			})
+				game.playerDefaults.push(pDef);
+				return tmp;
+			});
+			resp.data = await this.gamesService.create(game);
 		}
-		return ans;
+		return resp;
 	}
 }

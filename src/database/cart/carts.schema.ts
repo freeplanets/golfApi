@@ -25,20 +25,19 @@ const CartsSchema = new Schema({
         name: 'siteidstatusGlobalIndex',
 				type: 'global',
         rangeKey: 'status'
-      },
-			{
-        name: 'siteidcartnameGlobalIndex',
-				type: 'global',
-        rangeKey: 'cartName'				
-			}
+      }
     ]
   },
   zoneid: {
     type: String,
-    index: {
-			type: 'global',
-      // global: true
-    }
+    index: [
+      {
+        name: 'zoneidfairwaynoGlobalIndex',
+        type: 'global',
+        // global: true,
+        rangeKey: 'fairwayno'
+      }
+    ]
   },
   fairwayno: {
     type: Number

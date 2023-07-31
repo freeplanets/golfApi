@@ -43,7 +43,7 @@ const GamesSchema = new Schema({
   },
   carts: {
     type: Array,
-    schema: String,
+    schema: [String],
   },
   par: {
     type: Number

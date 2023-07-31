@@ -14,6 +14,11 @@ const cartResExVal: commonResWithData<carts> = {
 	data:cartExVal,
 }
 
+const cartQueryExVal:Partial<carts> = {
+	siteid: 'linkougolf',
+	status: 'active',
+}
+
 export const cartEx:Record<'Request', ExampleObject> = {
 	Request: {
 		value: cartExVal,
@@ -23,5 +28,11 @@ export const cartEx:Record<'Request', ExampleObject> = {
 export const cartResEx:Record<'Response', ExampleObject> = {
 	Response: {
 		value: cartResExVal,
+	}
+}
+
+export const cartQueryEx:Record<'Request', ExampleObject> = {
+	Request: {
+		value: cartQueryExVal,
 	}
 }
