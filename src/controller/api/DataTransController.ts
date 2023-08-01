@@ -26,7 +26,7 @@ export default class DataTransController {
 		private readonly coursesService:CoursesService,
 		private readonly gamesService:GamesService) {}
 	@Post('game')
-	@ApiOperation({summary:'接收球場客戶資料(working.....)', description:'接收球場客戶資料 API / acceptDataFromMain'})
+	@ApiOperation({summary:'接收球場客戶資料', description:'接收球場客戶資料 API / acceptDataFromMain'})
 	@ApiBody({description:'球場傳入來賓進場資料', type: ksGameRequest, examples: ksGameReqEx})
 	@ApiResponse({status: 200, description:'球場傳入來賓進場資料回傳物件', type: commonResponse})
 	async saveData(@Body() body:ksGameReq){

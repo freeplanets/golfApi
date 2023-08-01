@@ -3,6 +3,7 @@ import { DynamooseModule } from "nestjs-dynamoose";
 import CartsSchema from "./carts.schema";
 import CartController from "../../controller/manage/CartController";
 import CartsService from "./carts.service";
+import CartHistorySchema from "./cartHistory.schema";
 
 @Module({
 	imports: [
@@ -13,7 +14,14 @@ import CartsService from "./carts.service";
 				options: {
 					throughput: 'ON_DEMAND',
 				}
-			}
+			},
+			{
+				name: 'CartHistory',
+				schema: CartHistorySchema,
+				options: {
+					throughput: 'ON_DEMAND',
+				}
+			},
 		])
 	],
 	controllers: [CartController],

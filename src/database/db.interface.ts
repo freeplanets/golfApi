@@ -124,6 +124,13 @@ export interface carts extends cartKey {
   deviceType?:string;
 }
 
+export interface cartHistory extends cartKey {
+  carthistoryid:string;
+  status?: string,
+  location?: mapLatLong;
+  ts:number;
+}
+
 export interface deviceKey extends defaultKey {
   deviceid: string;
 }
@@ -136,19 +143,6 @@ export interface devices extends deviceKey {
   cartid?: string;
 }
 
-export interface carPosition extends cartKey {
-  siteid: string;
-  zoneid: string;
-  fairwayno: number;
-  // cartid: number;
-  location: mapLatLong;
-}
-export interface carPositionHistory extends cartKey {
-  siteid: string,
-  carid: number;
-  location: mapLatLong;
-  ts?:string;
-}
 
 export interface score {
   holeNo:number;
@@ -220,12 +214,6 @@ export interface games extends gameKey {
   caddies: caddie[];
   playerDefaults: playerDefault[];
   sideGames:sideGame[];
-}
-
-// for game search
-export default interface siteDateReq {
-  siteid: string,
-  queryDate: string,
 }
 
 export interface courseKey extends defaultKey {

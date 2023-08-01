@@ -40,7 +40,10 @@ const CartsSchema = new Schema({
     ]
   },
   fairwayno: {
-    type: Number
+    type: Number,
+    index: {
+      type: 'global',
+    }
   },
   status: {
     type: String,

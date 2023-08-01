@@ -1,7 +1,7 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
-import siteDateReq, { caddie, games, player, playerDefault, playerGameData, score, sideGame } from "../../../database/db.interface";
+import { caddie, games, player, playerDefault, playerGameData, score, sideGame } from "../../../database/db.interface";
 import { HcpType, sideGameFormat, sideGameGroup, sideGames } from "../../../models/enum";
-import { commonResWithData } from "../../../models/if";
+import siteDateReq, { commonResWithData } from "../../../models/if";
 
 const caddies:caddie[] = [
 	{
@@ -45,7 +45,7 @@ const sideGameO:sideGame = {
   format: sideGameFormat.individual,
   wager: 3,
   hcpType: HcpType.FullHcp,
-  playerGameData:[playerGD],	
+  playerGameData:[playerGD],
 }
 const gameDataPartialExVal: Partial<games> = {
   siteid: 'linkougolf',
@@ -122,5 +122,11 @@ export const gamePartialReqEx:Record<'Request', ExampleObject> = {
 export const getGamesReqEx:Record<'Request', ExampleObject> = {
   Request: {
     value: siteDateExVal,
+  }
+}
+
+export const sideGameReqEx:Record<'Request', ExampleObject> = {
+  Request: {
+    value: sideGameO,
   }
 }

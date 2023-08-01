@@ -1,14 +1,18 @@
-import { Controller, Get, Headers, Param, Post } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Get, Headers, Param, Post } from "@nestjs/common";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
+import { Condition } from "dynamoose";
 import { commonResEx } from "../../models/examples/commonResponseEx";
 import GamesService from "../../database/game/games.service";
 import CartsService from "../../database/cart/carts.service";
 import { tokenCheck } from "../../function/Commands";
-import { carts, games } from "../../database/db.interface";
-import { commonResWithData } from "../../models/if";
+import { cartHistory, carts, games, sideGame } from "../../database/db.interface";
+import { commonResWithData, positonReq } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
-import { Condition } from "dynamoose";
+import positionRequest from "../../models/cart/positionRequest";
+import { positionReqEx } from "../../models/examples/carposition/carPositionEx";
+import _sideGameObject from "../../models/game/_sideGameObject";
+import { sideGameReqEx } from "src/models/examples/game/gameDataEx";
 
 @ApiBearerAuth()
 @ApiTags('Cart')
@@ -20,7 +24,7 @@ export default class InCartController {
 	){}
 
 	@Get('site/:siteid')
-	@ApiOperation({summary:'取得球場完整資料 / get golf club complete information', description: '取得球場完整資料 / get golf club complete information'})
+	@ApiOperation({summary:'取得球場完整資料 / get golf club complete information(working.....)', description: '取得球場完整資料 / get golf club complete information'})
 	@ApiParam({name: 'siteid', description: '球場代號'})
 	getSiteData(@Param('siteid') siteid:string, @Headers('WWW-AUTH') token:Record<string, string>){
 		return commonResEx.Response.value;
@@ -36,8 +40,38 @@ export default class InCartController {
 
 	@Post('updatePosition')
 	@ApiOperation({summary:'更新球車位/ updatePosition',description:'更新球車位/ updatePosition'})
-	updatePosition(){}
-	sidegameRegister(){}
+	@ApiBody({description: '位置資料', type: positionRequest, examples: positionReqEx })
+	async updatePosition(@Body() body:positonReq, @Headers('WWW-AUTH') token:Record<string, string>){
+		const resp:commonResWithData<Partial<carts>[]> = {
+			errcode: '0',
+		}
+		const user = tokenCheck(String(token));
+		if (user) {
+			try {
+				resp.data = await this.cartService.positionUpdate(body);
+			} catch(e) {
+				resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
+				resp.error = {
+					message: errorMsg('DATABASE_ACCESS_ERROR'),
+					extra: e,
+				}
+			}
+		} else {
+			resp.errcode = ErrCode.TOKEN_ERROR;
+			resp.error = {
+				message: errorMsg('TOKEN_ERROR'),
+			}
+		}
+		return resp;
+	}
+
+	@Post('sidegameRegister')
+	@ApiOperation({summary:'小遊戲登錄 / sidegameRegister (working.....)', description:'小遊戲登錄 / sidegameRegister'})
+	@ApiBody({description:'', type: _sideGameObject, examples:sideGameReqEx})
+	sidegameRegister(@Body() body:sideGame, @Headers('WWW-AUTH') token:Record<string, string>){
+		
+	}
+
 	updateGamePoint(){}
 	getResult(){}
 

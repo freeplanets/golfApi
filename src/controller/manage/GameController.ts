@@ -4,13 +4,13 @@ import { Condition } from "dynamoose";
 import GamesService from "../../database/game/games.service";
 import gameData from "../../models/game/gameData";
 import { gamePartialReqEx, gameReqEx, getGamesReqEx } from "../../models/examples/game/gameDataEx";
-import siteDateReq, { gameKey, games } from "../../database/db.interface";
+import { gameKey, games } from "../../database/db.interface";
 import { createTableData, deleteTableData, getTableData, hashKey, tokenCheck, updateTableData } from "../../function/Commands";
 import gamePartialData from "../../models/game/gamePartialData";
 import gameResponse from "../../models/game/gameResponse";
 import commonResponse from "../../models/common/commonResponse";
 import siteDateRequest from "../../models/game/siteDateRequest";
-import { commonResWithData } from "../../models/if";
+import siteDateReq, { commonResWithData } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
 
