@@ -4,6 +4,7 @@
 .serverless
 .build
 .dynamodb
+.env
 
 # Logs
 logs

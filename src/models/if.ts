@@ -31,6 +31,7 @@ export interface positonReq {
   cartid:string; // 球車代號	TRUE
   zoneid?:string; // 分區代號
   fairwayno:number; //球道代號	TRUE
-  position:mapLatLong; // 經緯度物件	TRUE																				
-  distance?:number; // 離發球區距離																					  
+  location:mapLatLong; // 經緯度物件	TRUE																				
+  distance?:number; // 離發球區距離
+  cartName?:string; // for response
 }

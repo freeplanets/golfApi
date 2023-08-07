@@ -4,6 +4,8 @@ import { commonRes, commonResWithData } from "../models/if";
 import { errorMsg } from "./Errors";
 // import {v4 as uuidv4} from 'uuid';
 import { JwtService } from "@nestjs/jwt";
+import { ConditionComparisonComparatorName, queryReq } from "./func.interface";
+import { Condition } from "dynamoose";
 
 
 const jwt = new JwtService();
@@ -81,7 +83,8 @@ export async function deleteTableData<D extends defaultKey>(token:string, dbserv
 	}
 	return resp;	
 }
-export async function queryTable<D extends K, K>(token:string, dbservice:any, key: Partial<D>) {
+export async function queryTable<D extends K, K>(token:string, dbservice:any, key: Partial<D> | queryReq) {
+	console.log('queryTable:', key);
 	let resp:commonResWithData<D[]> = {
 		errcode: '0',		
 	}	
@@ -90,7 +93,12 @@ export async function queryTable<D extends K, K>(token:string, dbservice:any, ke
 		const service  = (dbservice as defaultMethod<D, K>);
 		try {
 			// if (addClubid) key.siteid = user.siteid;
-			resp.data = await service.query(key);
+			if ((key as queryReq).queryKey) {
+				const cond = createCondition(key as queryReq);
+				resp.data = await service.queryWithCondition(cond);
+			} else {
+				resp.data = await service.query(key as Partial<D>);
+			}
 		} catch(e) {
 			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
 			resp.error = {
@@ -147,6 +155,7 @@ export async function updateTableData<D extends K, K extends defaultKey>(token:s
 	}
 	const user = tokenCheck(token);
 	if (user) {
+		console.log('updateTableData:', data);
 		data.modifyid = user.uid;
 		const service = (dbservice as defaultMethod<D, K>);
 		try {
@@ -227,4 +236,44 @@ export function isMyClub(user:platformUser, siteid:string):boolean {
 		return true;
 	}
 	return ans;
+}
+
+function createCondition(dta:queryReq){
+	const cond = new Condition().filter(dta.queryKey);
+	switch(dta.queryType){
+		case ConditionComparisonComparatorName.equals:
+			cond.eq(dta.items[0]);
+			break;
+		case ConditionComparisonComparatorName.notEquals:
+			cond.not().eq(dta.items[0]);
+			break;
+		case ConditionComparisonComparatorName.lessThan:
+			cond.lt(dta.items[0]);
+			break;
+		case ConditionComparisonComparatorName.lessThanEquals:
+			cond.le(dta.items[0]);
+			break;
+		case ConditionComparisonComparatorName.greaterThan:
+			cond.gt(dta.items[0]);
+			break;
+		case ConditionComparisonComparatorName.greaterThanEquals:
+			cond.ge(dta.items[0]);
+			break;
+		case ConditionComparisonComparatorName.beginsWith:
+			cond.beginsWith(dta.items[0]);
+			break;
+		case ConditionComparisonComparatorName.contains:
+			cond.contains(dta.items[0]);
+			break;
+		case ConditionComparisonComparatorName.exists:
+			cond.exists();
+			break;
+		case ConditionComparisonComparatorName.in:
+			cond.in(dta.items);
+			break;
+		case ConditionComparisonComparatorName.between:
+			cond.between(dta.items);
+			break;
+	}
+	return cond;
 }

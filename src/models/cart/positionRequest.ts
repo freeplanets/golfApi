@@ -24,11 +24,17 @@ export default class positionRequest implements positonReq {
 		description: '經緯度物件',
 		type: _mapLatLong,
 	})
-	position: mapLatLong;
+	location: mapLatLong;
 
 	@ApiProperty({
 		description: '離發球區距離',
 		required: false,
 	})
 	distance?: number;
+
+	@ApiProperty({
+		description: '球車名稱(回傳用)',
+		required: false,
+	})
+	cartName?: string;
 }

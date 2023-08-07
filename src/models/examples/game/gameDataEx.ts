@@ -86,6 +86,10 @@ const gameDataExVal: games = {
   playerDefaults: [playerD],
   sideGames: [sideGameO],
 }
+const partialPlayer:Partial<player> = {
+  playerName: playerO.playerName,
+  holes: playerO.holes,
+}
 
 const gameRexExVal:commonResWithData<games> = {
 	errcode: '0',
@@ -128,5 +132,11 @@ export const getGamesReqEx:Record<'Request', ExampleObject> = {
 export const sideGameReqEx:Record<'Request', ExampleObject> = {
   Request: {
     value: sideGameO,
+  }
+}
+
+export const updateGamePointEx:Record<'Request', ExampleObject> = {
+  Request: {
+    value: partialPlayer,
   }
 }

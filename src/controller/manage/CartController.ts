@@ -37,6 +37,7 @@ export default class CartController {
 		const keys = {
 			cartid: cartid,
 		}
+		if (body.cartid) delete body.cartid;
 		const resp = await updateTableData<carts, cartKey>(String(token), this.cartService, body, keys);
 		return resp;
 	}

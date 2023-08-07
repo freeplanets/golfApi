@@ -99,6 +99,8 @@ export interface zoneKey extends defaultKey {
 export interface zones extends zoneKey {
   siteid:string;
   name:string;
+  holes:number;
+  par:number;
   tees:teeObject[];
   fairways:fairwayObject[];
   refNo:number;
@@ -186,7 +188,7 @@ export interface playerDefault {
   fullHcp: string;
   allowance: number;
   hcp: string;
-  hcpRound: boolean;  
+  hcpRound: boolean;  //從果難洞算起或開始洞
 }
 export interface caddie {
   caddieid:string,

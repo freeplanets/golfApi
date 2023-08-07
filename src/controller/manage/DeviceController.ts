@@ -35,6 +35,7 @@ export default class DeviceController {
 		const keys = {
 			deviceid: deviceid,
 		}
+		if (body.deviceid) delete body.deviceid;
 		const resp = await updateTableData<devices, deviceKey>(String(token), this.devicesService, body, keys);
 		return resp;
 	}

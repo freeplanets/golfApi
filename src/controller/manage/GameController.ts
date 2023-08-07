@@ -40,6 +40,7 @@ export default class GameController {
 		const keys:gameKey = {
 			gameid,
 		};
+		if (body.gameid) delete body.gameid;
 		const resp = await updateTableData(String(token), this.gamesService, body, keys);
 		return resp;
 	}

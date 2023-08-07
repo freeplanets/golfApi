@@ -36,6 +36,7 @@ export default class CourseController {
 		const keys = {
 			courseid: courseid,
 		}
+		if (body.courseid) delete body.courseid;
 		const resp = await updateTableData<courses, courseKey>(String(token), this.courseService, body, keys);
 		return resp;
 	}

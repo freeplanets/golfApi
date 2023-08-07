@@ -9,7 +9,7 @@ const carPositionExVal:positonReq = {
 	cartid: '1KafHC5GHhIcYyqGuS3ocN',
 	zoneid: '6R81eqZpYujVAeJotqeVEZ',
 	fairwayno: 1,
-	position: loc,
+	location: loc,
 	distance: 150,
 }
 

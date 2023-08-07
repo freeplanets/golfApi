@@ -53,7 +53,7 @@ export default class CartsService extends defaultService<carts, cartKey> {
 		const partialCart:Partial<carts> = {
 			zoneid: data.zoneid,
 			fairwayno: data.fairwayno,
-			location: data.position,
+			location: data.location,
 			distance: data.distance,
 		}
 		const key:cartKey = {

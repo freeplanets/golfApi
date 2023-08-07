@@ -17,6 +17,12 @@ const ZonesSchema = new Schema({
   name: {
     type: String,
   },
+  holes: {
+    type: Number,
+  },
+  par: {
+    type: Number,
+  },
   tees: {
     type: Array,
     schema: [

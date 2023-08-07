@@ -42,8 +42,24 @@ functions:
       - http:
           path: /{proxy+}
           method: ANY
-          cors: true
+          cors:
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+              - WWW-AUTH
       - http:
           path: /
           method: ANY
-          cors: true
+          cors:
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+              - WWW-AUTH

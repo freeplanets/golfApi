@@ -11,7 +11,7 @@ import CoursesService from "../../database/course/courses.service";
 import GamesService from "../../database/game/games.service";
 // import { courses } from "src/database/db.interface";
 import { Condition } from "dynamoose";
-import { courses, games, player, playerDefault, score, zones } from "src/database/db.interface";
+import { courses, games, player, playerDefault, score } from "src/database/db.interface";
 import gameData from "../../models/game/gameData";
 import { hashKey } from "../../function/Commands";
 import _playerObject from "../../models/game/_playerObject";

@@ -38,6 +38,7 @@ export default class ZoneController {
 		const keys = {
 			zoneid: zoneid,
 		}
+		if (body.zoneid) delete body.zoneid;
 		const resp = await updateTableData<zones, zoneKey>(String(token), this.zoneService, body, keys);
 		return resp;
 	}

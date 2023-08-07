@@ -25,6 +25,16 @@ export default class zonesData implements zones {
 	name: string;
 
 	@ApiProperty({
+		description: '洞數',
+	})
+	holes: number;
+
+	@ApiProperty({
+		description: '標準桿',
+	})	
+	par: number;
+
+	@ApiProperty({
 		description: '所有T台種類',
 		isArray:true,
 		type: _teeObject,
