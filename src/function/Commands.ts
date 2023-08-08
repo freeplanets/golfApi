@@ -1,6 +1,6 @@
 import { defaultKey, defaultMethod, platformUser } from "../database/db.interface";
 import { ErrCode } from "../models/enumError";
-import { commonRes, commonResWithData } from "../models/if";
+import { AnyObject, commonRes, commonResWithData } from "../models/if";
 import { errorMsg } from "./Errors";
 // import {v4 as uuidv4} from 'uuid';
 import { JwtService } from "@nestjs/jwt";
@@ -164,6 +164,8 @@ export async function updateTableData<D extends K, K extends defaultKey>(token:s
 			if (f) {
 				// 更改資料時檢查是否為同球場
 				if (isMyClub(user, f.siteid)) {
+					data = removeUnderLineData(data);
+					console.log('removeUnderLineData:', JSON.stringify(data));
 					resp.data = await service.update(keys, data, filter);
 				} else { 
 					resp.errcode = ErrCode.ERROR_PARAMETER;
@@ -200,10 +202,13 @@ export async function createTableData<D extends K, K extends defaultKey>(token:s
 	}
 	const user = tokenCheck(token);
 	if (user) {
+		console.log('createTableData:', data);
 		data.modifyid = user.uid;
 		const service = (dbservice as defaultMethod<D, K>);
 		try {
 			if (data.siteid){
+				data = removeUnderLineData(data);
+				console.log('createTableData:', data)
 				resp.data = await service.create(data);
 			} else { 
 				resp.errcode = ErrCode.ERROR_PARAMETER;
@@ -276,4 +281,28 @@ function createCondition(dta:queryReq){
 			break;
 	}
 	return cond;
+}
+
+function removeUnderLineData(dta:any) {
+	// console.log(dta);
+	if (typeof dta !== 'object') {
+		return dta;
+	}
+	const a:AnyObject = {};
+	Object.keys(dta).forEach((key) => {
+		// console.log('key:', key);
+		if (key.indexOf('_') === -1) {
+			if (typeof dta[key] === 'object') {
+				if (Array.isArray(dta[key]) ) {
+					a[key] = dta[key].map((itm:any) => removeUnderLineData(itm))
+					// console.log('check:', key, a[key]);
+				} else {
+					a[key] = removeUnderLineData(dta[key]);
+				}
+			} else {
+				a[key] = dta[key];
+			}
+		}
+	});
+	return a;
 }

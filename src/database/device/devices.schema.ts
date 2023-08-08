@@ -22,6 +22,10 @@ const DevicesSchema = new Schema({
     type: String,
     index: [
       {
+        name: 'siteidGlobalIndex',
+        type: 'global',
+      },
+      {
         name: 'siteidcartidGlobalIndex',
 				type: 'global',
         // global: true,

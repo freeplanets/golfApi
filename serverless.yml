@@ -1,13 +1,16 @@
 service: golf-api
+useDotenv: true
+
 provider:
   name: aws
   runtime: nodejs16.x
   stage: ${opt:stage, 'dev'}
   region: ap-southeast-1
   memorySize: 128
-  timeout: 10
+  timeout: 30
   environment:
     STAGE: ${self:provider.stage}
+    API_KEY: ${env:API_KEY}
   iamRoleStatements:
     - Effect: 'Allow'
       Action:

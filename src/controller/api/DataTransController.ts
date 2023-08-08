@@ -1,5 +1,5 @@
-import { Body, Controller, Param, Post } from "@nestjs/common";
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Headers, HttpCode, Param, Post, Res } from "@nestjs/common";
+import { ApiBody, ApiHeader, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import commonResponse from "../../models/common/commonResponse";
 import { commonResEx } from "../../models/examples/commonResponseEx";
 import ksGameRequest from "../../models/transData/ks/request/ksGameRequest";
@@ -11,12 +11,15 @@ import CoursesService from "../../database/course/courses.service";
 import GamesService from "../../database/game/games.service";
 // import { courses } from "src/database/db.interface";
 import { Condition } from "dynamoose";
-import { courses, games, player, playerDefault, score } from "src/database/db.interface";
+import { courses, player, playerDefault, score } from "src/database/db.interface";
 import gameData from "../../models/game/gameData";
 import { hashKey } from "../../function/Commands";
 import _playerObject from "../../models/game/_playerObject";
-import { commonResWithData } from "../../models/if";
+import { commonRes } from "../../models/if";
 import { HcpType } from "../../models/enum";
+import EncDecString from "../../function/EncDecString";
+import { ErrCode } from "../../models/enumError";
+import { errorMsg } from "../../function/Errors";
 
 @ApiTags('Api')
 @Controller('ksapi')
@@ -27,12 +30,40 @@ export default class DataTransController {
 		private readonly gamesService:GamesService) {}
 	@Post('game')
 	@ApiOperation({summary:'接收球場客戶資料', description:'接收球場客戶資料 API / acceptDataFromMain'})
+	@ApiHeader({name: 'X-Api-Key', description: 'Api key'})
 	@ApiBody({description:'球場傳入來賓進場資料', type: ksGameRequest, examples: ksGameReqEx})
-	@ApiResponse({status: 200, description:'球場傳入來賓進場資料回傳物件', type: commonResponse})
-	async saveData(@Body() body:ksGameReq){
-		const siteid = 'linkougolf';
+	// @ApiResponse({status: 200, description:'球場傳入來賓進場資料回傳物件', type: commonResponse})
+	// @HttpCode(204)
+	async saveData(@Body() body:ksGameReq, @Headers('X-Api-Key') apiKey:string){
+		// const siteid = 'linkougolf';
 		// console.log( body);
-		const resp = await this.createGames(siteid, body);
+		const resp:commonRes = {
+			errcode: ErrCode.OK,
+		}
+		console.log('body', body);
+		//console.log('siteid:', siteid, process.env.API_KEY);
+		const eds:EncDecString = new EncDecString(process.env.API_KEY);
+		const { siteid } = JSON.parse(eds.Decrypted(apiKey));
+		console.log('siteid:', siteid, apiKey);
+		if (siteid) {
+			try {
+				console.log('createGames start:', new Date().getTime());
+				await this.createGames(siteid, body);
+				console.log('createGames end:', new Date().getTime());
+				return;
+			} catch (e) {
+				resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
+				resp.error = {
+					message: errorMsg('DATABASE_ACCESS_ERROR'),
+					extra: e,
+				}				
+			}
+		} else {
+			resp.errcode = ErrCode.MISS_PARAMETER
+			resp.error = {
+				message: errorMsg('MISS_PARAMETER', 'X-Api-Key'),
+			}
+		}
 		return resp;
 	}
 
@@ -46,10 +77,7 @@ export default class DataTransController {
 		return commonResEx.Response.value;	
 	}
 	
-	async createGames(siteid:string, data:ksGameReq):Promise<commonResWithData<games>>{
-		const resp:commonResWithData<games> = {
-			errcode: '0',
-		}
+	async createGames(siteid:string, data:ksGameReq):Promise<any>{
 		const zones:number[] = [data.zones[0].number];
 		if (data.zones[1] && data.zones[1].number !== undefined) {
 			zones.push(data.zones[1].number);
@@ -137,8 +165,8 @@ export default class DataTransController {
 				game.playerDefaults.push(pDef);
 				return tmp;
 			});
-			resp.data = await this.gamesService.create(game);
+			await this.gamesService.create(game);
 		}
-		return resp;
+		return;
 	}
 }

@@ -24,26 +24,34 @@ export default class CartsService extends defaultService<carts, cartKey> {
 	
 	async create(data: carts): Promise<carts> {
 		const carth = this.createHistoryData(data);
+		await this.cartsModel.create(data);
+		await this.cartHistoryModel.create(carth);
+		/*
 		await transaction([
 			this.cartsModel.transaction.create(data),
 			this.cartHistoryModel.transaction.create(carth),
 		], transSet);
+		*/
 		return super.findOne({cartid: data.cartid});
 	}
 
 	async update(key: cartKey, data: Partial<carts>, cond?: Partial<carts>): Promise<carts> {
 		if (data.status !== undefined) {
 			const carth = this.createHistoryData(data as carts);
-			let conds:ModelUpdateSettings | null = null;
+			let conds:ModelUpdateSettings | any = null;
 			if (cond) {
 				const condition = new Condition(cond).eq(true);
 				conds = { return: 'item', condition: condition};
 			}
+			await this.cartsModel.update(key, data, conds);
+			await this.cartHistoryModel.create(carth);
+			/*
 			const ans = await transaction([
 				this.cartsModel.transaction.update(key, data, conds),
 				this.cartHistoryModel.transaction.create(carth),
 			], transSet);
 			console.log('update trans:', ans);
+			*/
 			return super.findOne(key);
 		} else {
 			return super.update(key, data, cond);
@@ -60,11 +68,15 @@ export default class CartsService extends defaultService<carts, cartKey> {
 			cartid: data.cartid,
 		}
 		const carth = this.createHistoryData((data as unknown) as carts);
+		await this.cartsModel.update(key, partialCart);
+		await this.cartHistoryModel.create(carth);
+		/*
 		const ans = await transaction([
 			this.cartsModel.transaction.update(key, partialCart),
 			this.cartHistoryModel.transaction.create(carth),
 		], transSet);
 		console.log(ans);
+		*/
 		const fields = ['cartid', 'cartName', 'zoneid', 'fairwayno', 'location', 'distance'];
 		return super.query({zoneid: data.zoneid, fairwayno: data.fairwayno}, fields);
 	}

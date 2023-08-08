@@ -12,6 +12,10 @@ const CartsSchema = new Schema({
     type: String,
     index: [
       {
+        name: 'siteidGlobalIndex',
+        type: 'global',
+      },
+      {
         name: 'siteiddeviceidGlobalIndex',
 				type: 'global',
         rangeKey: 'deviceid'
