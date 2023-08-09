@@ -6,7 +6,7 @@ import { errorMsg } from "./Errors";
 import { JwtService } from "@nestjs/jwt";
 import { ConditionComparisonComparatorName, queryReq } from "./func.interface";
 import { Condition } from "dynamoose";
-
+import { InternalPropertiesClass } from "dynamoose/dist/InternalPropertiesClass";
 
 const jwt = new JwtService();
 const pfSite = 'union';
@@ -95,7 +95,7 @@ export async function queryTable<D extends K, K>(token:string, dbservice:any, ke
 			// if (addClubid) key.siteid = user.siteid;
 			if ((key as queryReq).queryKey) {
 				const cond = createCondition(key as queryReq);
-				resp.data = await service.queryWithCondition(cond);
+				resp.data = await service.query(cond);
 			} else {
 				resp.data = await service.query(key as Partial<D>);
 			}

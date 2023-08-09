@@ -13,7 +13,6 @@ import InCartController from "../../controller/cart/InCartController";
 @Module({
 	imports: [
 		CartsModule,
-    DevicesModule,
 		ZonesModule,
 		CouresModule,
 		DynamooseModule.forFeature([

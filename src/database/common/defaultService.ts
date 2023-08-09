@@ -26,7 +26,7 @@ export default class defaultService<T extends K, K extends defaultKey> implement
 	findAll(): Promise<T[]> {
 		return this.model.scan().exec();
 	}
-	query(key: Partial<T>, field?:string[]): Promise<QueryResponse<T>> {
+	query(key: Partial<T> | ConditionInitializer, field?:string[]): Promise<QueryResponse<T>> {
 		 const query = this.model.query(key);
 		 if (field && field.length > 0) query.attributes(field);
 		 return query.exec();
@@ -34,6 +34,7 @@ export default class defaultService<T extends K, K extends defaultKey> implement
 	delete(key:K): Promise<void> {
 		return this.model.delete(key);
 	}
+	/*
 	queryWithCondition(cond:ConditionInitializer, field?:string[]):Promise<QueryResponse<T>>{
 		const query = this.model.query(cond);
 		if (field && field.length > 0) {
@@ -41,6 +42,7 @@ export default class defaultService<T extends K, K extends defaultKey> implement
 		}
 		return query.exec();
 	}
+	*/
 	getModel() {
 		return this.model;
 	}

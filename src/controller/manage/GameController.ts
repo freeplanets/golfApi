@@ -96,7 +96,7 @@ export default class GameController {
 				const endTime = new Date(`${siteDate.queryDate} 23:59:59`).getTime()/1000;
 				console.log('queryGame', siteDate, startTime, endTime);
 				const cond = new Condition({siteid: siteDate.siteid}).where('esttimatedStartTime').between(startTime, endTime);
-				resp.data = await this.gamesService.queryWithCondition(cond);
+				resp.data = await this.gamesService.query(cond);
 			}
 		} else {
 			resp.errcode = ErrCode.TOKEN_ERROR,

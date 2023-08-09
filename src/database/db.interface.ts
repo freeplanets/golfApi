@@ -18,8 +18,8 @@ export interface defaultMethod<T extends K, K extends defaultKey> {
   update(key:K, data:Partial<T>, cond?:Partial<T>):Promise<T>;
   findOne(key:K):Promise<T>;
   findAll():Promise<T[]>;
-  query(key:Partial<T>, field?:string[]):Promise<QueryResponse<T>>;
-  queryWithCondition(cond:ConditionInitializer, field?:string[]):Promise<QueryResponse<T>>;
+  query(key:Partial<T>|ConditionInitializer, field?:string[]):Promise<QueryResponse<T>>;
+  // queryWithCondition(cond:ConditionInitializer, field?:string[]):Promise<QueryResponse<T>>;
   delete(key:K):Promise<void>;
 }
 
@@ -109,7 +109,8 @@ export interface zones extends zoneKey {
 }
 
 export interface cartKey extends defaultKey {
-  cartid: string;
+  cartid?: string;
+  deviceid?:string;
 }
 
 export interface carts extends cartKey {
@@ -133,7 +134,7 @@ export interface cartHistory extends cartKey {
   ts:number;
 }
 
-export interface deviceKey extends defaultKey {
+export interface deviceKey {
   deviceid: string;
 }
 

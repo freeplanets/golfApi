@@ -172,7 +172,7 @@ export default class InCartController {
 					const cart = carts[0];
 					console.log('cart:', cart);
 					const cond = new Condition({siteid: user.siteid}).where('endTime').eq(0);
-					const game = await this.gamesService.queryWithCondition(cond);
+					const game = await this.gamesService.query(cond);
 					if (game.count > 0) {
 						game.forEach((g) => {
 							 const fIdx = g.carts.lastIndexOf(cart.cartid)

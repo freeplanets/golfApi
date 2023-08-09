@@ -4,9 +4,11 @@ import CartsSchema from "./carts.schema";
 import CartController from "../../controller/manage/CartController";
 import CartsService from "./carts.service";
 import CartHistorySchema from "./cartHistory.schema";
+import DevicesModule from "../device/devices.module";
 
 @Module({
 	imports: [
+		DevicesModule,	
 		DynamooseModule.forFeature([
 			{
 				name: 'Carts',

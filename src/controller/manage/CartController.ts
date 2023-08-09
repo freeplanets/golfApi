@@ -1,22 +1,30 @@
 import { Body, Controller, Headers, Post, Get, Param, Delete, Put, Patch } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { cartKey, carts } from "../../database/db.interface";
+import { cartKey, carts, deviceKey, devices } from "../../database/db.interface";
 import zoneModifyResponse from "../../models/zone/zoneModifyResponse";
 import commonResponse from "../../models/common/commonResponse";
 import zoneResponse from "../../models/zone/zoneResponse";
-import { createTableData, deleteTableData, getTableData, hashKey, queryTable, updateTableData } from "../../function/Commands";
+import { createTableData, deleteTableData, getTableData, hashKey, queryTable, tokenCheck, updateTableData } from "../../function/Commands";
 import CartsService from "../../database/cart/carts.service";
 import cartData from "../../models/cart/cartData";
 import { cartEx, cartQueryEx, cartResEx } from "../../models/examples/cart/cartEx";
 import cartResponse from "../../models/cart/cartResponse";
 import queryCartsRequest from "../../models/cart/queryCartsRequest";
 import cartsResponse from "../../models/cart/cartsResponse";
+import DevicesService from "../../database/device/devices.service";
+import { DeviceStatus } from "../../function/func.interface";
+import { ErrCode } from "../../models/enumError";
+import { errorMsg } from "../../function/Errors";
+import { commonRes } from "../../models/if";
 
 @ApiBearerAuth()
 @ApiTags('Manage')
 @Controller('manage')
 export default class CartController {
-	constructor(private readonly cartService:CartsService){}
+	constructor(
+		private readonly cartsService:CartsService,
+		private readonly devicesService:DevicesService,
+	){}
 
 	@Put('cart')
 	@ApiOperation({summary: '球車資料新增', description: '球車資料新增'})
@@ -24,7 +32,7 @@ export default class CartController {
 	@ApiResponse({status: 200, description: '回傳物件', type: zoneModifyResponse })
 	async add(@Body() body:carts,@Headers('WWW-AUTH') token: Record<string, string>){
 		body.cartid = hashKey();
-		const resp = await createTableData<carts, cartKey>(String(token), this.cartService, body);
+		const resp = await createTableData<carts, cartKey>(String(token), this.cartsService, body);
 		return resp;
 	}
 
@@ -38,7 +46,7 @@ export default class CartController {
 			cartid: cartid,
 		}
 		if (body.cartid) delete body.cartid;
-		const resp = await updateTableData<carts, cartKey>(String(token), this.cartService, body, keys);
+		const resp = await updateTableData<carts, cartKey>(String(token), this.cartsService, body, keys);
 		return resp;
 	}
 
@@ -47,7 +55,7 @@ export default class CartController {
 	@ApiParam({name:'cartid', description:'球車代號'})
 	@ApiResponse({status: 200, description: '回傳物件', type: zoneResponse })
 	async getOne(@Param('cartid') cartid:string,@Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await getTableData(String(token), this.cartService, {cartid: cartid});
+		const resp = await getTableData(String(token), this.cartsService, {cartid: cartid});
 		return resp;
 	}
 
@@ -56,7 +64,7 @@ export default class CartController {
 	@ApiParam({name:'cartid', description:'球車代號'})
 	@ApiResponse({status: 200, description:'刪除球車回傳物件', type: commonResponse})
 	async delete(@Param('cartid') cartid:string, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await deleteTableData(String(token), this.cartService, {cartid: cartid});
+		const resp = await deleteTableData(String(token), this.cartsService, {cartid: cartid});
 		return resp;
 	}
 
@@ -66,7 +74,89 @@ export default class CartController {
 	@ApiResponse({status: 200, description:'球車回傳物件', type: cartsResponse})
 	async query(@Body() body:Partial<carts>, @Headers('WWW-AUTH') token:Record<string, string>){
 		// console.log('cart query', body);
-		const resp = await queryTable(String(token), this.cartService, body);
+		const resp = await queryTable(String(token), this.cartsService, body);
 		return resp;
+	}
+
+	@Get('assignDevice/:cartid/:deviceid')
+	@ApiOperation({ summary: '球車配置裝置(原裝置要改回idle,cartid清空)', description: '球車配置裝置(原裝置要改回idle,cartid清空)'})
+	@ApiParam({name:'cartid', description:'球車代號'})
+	@ApiParam({name:'deviceid', description:'裝置代號'})
+	@ApiResponse({status: 200, description:'刪除球車回傳物件', type: commonResponse})	
+	async assignDevice(@Param('cartid') cartid:string, @Param('deviceid') deviceid:string, @Headers('WWW-AUTH') token:Record<string, string>){
+		let resp:commonRes = {
+			errcode: ErrCode.OK,
+		}
+		const user = tokenCheck(String(token));
+		if (user) {
+			resp = await this.updateCartAndDevice(cartid, deviceid)
+		} else {
+			resp.errcode = ErrCode.TOKEN_ERROR;
+			resp.error = {
+				message: errorMsg('TOKEN_ERROR'),
+			}
+		}
+		return resp;
+	}
+
+
+	async updateCartAndDevice(cartid:string, deviceid:string) {
+		const resp:commonRes = {
+			errcode: '0',
+		}
+		const cartsKey:cartKey = {
+			cartid,
+		}
+		const devicesKey:deviceKey = {
+			deviceid
+		};
+		try {
+			console.log(devicesKey);
+			let ans = await this.devicesService.findOne(devicesKey);
+			console.log('device', ans);
+			let device:devices;
+			if (device = ans) {
+				// resign old device to idle
+				let cart = await this.cartsService.query(cartsKey, ['deviceid']);
+				if (cart[0].deviceid) {
+					await this.setDeviceStatue(cart[0].deviceid, DeviceStatus.idle);				
+				}
+				// update cart device
+				const partialCart:Partial<carts> = {
+					deviceid,
+					deviceName: device.deviceName,
+					deviceType: device.deviceType,
+				}
+				await this.cartsService.update(cartsKey, partialCart);
+				// set new device to onduty
+				await this.setDeviceStatue(deviceid, DeviceStatus.onduty, cartid);
+			} else {
+				resp.errcode = ErrCode.ITEM_NOT_FOUND;
+				resp.error = {
+					message: errorMsg('ITEM_NOT_FOUND'),
+					extra: {
+						deviceid,
+					}
+				}
+			}
+		} catch(e) {
+			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
+			resp.error = {
+				message: errorMsg('DATABASE_ACCESS_ERROR'),
+				extra: e,
+			}
+		}
+		return resp;
+	}
+
+	async setDeviceStatue(deviceid:string, status:DeviceStatus, cartid:string='') {
+		const devicesKey:deviceKey = {
+			deviceid
+		};
+		const data:Partial<devices> = {
+			status,
+			cartid,
+		}		
+		await this.devicesService.update(devicesKey, data);
 	}
 }

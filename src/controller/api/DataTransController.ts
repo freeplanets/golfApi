@@ -84,7 +84,7 @@ export default class DataTransController {
 		}
 		const subCond = new Condition('refNo').in(zones);
 		const cond = new Condition('siteid').eq(siteid).parenthesis(subCond);
-		const ans = await this.zonesService.queryWithCondition(cond);
+		const ans = await this.zonesService.query(cond);
 		if (ans.count>0) {
 			const zoneids: string[] = [];
 			ans.forEach((itm) => {

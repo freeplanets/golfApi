@@ -25,6 +25,16 @@ export enum ConditionComparisonComparatorName {
 	in = "in",
 	between = "between"
 }
+export enum CartStatus {
+	idle = 'idle',
+	onduty = 'onduty',
+	maintance = 'maintance',
+}
+export enum DeviceStatus {
+	idle = 'idle',
+	onduty = 'onduty',
+	maintance = 'maintance',
+}
 export interface oneOfType {
 	oneOf: string | number | boolean;
 }
