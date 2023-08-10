@@ -3,8 +3,8 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } 
 import { Condition } from "dynamoose";
 import GamesService from "../../database/game/games.service";
 import gameData from "../../models/game/gameData";
-import { gamePartialReqEx, gameReqEx, getGamesReqEx } from "../../models/examples/game/gameDataEx";
-import { gameKey, games } from "../../database/db.interface";
+import { assignCartEx, gamePartialReqEx, gameReqEx, getGamesReqEx } from "../../models/examples/game/gameDataEx";
+import { carts, gameKey, games } from "../../database/db.interface";
 import { createTableData, deleteTableData, getTableData, hashKey, tokenCheck, updateTableData } from "../../function/Commands";
 import gamePartialData from "../../models/game/gamePartialData";
 import gameResponse from "../../models/game/gameResponse";
@@ -13,6 +13,9 @@ import siteDateRequest from "../../models/game/siteDateRequest";
 import siteDateReq, { commonResWithData } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
+import assignCartRequest from "../../models/game/assignCartRequest";
+import CartsService from "../../database/cart/carts.service";
+import { CartStatus } from "../../function/func.interface";
 
 @ApiBearerAuth()
 @ApiTags('Manage')
@@ -20,6 +23,7 @@ import { errorMsg } from "../../function/Errors";
 export default class GameController {
 	constructor(
 		private readonly gamesService:GamesService,
+		private readonly cartsService:CartsService,
 	){}
 
 	@Put('game')
@@ -77,9 +81,27 @@ export default class GameController {
 		return resp;
 	}
 
+	@Post('assignCart/:gameid')
+	@ApiOperation({summary: '指派球車/ assign cart for game', description: '指派球車/ assign cart for game'})
+	@ApiParam({name: 'gameid', description: '編組代號'})
+	@ApiBody({description: '球車代號', type: assignCartRequest, examples: assignCartEx})
+	async assignCart(@Param('gameid') gameid:string, @Body() body:Partial<games>, @Headers('WWW-AUTH') token:Record<string, string>){
+		const resp = await updateTableData(String(token), this.gamesService, body, {gameid});
+		if (resp.errcode === ErrCode.OK) {
+			const service = this.cartsService;
+			body.carts.forEach(async (cartid) => {
+				const cartData:Partial<carts> = {
+					status: CartStatus.onduty,
+				}
+				await service.update({ cartid }, cartData);
+			})
+		}		
+		return resp;
+	}
+
 	async queryGamesByDate(token:string, siteDate:siteDateReq):Promise<commonResWithData<games[]>> {
 		let resp:commonResWithData<games[]> = {
-			errcode: '0',		
+			errcode: ErrCode.OK,		
 		}		
 		const user = tokenCheck(token);
 		if (user) {

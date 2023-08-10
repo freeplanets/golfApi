@@ -49,7 +49,7 @@ const ksGameReqExVal:ksGameReq = {
 			}
 		}		
 	],
-	teeOffTimestamp: 1620029793,
+	teeOffTimestamp: Math.round(new Date().getTime() / 1000),
 }
 export const ksGameReqEx:Record<'Request', ExampleObject> = {
 	Request: {

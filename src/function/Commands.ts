@@ -25,7 +25,7 @@ export function tokenCheck(token:string): platformUser | false {
 }
 export async function FuncWithTockenCheck<D>(token:string, P:Promise<D>) {
 	let resp:commonResWithData<D> = {
-		errcode: '0',		
+		errcode: ErrCode.OK,		
 	}	
 	if (tokenCheck(token)) {
 		resp = await P.then();
@@ -39,7 +39,7 @@ export async function FuncWithTockenCheck<D>(token:string, P:Promise<D>) {
 }
 export async function deleteTableData<D extends defaultKey>(token:string, dbservice:any, keys:defaultKey) {
 	let resp:commonRes = {
-		errcode: '0',		
+		errcode: ErrCode.OK,		
 	}	
 	if (keys) {
 		const user = tokenCheck(token);
@@ -86,7 +86,7 @@ export async function deleteTableData<D extends defaultKey>(token:string, dbserv
 export async function queryTable<D extends K, K>(token:string, dbservice:any, key: Partial<D> | queryReq) {
 	console.log('queryTable:', key);
 	let resp:commonResWithData<D[]> = {
-		errcode: '0',		
+		errcode: ErrCode.OK,		
 	}	
 	const user = tokenCheck(token);
 	if (user) {
@@ -116,7 +116,7 @@ export async function queryTable<D extends K, K>(token:string, dbservice:any, ke
 }
 export async function getTableData<D extends K, K extends defaultKey>(token:string, dbservice:any, keys:K):Promise<commonResWithData<D>> {
 	const resp:commonResWithData<D> = {
-		errcode: '0',		
+		errcode: ErrCode.OK,		
 	}
 	const user = tokenCheck(token);
 	if (user) {
@@ -151,7 +151,7 @@ export async function getTableData<D extends K, K extends defaultKey>(token:stri
 }
 export async function updateTableData<D extends K, K extends defaultKey>(token:string, dbservice:any, data:Partial<D>, keys:K, filter?:Partial<D>):Promise<commonResWithData<D>> {
 	const resp:commonResWithData<D> = {
-		errcode: '0',		
+		errcode: ErrCode.OK,		
 	}
 	const user = tokenCheck(token);
 	if (user) {
@@ -166,6 +166,7 @@ export async function updateTableData<D extends K, K extends defaultKey>(token:s
 				if (isMyClub(user, f.siteid)) {
 					data = removeUnderLineData(data);
 					console.log('removeUnderLineData:', JSON.stringify(data));
+					// console.log('service:', service);
 					resp.data = await service.update(keys, data, filter);
 				} else { 
 					resp.errcode = ErrCode.ERROR_PARAMETER;
@@ -198,7 +199,7 @@ export async function updateTableData<D extends K, K extends defaultKey>(token:s
 
 export async function createTableData<D extends K, K extends defaultKey>(token:string, dbservice:any, data:D):Promise<commonResWithData<D>> {
 	const resp:commonResWithData<D> = {
-		errcode: '0',		
+		errcode: ErrCode.OK,		
 	}
 	const user = tokenCheck(token);
 	if (user) {

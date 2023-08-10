@@ -113,12 +113,13 @@ export default class CartController {
 		try {
 			console.log(devicesKey);
 			let ans = await this.devicesService.findOne(devicesKey);
-			console.log('device', ans);
+			// console.log('device', ans);
 			let device:devices;
 			if (device = ans) {
 				// resign old device to idle
 				let cart = await this.cartsService.query(cartsKey, ['deviceid']);
 				if (cart[0].deviceid) {
+					// console.log('check1');
 					await this.setDeviceStatue(cart[0].deviceid, DeviceStatus.idle);				
 				}
 				// update cart device
@@ -127,8 +128,10 @@ export default class CartController {
 					deviceName: device.deviceName,
 					deviceType: device.deviceType,
 				}
+				// console.log('check2', partialCart);
 				await this.cartsService.update(cartsKey, partialCart);
 				// set new device to onduty
+				// console.log('check3');
 				await this.setDeviceStatue(deviceid, DeviceStatus.onduty, cartid);
 			} else {
 				resp.errcode = ErrCode.ITEM_NOT_FOUND;
@@ -149,14 +152,15 @@ export default class CartController {
 		return resp;
 	}
 
-	async setDeviceStatue(deviceid:string, status:DeviceStatus, cartid:string='') {
+	async setDeviceStatue(deviceid:string, status:DeviceStatus, cartid:string = '') {
 		const devicesKey:deviceKey = {
 			deviceid
 		};
 		const data:Partial<devices> = {
 			status,
 			cartid,
-		}		
+		}
+		// console.log('setDeviceStatus:', data);
 		await this.devicesService.update(devicesKey, data);
 	}
 }

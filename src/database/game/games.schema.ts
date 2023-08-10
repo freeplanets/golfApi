@@ -1,4 +1,5 @@
 import { Schema } from "dynamoose";
+import teeObjectSchema from "../zone/common/tee.schema";
 
 const GamesSchema = new Schema({
   gameid: {
@@ -76,7 +77,8 @@ const GamesSchema = new Schema({
             type: String
           },
           tee: {
-            type: String
+            type: Object,
+            schema: teeObjectSchema,
           },
           playerOrder: {
             type: Number

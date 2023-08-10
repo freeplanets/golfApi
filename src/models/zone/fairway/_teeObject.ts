@@ -13,7 +13,20 @@ export default class _teeObject implements teeObject {
 	teeColor: string;
 
 	@ApiProperty({
+		description: '斜度指數',
+		required: false,
+	})
+	slope?: number;
+
+	@ApiProperty({
+		description: '難度指數',
+		required: false,
+	})
+	rating?: number;
+
+	@ApiProperty({
 		description: '離果領距離',
+		required: false,
 	})
 	distance?: number;
 }

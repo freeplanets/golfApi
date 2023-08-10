@@ -7,7 +7,6 @@ import ZonesModule from "../zone/zones.module";
 import CouresModule from "../course/courses.module";
 import GameController from "../../controller/manage/GameController";
 import CartsModule from "../cart/carts.module";
-import DevicesModule from "../device/devices.module";
 import InCartController from "../../controller/cart/InCartController";
 
 @Module({

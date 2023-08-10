@@ -1,5 +1,5 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
-import { caddie, games, player, playerDefault, playerGameData, score, sideGame } from "../../../database/db.interface";
+import { caddie, games, player, playerDefault, playerGameData, score, sideGame, teeObject } from "../../../database/db.interface";
 import { HcpType, sideGameFormat, sideGameGroup, sideGames } from "../../../models/enum";
 import siteDateReq, { commonResWithData } from "../../../models/if";
 
@@ -31,10 +31,16 @@ const playerGD: playerGameData = {
   points: 0,
   holes:[scores1],
 }
+const myTee: teeObject = {
+  teeColor: 'White',
+  teeName: 'Regular',
+  rating: 71.5,
+  slope: 134,
+}
 const playerO: player = {
   playerName: 'James',
   hcp: '20',
-  tee: 'RedTee',
+  tee: myTee,
   playerOrder: 1,
   gross: 0,
   holes: [scores1],
@@ -58,7 +64,7 @@ const gameDataPartialExVal: Partial<games> = {
   carts: ['cartid'],
   stepInZone: 'zoneid1',
   stepInFairway: 1,
-  esttimatedStartTime: 1690387200,
+  esttimatedStartTime: Math.round(new Date().getTime() / 1000),
   startTime: 0,
   endTime: 0,
   players: [playerO],
@@ -78,7 +84,7 @@ const gameDataExVal: games = {
   carts: ['cartid'],
   stepInZone: 'zoneid1',
   stepInFairway: 1,
-  esttimatedStartTime: 1690387200,
+  esttimatedStartTime: Math.round(new Date().getTime() / 1000),
   startTime: 0,
   endTime: 0,
   players: [playerO],
@@ -102,7 +108,11 @@ const gameRexExVal:commonResWithData<games> = {
 
 const siteDateExVal:siteDateReq = {
   siteid: 'linkougolf',
-  queryDate: '2023-07-31',
+  queryDate: new Date().toLocaleDateString().replaceAll('/','-'),
+}
+
+const assignCartExVal:Partial<games> = {
+  carts: ['cartid'], 
 }
 
 export const gameResEx:Record<'Response', ExampleObject> = {
@@ -138,5 +148,11 @@ export const sideGameReqEx:Record<'Request', ExampleObject> = {
 export const updateGamePointEx:Record<'Request', ExampleObject> = {
   Request: {
     value: partialPlayer,
+  }
+}
+
+export const assignCartEx:Record<'Request', ExampleObject> = {
+  Request: {
+    value: assignCartExVal,
   }
 }

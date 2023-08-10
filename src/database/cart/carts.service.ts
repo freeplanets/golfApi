@@ -37,13 +37,18 @@ export default class CartsService extends defaultService<carts, cartKey> {
 
 	async update(key: cartKey, data: Partial<carts>, cond?: Partial<carts>): Promise<carts> {
 		if (data.status !== undefined) {
-			const carth = this.createHistoryData(data as carts);
+			const carth = this.createHistoryData(data as carts, key);
 			let conds:ModelUpdateSettings | any = null;
 			if (cond) {
 				const condition = new Condition(cond).eq(true);
 				conds = { return: 'item', condition: condition};
 			}
-			await this.cartsModel.update(key, data, conds);
+			if (conds) {
+				console.log('update with cond', conds);
+				await this.cartsModel.update(key, data, conds);
+			} else {
+				await this.cartsModel.update(key, data);	
+			}
 			await this.cartHistoryModel.create(carth);
 			/*
 			const ans = await transaction([
@@ -67,7 +72,7 @@ export default class CartsService extends defaultService<carts, cartKey> {
 		const key:cartKey = {
 			cartid: data.cartid,
 		}
-		const carth = this.createHistoryData((data as unknown) as carts);
+		const carth = this.createHistoryData((data as unknown) as carts, key);
 		await this.cartsModel.update(key, partialCart);
 		await this.cartHistoryModel.create(carth);
 		/*
@@ -87,10 +92,10 @@ export default class CartsService extends defaultService<carts, cartKey> {
 		const cond = new Condition(key).where('ts').between(start, end);
 		return this.cartHistoryModel.query(cond).exec();
 	}
-	createHistoryData(data:carts) {
+	createHistoryData(data:carts, key?:cartKey) {
 		const dat:cartHistory = {
 			carthistoryid: hashKey(),
-			cartid: data.cartid,
+			cartid: data.cartid ? data.cartid : key.cartid,
 			//status: data.status,
 			ts: new Date().getTime()/1000,
 		}

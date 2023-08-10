@@ -1,4 +1,5 @@
 import { Schema } from "dynamoose";
+import teeObjectSchema from "../zone/common/tee.schema";
 
 const CoursesSchema = new Schema({
   courseid: {
@@ -27,10 +28,14 @@ const CoursesSchema = new Schema({
     type: String,
   },
   holes: {
-    type: Number
+    type: Number,
   },
   par: {
-    type: Number
+    type: Number,
+  },
+  tees: {
+    type: Array,
+    schema: [teeObjectSchema],
   },
   slope: {
     type: Number,

@@ -1,7 +1,8 @@
-import { courses } from "src/database/db.interface";
+import { courses, teeObject } from "src/database/db.interface";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsDate, IsNumber, IsString } from "class-validator";
 import _KeySiteId from "../common/_KeySiteId";
+import _teeObject from "../zone/fairway/_teeObject";
 
 export default class courseData implements courses {
 	@ApiProperty({
@@ -46,6 +47,13 @@ export default class courseData implements courses {
 	})
 	@IsNumber()
   par: number;
+
+	@ApiProperty({
+		description: '難度',
+		isArray: true,
+		type: _teeObject,
+	})
+	tees: teeObject[];
 
 	@ApiProperty({
 		description: '斜度指數',

@@ -1,6 +1,5 @@
-import { Body, Controller, Headers, HttpCode, Param, Post, Res } from "@nestjs/common";
+import { Body, Controller, Headers, Param, Post } from "@nestjs/common";
 import { ApiBody, ApiHeader, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
-import commonResponse from "../../models/common/commonResponse";
 import { commonResEx } from "../../models/examples/commonResponseEx";
 import ksGameRequest from "../../models/transData/ks/request/ksGameRequest";
 import { ksGameReqEx } from "../../models/transData/ks/request/ksGameReqEx";
@@ -89,19 +88,31 @@ export default class DataTransController {
 			const zoneids: string[] = [];
 			ans.forEach((itm) => {
 				// console.log('itm:',itm);
-				zoneids[itm.refNo] = itm.zoneid;
+				// zoneids[itm.refNo] = itm.zoneid;
+				zoneids.push(itm.zoneid);
 			});
 			// console.log(zoneids);
+			/*
 			const searchCourseKey:Partial<courses> = {
 				outZone: zoneids[zones[0]],
 			}
 			if (zones[1] !== undefined) {
 				searchCourseKey.inZone = zoneids[zones[1]];
 			}
-			// console.log(searchCourseKey);
-			const ans1 = await this.coursesService.query(searchCourseKey)
+			*/
+
+			let cond = new Condition().where('outZone').eq(zoneids[0]).and().where('inZone').eq(zoneids[1]);
+			//cond.or().parenthesis((condition) => condition.where('outZone').eq(zoneids[1]).and().where('inZone').eq(zoneids[0]));
+			//.or().where('outZone').eq(zoneids[1]).and().where('inZone').eq(zoneids[0]);
+			let ans1 = await this.coursesService.query(cond);
+			if (ans1.count === 0) {
+				cond = new Condition().where('outZone').eq(zoneids[1]).and().where('inZone').eq(zoneids[0]); 
+				ans1 = await this.coursesService.query(cond);
+			}
+			console.log('after course check', ans1.count);
 			// return ans1;
 			const course = ans1[0];
+			console.log('course:', course);
 			const zone = [];
 			if (ans[0].refNo === data.zones[0].number) {
 				zone.push(ans[0]);
@@ -146,9 +157,11 @@ export default class DataTransController {
 						holes.push(sco);
 					})
 				});
+				const ctee = course.tees.find((t) => t.teeColor === itm.tee.name);
+				console.log('ctee', itm.tee.name, ctee);
 				const tmp:player = {
 					playerName: itm.name,
-					tee: itm.tee.name,
+					tee: ctee,
 					hcp: '0',
 					playerOrder: idx,
 					gross: 0,

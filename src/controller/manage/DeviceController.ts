@@ -21,7 +21,7 @@ export default class DeviceController {
 	@ApiResponse({status: 200, description: '回傳物件', type: deviceReponse })
 	async add(@Body() body:devices,@Headers('WWW-AUTH') token: Record<string, string>){
 		// console.log('device Put', body, token);
-		body.deviceid = hashKey();
+		if(!body.deviceid) body.deviceid = hashKey();
 		const resp = await createTableData<devices, deviceKey>(String(token), this.devicesService, body);
 		return resp;
 	}

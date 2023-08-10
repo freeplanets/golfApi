@@ -1,7 +1,25 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
-import { courses } from "src/database/db.interface";
-import { commonResWithData } from "src/models/if";
+import { courses, teeObject } from "../../../database/db.interface";
+import { commonResWithData } from "../../../models/if";
 
+const rs1:teeObject = {
+	teeName: 'Regular',
+	teeColor: 'White',
+	rating: 71.5,
+	slope: 134,
+}
+const rs2: teeObject = {
+	teeName:'Champion',
+	teeColor: 'Blue',
+	rating: 73.5,
+	slope: 138,	
+}
+const rs3: teeObject = {
+	teeName: 'Ladies',
+	teeColor: 'Red',
+	rating: 73.5,
+	slope: 133,	
+}
 const courseExVal:Partial<courses> = {
 	// courseid: '',
 	siteid: 'linkougolf',
@@ -10,6 +28,7 @@ const courseExVal:Partial<courses> = {
 	inZone: '02',
 	holes: 18,
 	par: 72,
+	tees: [rs1, rs2, rs3],
 }
 
 const courseResExVal:commonResWithData<Partial<courses>> = {

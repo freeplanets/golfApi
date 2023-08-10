@@ -41,10 +41,6 @@ const DevicesSchema = new Schema({
   },
   cartid: {
     type: String,
-    index: {
-			type: 'global',
-      // global: true
-    }
   },
 	modifyid: {
 		type: String,

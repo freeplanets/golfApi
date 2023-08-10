@@ -27,6 +27,8 @@ export interface defaultMethod<T extends K, K extends defaultKey> {
 export interface teeObject {
   teeName:string;
   teeColor:string;
+  slope?:number;
+  rating?:number;
   distance?:number,
 }
 
@@ -108,7 +110,7 @@ export interface zones extends zoneKey {
   modifyTime?:number;
 }
 
-export interface cartKey extends defaultKey {
+export interface cartKey {
   cartid?: string;
   deviceid?:string;
 }
@@ -177,7 +179,7 @@ export interface sideGame {
 export interface player {
   playerName: string;
   hcp: string;
-  tee: string;
+  tee: teeObject;
   playerOrder:number;
   gross:number;
   holes: score[],
@@ -196,7 +198,7 @@ export interface caddie {
   caddieName?:string,
 }
 
-export interface gameKey extends defaultKey {
+export interface gameKey {
   gameid:string;
 }
 export interface games extends gameKey {
@@ -222,6 +224,7 @@ export interface games extends gameKey {
 export interface courseKey extends defaultKey {
   courseid: string;
 }
+
 export interface courses extends courseKey {
   siteid:string;
   courseName:string;
@@ -229,6 +232,7 @@ export interface courses extends courseKey {
   inZone?:string;
   holes:number;
   par:number;
+  tees:teeObject[],
   slope?:number;
   rating?:number;
   courseType?:string;

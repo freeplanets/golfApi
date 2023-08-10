@@ -4,8 +4,8 @@ import { Condition } from "dynamoose";
 import { commonResEx } from "../../models/examples/commonResponseEx";
 import GamesService from "../../database/game/games.service";
 import CartsService from "../../database/cart/carts.service";
-import { tokenCheck } from "../../function/Commands";
-import { carts, games, sideGame } from "../../database/db.interface";
+import { queryTable, tokenCheck } from "../../function/Commands";
+import { carts, games, sideGame, zones } from "../../database/db.interface";
 import { commonResWithData, positonReq } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
@@ -17,7 +17,7 @@ import positionResponse from "../../models/cart/positionResponse";
 import _partialPlayerObject from "../../models/game/_partialPlayerObject";
 import commonResponse from "../../models/common/commonResponse";
 import playerDefaultRequest from "../../models/game/playerDefaultsRequest";
-import EncDecString from "../../function/EncDecString";
+import ZonesService from "../../database/zone/zones.service";
 
 @ApiBearerAuth()
 @ApiTags('Cart')
@@ -26,16 +26,15 @@ export default class InCartController {
 	constructor(
 		private readonly gamesService:GamesService,
 		private readonly cartService:CartsService,
+		private readonly zonesService:ZonesService,
 	){}
 
 	@Get('site/:siteid')
-	@ApiOperation({summary:'取得球場完整資料 / get golf club complete information(working.....)', description: '取得球場完整資料 / get golf club complete information'})
+	@ApiOperation({summary:'取得整資料 / get golf club complete information(working.....)', description: '取得球場完整資料 / get golf club complete information'})
 	@ApiParam({name: 'siteid', description: '球場代號'})
-	getSiteData(@Param('siteid') siteid:string, @Headers('WWW-AUTH') token:Record<string, string>){
-		console.log('siteid:', siteid, process.env.API_KEY);
-		const eds:EncDecString = new EncDecString(process.env.API_KEY);
-		console.log(siteid, JSON.parse(eds.Decrypted(siteid)));
-		return commonResEx.Response.value;
+	async getSiteData(@Param('siteid') siteid:string, @Headers('WWW-AUTH') token:Record<string, string>){
+		const resp = await queryTable(String(token), this.zonesService, { siteid } );
+		return resp;
 	}
 
 	@Get('getCheckInData/:deviceid')
@@ -157,9 +156,10 @@ export default class InCartController {
 
 	getResult(){}
 
-	async searchCheckInData(token:string, deviceid:string):Promise<commonResWithData<games>> {
-		let resp:commonResWithData<games> = {
-			errcode: '0',		
+	async searchCheckInData(token:string, deviceid:string):Promise<commonResWithData<any>> {
+		let resp:commonResWithData<any> = {
+			errcode: '0',
+			data: {}		
 		}		
 		const user = tokenCheck(token);
 		if (user) {
@@ -171,22 +171,28 @@ export default class InCartController {
 				if (carts.count > 0) {
 					const cart = carts[0];
 					console.log('cart:', cart);
-					const cond = new Condition({siteid: user.siteid}).where('endTime').eq(0);
+					let cond = new Condition({siteid: user.siteid}).where('endTime').eq(0);
 					const game = await this.gamesService.query(cond);
 					if (game.count > 0) {
 						game.forEach((g) => {
 							 const fIdx = g.carts.lastIndexOf(cart.cartid)
-							 if (fIdx > -1) resp.data = game[0];
+							 if (fIdx > -1) resp.data.game = game[0];
 						})
 					}
-					if (!resp.data) {
+					if (!resp.data.game) {
 						resp.errcode = ErrCode.ITEM_NOT_FOUND;
 						resp.error = {
 							message: errorMsg('ITEM_NOT_FOUND'),
 						}
+					} else {
+						const g = resp.data.game as games
+						const zones = [g.outZone, g.inZone];
+						console.log('zones:', zones);
+						cond = new Condition({siteid: user.siteid}).where('zoneid').in(zones)
+						resp.data.zones = await this.zonesService.query(cond);
+						console.log('after query zones');
 					}
 				}
-	
 		} else {
 			resp.errcode = ErrCode.TOKEN_ERROR,
 			resp.error = {

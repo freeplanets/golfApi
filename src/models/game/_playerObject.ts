@@ -1,7 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { player, score } from "../../database/db.interface";
+import { player, score, teeObject } from "../../database/db.interface";
 import { AnyObject } from "../../models/if";
 import _scoreObject from "./_scoreObject";
+import _teeObject from "../zone/fairway/_teeObject";
 
 export default class _playerObject implements player {
 	@ApiProperty({
@@ -15,9 +16,10 @@ export default class _playerObject implements player {
 	hcp: string;
 
 	@ApiProperty({
-		description: 'T台名稱',
+		description: 'T台資料物件',
+		type: _teeObject,
 	})
-	tee: string;
+	tee: teeObject;
 
 	@ApiProperty({
 		description: '擊球順序',
