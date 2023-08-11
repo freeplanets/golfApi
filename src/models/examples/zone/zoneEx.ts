@@ -1,7 +1,7 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
 import { fairwayObject, teeObject, zones } from "../../../database/db.interface";
 import { fairwayInfoEx } from "./fairwayInfoEx";
-import { commonResWithData } from "src/models/if";
+import { commonResWithData } from "../../../models/if";
 const tee1:teeObject = {
 	teeName: 'WhiteTee',
 	teeColor: 'White',

@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNumber, IsString } from "class-validator";
 import { carts } from "src/database/db.interface";
+import { CartStatus } from "../../function/func.interface";
 
 export default class queryCartsRequest implements Partial<carts> {
 	@ApiProperty({
@@ -32,8 +33,9 @@ export default class queryCartsRequest implements Partial<carts> {
 
 	@ApiProperty({
 		description: '球車狀態',
+		enum: CartStatus,
 		required: false,
 	})
 	@IsString()
-	status: string;
+	status?: CartStatus;
 }

@@ -2,6 +2,7 @@ import { QueryResponse } from "nestjs-dynamoose";
 import { HcpType, mapAssetObjectType, sideGameFormat, sideGameGroup, sideGames } from "../models/enum";
 import { AnyObject } from "../models/if";
 import { ConditionInitializer } from "dynamoose/dist/Condition";
+import { CartStatus } from "../function/func.interface";
 
 export interface defaultKey {
   siteid?: string;
@@ -120,7 +121,7 @@ export interface carts extends cartKey {
   siteid:string;
   zoneid?:string;
   fairwayno?:number;
-  status:string;
+  status:CartStatus;
   location?:mapLatLong;
   distance?:number;
   loctm?:number;

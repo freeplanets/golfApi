@@ -25,12 +25,14 @@ const DevicesSchema = new Schema({
         name: 'siteidGlobalIndex',
         type: 'global',
       },
+      /*
       {
         name: 'siteidcartidGlobalIndex',
 				type: 'global',
         // global: true,
         rangeKey: 'cartid'
       },
+      */
       {
         name: 'siteidstatusGlobalIndex',
 				type: 'global',

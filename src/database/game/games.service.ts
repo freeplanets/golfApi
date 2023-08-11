@@ -1,8 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import defaultService from "../common/defaultService";
-import { gameKey, games, playerDefault, sideGame } from "../db.interface";
+import { gameKey, games, playerDefault, playerGameData, sideGame } from "../db.interface";
 import { InjectModel, Model } from "nestjs-dynamoose";
 import _partialPlayerObject from "../../models/game/_partialPlayerObject";
+import { HcpType } from "../../models/enum";
 
 @Injectable()
 export default class GamesService extends defaultService<games, gameKey> {
@@ -12,23 +13,20 @@ export default class GamesService extends defaultService<games, gameKey> {
 	){
 		super(gamesModel);
 	}
-	async setPlayerDefault(gameid:string, data:playerDefault[]) {
-		const key:gameKey = {
-			gameid,
-		};
-		return super.update(key, {playerDefaults: data});
-	}
 	async registerSideGame(gameid:string, data:sideGame){
 		const key:gameKey = {
 			gameid,
 		};
-		const f = await super.query(key, ['sideGames']);
-		if (f[0]) {
-			const sideGames = f[0].sideGames.map((item) => {
-				if (item.sideGameName === data.sideGameName) return data;
-				return item;
-			});
-			return super.update(key, {sideGames});
+		const ans = await super.query(key, ['playerDefaults','sideGames']);
+		if (ans.count > 0) {
+			const game = ans[0];
+			const fIdx = game.sideGames.findIndex((itm) => itm.sideGameName === data.sideGameName);
+			if (fIdx === -1){
+				game.sideGames.push(data);
+			} else {
+				game.sideGames[fIdx] = data;
+			}
+			return this.update(key, game);
 		}
 		return undefined;
 	}
@@ -54,5 +52,32 @@ export default class GamesService extends defaultService<games, gameKey> {
 			return super.update(key, {players});
 		}
 		return undefined;		
+	}
+	handicapCheck(type:HcpType, playerD:playerDefault[], playerGD:playerGameData[]):playerGameData[]{
+		switch(type) {
+			case HcpType.NoHcp:
+				return playerGD.map((itm) => {
+					itm.hcp = '0';
+					return itm;
+				});
+			case HcpType.FullHcp:
+				return playerGD.map((itm) => {
+					const f = playerD.find((p) => p.playerName === itm.playerName);
+					if (f) {
+						itm.hcp = f.hcp;
+					}
+					return itm;
+				})
+			case HcpType.HcpDiff:
+				const hcps = playerD.map((itm) => itm.hcp);
+
+		}
+		return playerGD;
+	}
+	hcpDiifRef(hcps:string[]) {
+		let newHcps=[];
+		hcps.forEach((itm) => {
+			newHcps[itm] = parseInt(itm.replace('+', '-'), 10);
+		})
 	}
 }

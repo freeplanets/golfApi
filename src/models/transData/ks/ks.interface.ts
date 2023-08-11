@@ -1,4 +1,4 @@
-import { AnyObject } from "src/models/if";
+import { AnyObject } from "../../../models/if";
 
 export interface ksCaddie {
   number: string;

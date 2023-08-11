@@ -46,13 +46,47 @@ const playerO: player = {
   holes: [scores1],
   extra: {},	
 }
+
+const player1: playerGameData = {
+  selected: true,
+  playerName: '李小明',
+  hcp:'20',
+  betterballGroup: sideGameGroup.NONE,
+  points: 0,
+  holes:[scores1],
+}
+const player2: playerGameData = {
+  selected: true,
+  playerName: '張小四',
+  hcp:'20',
+  betterballGroup: sideGameGroup.NONE,
+  points: 0,
+  holes:[scores1],
+}
+const player3: playerGameData = {
+  selected: true,
+  playerName: '王大大',
+  hcp:'20',
+  betterballGroup: sideGameGroup.NONE,
+  points: 0,
+  holes:[scores1],
+}
+const player4: playerGameData = {
+  selected: true,
+  playerName: '周明人',
+  hcp:'20',
+  betterballGroup: sideGameGroup.NONE,
+  points: 0,
+  holes:[scores1],
+}
 const sideGameO:sideGame = {
   sideGameName:sideGames.STABLEFORD,
   format: sideGameFormat.individual,
-  wager: 3,
+  wager: 1,
   hcpType: HcpType.FullHcp,
-  playerGameData:[playerGD],
+  playerGameData:[player1, player2, player3, player4],
 }
+
 const gameDataPartialExVal: Partial<games> = {
   siteid: 'linkougolf',
   courseid: 'courseid',
@@ -108,7 +142,7 @@ const gameRexExVal:commonResWithData<games> = {
 
 const siteDateExVal:siteDateReq = {
   siteid: 'linkougolf',
-  queryDate: new Date().toLocaleDateString().replaceAll('/','-'),
+  querydate: new Date().toLocaleDateString().replaceAll('/','-'),
 }
 
 const assignCartExVal:Partial<games> = {

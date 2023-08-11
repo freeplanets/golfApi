@@ -111,14 +111,14 @@ export default class CartController {
 			deviceid
 		};
 		try {
-			console.log(devicesKey);
+			// console.log(devicesKey);
 			let ans = await this.devicesService.findOne(devicesKey);
 			// console.log('device', ans);
 			let device:devices;
 			if (device = ans) {
 				// resign old device to idle
 				let cart = await this.cartsService.query(cartsKey, ['deviceid']);
-				if (cart[0].deviceid) {
+				if (cart.count > 0 && cart[0].deviceid) {
 					// console.log('check1');
 					await this.setDeviceStatue(cart[0].deviceid, DeviceStatus.idle);				
 				}
@@ -143,6 +143,7 @@ export default class CartController {
 				}
 			}
 		} catch(e) {
+			console.log('error:', e);
 			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
 			resp.error = {
 				message: errorMsg('DATABASE_ACCESS_ERROR'),

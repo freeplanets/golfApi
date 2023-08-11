@@ -1,4 +1,4 @@
-import { mapLatLong } from "src/database/db.interface";
+import { carts, games, mapLatLong, zones } from "../database/db.interface";
 
 export interface AnyObject {
   modifyid?:string;
@@ -24,7 +24,7 @@ export interface commonResWithData<D> extends commonRes {
 // for game search
 export default interface siteDateReq {
   siteid: string,
-  queryDate: string,
+  querydate: string,
 }
 
 export interface positonReq {
@@ -34,4 +34,10 @@ export interface positonReq {
   location:mapLatLong; // 經緯度物件	TRUE																				
   distance?:number; // 離發球區距離
   cartName?:string; // for response
+}
+
+export interface checkInRes {
+	game: games,
+	zones: zones[],
+	cart: carts,
 }

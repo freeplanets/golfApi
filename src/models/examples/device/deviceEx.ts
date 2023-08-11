@@ -1,6 +1,6 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
 import { devices } from "src/database/db.interface";
-import { commonResWithData } from "src/models/if";
+import { commonResWithData } from "../../../models/if";
 import { commonResEx } from "../commonResponseEx";
 
 const queryDeviceExVal:Partial<devices> = {

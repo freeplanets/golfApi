@@ -125,9 +125,9 @@ export default class DataTransController {
 			}
 			const game = new gameData();
 			game.gameid = hashKey();
-			game.caddies = [ {caddieid: `caddie${data.caddie.number}`, caddieName:`caddie${data.caddie.number}`} ];
+			game.caddies = [ {caddieid: `caddie${this.add0(data.caddie.number)}`, caddieName:`caddie${this.add0(data.caddie.number)}`} ];
 			if (data.caddie2) {
-				game.caddies.push({caddieid: `caddie${data.caddie2.number}`, caddieName:`caddie${data.caddie2.number}`});
+				game.caddies.push({caddieid: `caddie${this.add0(data.caddie2.number)}`, caddieName:`caddie${this.add0(data.caddie2.number)}`});
 			}
 			game.siteid = siteid;
 			game.courseid = course.courseid;
@@ -181,5 +181,11 @@ export default class DataTransController {
 			await this.gamesService.create(game);
 		}
 		return;
+	}
+	add0(str:string){
+		while(str.length<=3) {
+			str = '0' + str;
+		}
+		return str
 	}
 }

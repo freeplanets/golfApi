@@ -2,14 +2,10 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel, Model, ModelUpdateSettings } from "nestjs-dynamoose";
 import { cartHistory, cartKey, carts } from "../db.interface";
 import { hashKey } from "../../function/Commands";
-import { Condition, transaction } from "dynamoose";
-import { TransactionReturnOptions, TransactionSettings } from "dynamoose/dist/Transaction";
+import { Condition } from "dynamoose";
 import defaultService from "../common/defaultService";
-import { positonReq } from "src/models/if";
+import { positonReq } from "../../models/if";
 
-const transSet:TransactionSettings = {
-	return: TransactionReturnOptions.items,
-}
 
 @Injectable()
 export default class CartsService extends defaultService<carts, cartKey> {

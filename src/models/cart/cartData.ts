@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { carts, mapLatLong } from "../../database/db.interface";
 import { IsNumber, IsObject, IsString } from "class-validator";
 import _mapLatLong from "../common/_mapLatLong";
+import { CartStatus } from "../../function/func.interface";
 
 export default class cartData implements carts {
 	@ApiProperty({
@@ -39,9 +40,10 @@ export default class cartData implements carts {
 
 	@ApiProperty({
 		description: '球車狀態',
+		enum: CartStatus
 	})
 	@IsString()
-	status: string;
+	status: CartStatus;
 
 	@ApiProperty({
 		description: '球車位置',
