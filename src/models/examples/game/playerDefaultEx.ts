@@ -3,32 +3,32 @@ import { games, playerDefault } from "src/database/db.interface";
 
 const player1: playerDefault = {
 	playerName: '李小明',
-	hcp: '+2',
-	fullHcp: '',
+	hcp: '',
+	fullHcp: '+2',
 	allowance: 1,
 	hcpRound: false,
 }
 
 const player2: playerDefault = {
 	playerName: '張小四',
-	hcp: '5',
-	fullHcp: '',
+	hcp: '',
+	fullHcp: '5',
 	allowance: 1,
 	hcpRound: false,
 }
 
 const player3: playerDefault = {
 	playerName: '王大大',
-	hcp: '10',
-	fullHcp: '',
+	hcp: '',
+	fullHcp: '10',
 	allowance: 1,
 	hcpRound: false,
 }
 
 const player4: playerDefault = {
 	playerName: '周明人',
-	hcp: '20',
-	fullHcp: '',
+	hcp: '',
+	fullHcp: '20',
 	allowance: 0.7,
 	hcpRound: false,
 }

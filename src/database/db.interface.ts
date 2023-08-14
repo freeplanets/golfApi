@@ -154,6 +154,7 @@ export interface score {
   holeNo:number;
   zoneid:string;
   fairwayno:number;
+  handicap:number;
   gross: number;
   extraInfo?:AnyObject;
 }
@@ -165,6 +166,7 @@ export interface playerGameData {
   betterballGroup:sideGameGroup;
   points:number;
   holes:score[];
+  extraInfo?:AnyObject;
 }
 
 export interface sideGame {
@@ -192,7 +194,7 @@ export interface playerDefault {
   fullHcp: string;
   allowance: number;
   hcp: string;
-  hcpRound: boolean;  //從果難洞算起或開始洞
+  hcpRound: boolean;  //從難洞算起或開始洞
 }
 export interface caddie {
   caddieid:string,

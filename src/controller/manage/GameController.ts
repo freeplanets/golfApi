@@ -77,6 +77,7 @@ export default class GameController {
 	@ApiOperation({summary: '查詢某球場某日全部編組資料 / query games via siteid and date', description: '查詢某球場某日全部編組資料 / query games via siteid and date'})
 	@ApiBody({description: '查詢參數', type: siteDateRequest, examples: getGamesReqEx})
 	async query(@Body() body:siteDateReq, @Headers('WWW-AUTH') token:Record<string, string>){
+		// console.log('query game', token);
 		const resp = await this.queryGamesByDate(String(token), body);
 		return resp;
 	}
@@ -107,15 +108,15 @@ export default class GameController {
 		if (user) {
 			let missKey = '';
 			if (!siteDate.siteid) missKey = 'siteid';
-			if (!siteDate.querydate) missKey = 'queryDate';
+			if (!siteDate.queryDate) missKey = 'queryDate';
 			if (missKey) {
 				resp.errcode = ErrCode.MISS_PARAMETER;
 				resp.error = {
 					message: errorMsg('MISS_PARAMETER', missKey),
 				}				
 			} else {
-				const startTime = new Date(`${siteDate.querydate} 00:00:00`).getTime()/1000;
-				const endTime = new Date(`${siteDate.querydate} 23:59:59`).getTime()/1000;
+				const startTime = new Date(`${siteDate.queryDate} 00:00:00`).getTime()/1000;
+				const endTime = new Date(`${siteDate.queryDate} 23:59:59`).getTime()/1000;
 				console.log('queryGame', siteDate, startTime, endTime);
 				const cond = new Condition({siteid: siteDate.siteid}).where('esttimatedStartTime').between(startTime, endTime);
 				resp.data = await this.gamesService.query(cond);
@@ -124,6 +125,7 @@ export default class GameController {
 			resp.errcode = ErrCode.TOKEN_ERROR,
 			resp.error = {
 				message: errorMsg('TOKEN_ERROR'),
+				extra: {token}
 			}		
 		}
 		return resp;

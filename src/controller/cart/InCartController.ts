@@ -3,8 +3,8 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } 
 import { Condition } from "dynamoose";
 import GamesService from "../../database/game/games.service";
 import CartsService from "../../database/cart/carts.service";
-import { tokenCheck, updateTableData } from "../../function/Commands";
-import { carts, games, sideGame } from "../../database/db.interface";
+import { playerDefaultHcpCal, tokenCheck, updateTableData } from "../../function/Commands";
+import { carts, devices, games, sideGame } from "../../database/db.interface";
 import { commonResWithData, positonReq } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
@@ -20,6 +20,7 @@ import ZonesService from "../../database/zone/zones.service";
 import checkInResponse from "../../models/game/checkInResponse";
 import { playerDefaultEx } from "../../models/examples/game/playerDefaultEx";
 import { CartStatus } from "../../function/func.interface";
+import DevicesService from "../../database/device/devices.service";
 
 @ApiBearerAuth()
 @ApiTags('Cart')
@@ -29,6 +30,7 @@ export default class InCartController {
 		private readonly gamesService:GamesService,
 		private readonly cartService:CartsService,
 		private readonly zonesService:ZonesService,
+		private readonly devicesService:DevicesService,
 	){}
 /*
 	@Get('site/:siteid')
@@ -83,6 +85,7 @@ export default class InCartController {
 	@ApiBody({description: '球員 hcp 預設資料', type:playerDefaultRequest, examples: playerDefaultEx })
 	async setPlayerDefault(@Param('gameid') gameid:string, @Body() body:Partial<games>, @Headers('WWW-AUTH') token:Record<string, string>){
 		console.log('setPlayerDefault', gameid, body);
+		body.playerDefaults = playerDefaultHcpCal(body.playerDefaults);
 		const resp = await updateTableData(String(token), this.gamesService, body, {gameid});
 		return resp;		
 	}
@@ -147,7 +150,7 @@ export default class InCartController {
 	@ApiResponse({})	
 	getResult(){}
 
-	async searchCheckInData(token:string, caddieid:string, deviceid):Promise<commonResWithData<any>> {
+	async searchCheckInData(token:string, caddieid:string, deviceid:string):Promise<commonResWithData<any>> {
 		let resp:commonResWithData<any> = {
 			errcode: '0',
 			data: {}		
@@ -174,21 +177,26 @@ export default class InCartController {
 				cond = new Condition({siteid: user.siteid}).where('zoneid').in(zones)
 				resp.data.zones = await this.zonesService.query(cond);
 				console.log('after query zones');
-								const searchKey:Partial<carts> = {
-					siteid: user.siteid,
+				/*
+				const searchKey:Partial<carts> = {
+					// siteid: user.siteid,
 					deviceid: deviceid,
 				};
-				const carts = await this.cartService.query(searchKey);
-				const cart:carts = carts[0];
-				console.log('cart:', cart);
-				resp.data.cart = cart;
-				if (!g.carts) {
-					g.carts = [cart.cartid];
-				} else {
-					const cIdx = g.carts.indexOf(cart.cartid);
-					if (cIdx == -1) g.carts.push(cart.cartid);
+				*/
+				const device = await this.devicesService.findOne({deviceid});
+				if (device && device.cartid) {
+					const cartid = device.cartid;
+					const cart = await this.cartService.findOne({ cartid });
+					console.log('cart:', cart);
+					resp.data.cart = cart;
+					if (!g.carts) {
+						g.carts = [cart.cartid];
+					} else {
+						const cIdx = g.carts.indexOf(cart.cartid);
+						if (cIdx == -1) g.carts.push(cart.cartid);
+					}
+					await this.cartService.update({cartid:cart.cartid}, {status:CartStatus.onduty});	
 				}
-				await this.cartService.update({cartid:cart.cartid}, {status:CartStatus.onduty});
 			}
 		} else {
 			resp.errcode = ErrCode.TOKEN_ERROR,
@@ -210,33 +218,33 @@ export default class InCartController {
 				siteid: user.siteid,
 				deviceid: deviceid,
 			};
-				const carts = await this.cartService.query(searchKey);
-				if (carts.count > 0) {
-					const cart = carts[0];
-					console.log('cart:', cart);
-					let cond = new Condition({siteid: user.siteid}).where('endTime').eq(0);
-					const game = await this.gamesService.query(cond);
-					if (game.count > 0) {
-						game.forEach((g) => {
-							 const fIdx = g.carts.lastIndexOf(cart.cartid)
-							 if (fIdx > -1) resp.data.game = game[0];
-						})
-					}
-					if (!resp.data.game) {
-						resp.errcode = ErrCode.ITEM_NOT_FOUND;
-						resp.error = {
-							message: errorMsg('ITEM_NOT_FOUND'),
-						}
-					} else {
-						const g = resp.data.game as games
-						const zones = [g.outZone, g.inZone];
-						console.log('zones:', zones);
-						cond = new Condition({siteid: user.siteid}).where('zoneid').in(zones)
-						resp.data.zones = await this.zonesService.query(cond);
-						resp.data.cart = cart;
-						console.log('after query zones');
-					}
+			const carts = await this.cartService.query(searchKey);
+			if (carts.count > 0) {
+				const cart = carts[0];
+				console.log('cart:', cart);
+				let cond = new Condition({siteid: user.siteid}).where('endTime').eq(0);
+				const game = await this.gamesService.query(cond);
+				if (game.count > 0) {
+					game.forEach((g) => {
+							const fIdx = g.carts.lastIndexOf(cart.cartid)
+							if (fIdx > -1) resp.data.game = game[0];
+					})
 				}
+				if (!resp.data.game) {
+					resp.errcode = ErrCode.ITEM_NOT_FOUND;
+					resp.error = {
+						message: errorMsg('ITEM_NOT_FOUND'),
+					}
+				} else {
+					const g = resp.data.game as games
+					const zones = [g.outZone, g.inZone];
+					console.log('zones:', zones);
+					cond = new Condition({siteid: user.siteid}).where('zoneid').in(zones)
+					resp.data.zones = await this.zonesService.query(cond);
+					resp.data.cart = cart;
+					console.log('after query zones');
+				}
+			}
 		} else {
 			resp.errcode = ErrCode.TOKEN_ERROR,
 			resp.error = {

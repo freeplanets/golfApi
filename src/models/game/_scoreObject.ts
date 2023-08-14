@@ -19,6 +19,11 @@ export default class _scoreObject implements score {
 	fairwayno: number;
 
 	@ApiProperty({
+		description: '差點',
+	})
+	handicap: number;
+
+	@ApiProperty({
 		description: '桿數/點數(sideGame)',
 	})
 	gross: number;

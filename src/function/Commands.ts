@@ -1,4 +1,4 @@
-import { defaultKey, defaultMethod, platformUser } from "../database/db.interface";
+import { defaultKey, defaultMethod, platformUser, player, playerDefault, playerGameData, score, sideGame } from "../database/db.interface";
 import { ErrCode } from "../models/enumError";
 import { AnyObject, commonRes, commonResWithData } from "../models/if";
 import { errorMsg } from "./Errors";
@@ -7,6 +7,8 @@ import { JwtService } from "@nestjs/jwt";
 import { ConditionComparisonComparatorName, queryReq } from "./func.interface";
 import { Condition } from "dynamoose";
 import { InternalPropertiesClass } from "dynamoose/dist/InternalPropertiesClass";
+import { HcpType, sideGames } from "src/models/enum";
+import _scoreObject from "src/models/game/_scoreObject";
 
 const jwt = new JwtService();
 const pfSite = 'union';
@@ -306,4 +308,106 @@ function removeUnderLineData(dta:any) {
 		}
 	});
 	return a;
+}
+
+export function playerDefaultHcpCal(data:playerDefault[]){
+	return data.map((pd) => {
+		const hcp = parseInt(pd.fullHcp.replace('+', '-'), 10);
+		pd.hcp = `${hcp * pd.allowance}`;
+		return pd;
+	})
+}
+
+export function createSideGameData(sideG:sideGame, playerDfs:playerDefault[], players:player[] ){
+	switch(sideG.sideGameName) {
+		case sideGames.NASSAU:
+		case sideGames.SIXES:
+			sideG = createNassauOrSixes(sideG);
+			break;
+		default:
+			sideG = createSideGameScore(sideG, players);
+	}
+	switch(sideG.hcpType){
+		case HcpType.NoHcp:
+			sideG.playerGameData.forEach((itm) => itm.hcp = '0');
+			break;
+		case HcpType.FullHcp:
+			sideG.playerGameData.forEach((itm) => {
+				const f = playerDfs.find((player) => player.playerName === itm.playerName);
+				if (f) {
+					itm.hcp = f.hcp;
+				}
+			});
+			break;
+		case HcpType.HcpDiff:
+			sideG = hcpDiff(sideG, playerDfs);
+		//case HcpType.Handicap:
+	}
+	sideG.playerGameData.forEach((itm) => {
+		if (!itm.extraInfo) itm.extraInfo = {};
+		itm.extraInfo.hcp = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+		const hcp = parseInt(itm.hcp, 10);
+		if (hcp) {
+			const f = playerDfs.find((player)=> player.playerName === itm.playerName);
+			if (f && f.hcpRound) {
+				if (hcp > 0) {
+
+				} else {
+				}
+			} else {
+				if (hcp > 0) {
+				} else {
+				}				
+			}
+		}
+	})
+}
+function hcpRound(hcp:string[], scores:score[]) {
+	// const myhcp = 
+}
+function hcpDiff(sideG:sideGame, playDfs:playerDefault[]) {
+	const ary:AnyObject[] = playDfs.map((itm) => {
+		return {
+			playerName: itm.playerName,
+			hcp: parseInt(itm.hcp, 10),
+		}
+	});
+	ary.sort((a:AnyObject, b:AnyObject) => a.hcp - b.hcp);
+	for(let i=1; i<ary.length - 1; i++) {
+		ary[i].hcp = ary[i].hcp - ary[0].hcp;
+	}
+	ary[0].hcp = 0;
+	sideG.playerGameData.forEach((itm) => {
+		const f = ary.find((aa) => aa.playerName === itm.playerName);
+		if (f) {
+			itm.hcp = String(f.hcp);
+		}
+	});
+	return sideG;
+}
+function createSideGameScore(sideG:sideGame, players:player[]){
+	players.forEach((player) => {
+		const f = sideG.playerGameData.find((itm) => itm.playerName === player.playerName);
+		if (f) {
+			f.holes = player.holes.map((hole) => {
+				return { ...hole };
+			});
+		}
+	});
+	return sideG;
+}
+function createNassauOrSixes(sideG:sideGame) {
+ sideG.playerGameData = sideG.playerGameData.map((player) => {
+	player.holes = [1, 2, 3].map((id) => {
+		return {
+			holeNo: id,
+			zoneid: '',
+			fairwayno: 0,
+			handicap: 0,
+			gross: 0,
+		}
+	});
+	return player
+ });
+ return sideG;
 }

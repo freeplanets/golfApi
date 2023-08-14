@@ -8,9 +8,11 @@ import CouresModule from "../course/courses.module";
 import GameController from "../../controller/manage/GameController";
 import CartsModule from "../cart/carts.module";
 import InCartController from "../../controller/cart/InCartController";
+import DevicesModule from "../device/devices.module";
 
 @Module({
 	imports: [
+		DevicesModule,
 		CartsModule,
 		ZonesModule,
 		CouresModule,

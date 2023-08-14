@@ -24,7 +24,7 @@ export interface commonResWithData<D> extends commonRes {
 // for game search
 export default interface siteDateReq {
   siteid: string,
-  querydate: string,
+  queryDate: string,
 }
 
 export interface positonReq {

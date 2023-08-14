@@ -151,6 +151,7 @@ export default class DataTransController {
 						const sco:score = {
 							zoneid: z.zoneid,
 							fairwayno: f.fairwayno,
+							handicap: f.handicap,
 							holeNo: no,
 							gross: 0,
 						};
@@ -183,7 +184,7 @@ export default class DataTransController {
 		return;
 	}
 	add0(str:string){
-		while(str.length<=3) {
+		while(str.length<3) {
 			str = '0' + str;
 		}
 		return str
