@@ -20,6 +20,7 @@ const scores1: score = {
   holeNo:1,
   zoneid:'zone1',
   fairwayno: 1,
+  handicap: 1,
   gross: 0,
   extraInfo:{},
 }
@@ -142,7 +143,7 @@ const gameRexExVal:commonResWithData<games> = {
 
 const siteDateExVal:siteDateReq = {
   siteid: 'linkougolf',
-  querydate: new Date().toLocaleDateString().replaceAll('/','-'),
+  queryDate: new Date().toLocaleDateString().replaceAll('/','-'),
 }
 
 const assignCartExVal:Partial<games> = {

@@ -144,6 +144,32 @@ export default class InCartController {
 		return resp;		
 	}
 
+	@Get('gameStart/:gameid/:startTime')
+	@ApiOperation({summary:'開始擊球/ game start',description:'開始擊球/ game start'})
+	@ApiParam({name: 'gameid', description: '編組代號'})
+	@ApiParam({name:'startTime', description:'開始擊球時間(timestamp)'})
+	@ApiResponse({status: 200, type: commonResponse})
+	async gameStart(@Param('gameid') gameid:string, @Param('startTime') startTime:string, @Headers('WWW-AUTH') token:Record<string, string>){
+		const data:Partial<games> = {
+			startTime: parseInt(startTime, 10),
+		}
+		const resp = await updateTableData(String(token), this.gamesService, {gameid}, data);
+		return resp;
+	}
+
+	@Get('gameEnd/:gameid/:endTime')
+	@ApiOperation({summary:'開始擊球/ game start',description:'開始擊球/ game start'})
+	@ApiParam({name: 'gameid', description: '編組代號'})
+	@ApiParam({name:'endTime', description:'結束擊球時間(timestamp)'})
+	@ApiResponse({status: 200, type: commonResponse})
+	async gameEnd(@Param('gameid') gameid:string, @Param('endTime') endTime:string, @Headers('WWW-AUTH') token:Record<string, string>){
+		const data:Partial<games> = {
+			endTime: parseInt(endTime, 10),
+		}
+		const resp = await updateTableData(String(token), this.gamesService, {gameid}, data);
+		return resp;
+	}
+
 	@Get('getResult/:gameid')
 	@ApiOperation({summary: '結果輸出/ getResult (建構中...)', description: '結果輸出/ getResult'})
 	@ApiParam({name:'gameid', description: '來賓分組代號'})

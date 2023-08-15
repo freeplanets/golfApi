@@ -1,4 +1,4 @@
-import { defaultKey, defaultMethod, platformUser, player, playerDefault, playerGameData, score, sideGame } from "../database/db.interface";
+import { defaultKey, defaultMethod, platformUser, player, playerDefault, score, sideGame } from "../database/db.interface";
 import { ErrCode } from "../models/enumError";
 import { AnyObject, commonRes, commonResWithData } from "../models/if";
 import { errorMsg } from "./Errors";
@@ -6,9 +6,8 @@ import { errorMsg } from "./Errors";
 import { JwtService } from "@nestjs/jwt";
 import { ConditionComparisonComparatorName, queryReq } from "./func.interface";
 import { Condition } from "dynamoose";
-import { InternalPropertiesClass } from "dynamoose/dist/InternalPropertiesClass";
-import { HcpType, sideGames } from "src/models/enum";
-import _scoreObject from "src/models/game/_scoreObject";
+import { HcpType, sideGames } from "../models/enum";
+import _scoreObject from "../models/game/_scoreObject";
 
 const jwt = new JwtService();
 const pfSite = 'union';

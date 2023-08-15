@@ -12,5 +12,5 @@ export default class siteDateRequest implements siteDateReq {
 		description: '查詢日期',
 	})
 	@IsDateString()
-	querydate: string;
+	queryDate: string;
 }
