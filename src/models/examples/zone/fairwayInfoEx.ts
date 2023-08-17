@@ -65,6 +65,7 @@ const green:greenObject = {
 	sno: 'A',
 	leftEdge: 6,
 	rightEdge: 7,
+	image: 'imageurl',
 	assets:[asset],
 	width: 12,
 	height: 10,

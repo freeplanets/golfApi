@@ -217,19 +217,22 @@ const ZonesSchema = new Schema({
                 type: Object,
                 schema: {
                   sno: {
-                    type: String
+                    type: String,
                   },
                   topEdge: {
-                    type: Number
+                    type: Number,
                   },
                   leftEdge: {
-                    type: Number
+                    type: Number,
                   },
                   rightEdge: {
-                    type: Number
+                    type: Number,
                   },
                   bottomEdge: {
-                    type: Number
+                    type: Number,
+                  },
+                  image: {
+                    type: String,
                   },
                   assets: {
                     type: Array,
@@ -238,61 +241,61 @@ const ZonesSchema = new Schema({
                         type: Object,
                         schema: {
                           name: {
-                            type: String
+                            type: String,
                           },
                           type: {
-                            type: String
+                            type: String,
                           },
                           show: {
-                            type: Boolean
+                            type: Boolean,
                           },
                           x: {
-                            type: Number
+                            type: Number,
                           },
                           y: {
-                            type: Number
+                            type: Number,
                           },
                           width: {
-                            type: Number
+                            type: Number,
                           },
                           height: {
-                            type: Number
+                            type: Number,
                           },
                           icon: {
-                            type: String
+                            type: String,
                           },
                           color: {
-                            type: String
+                            type: String,
                           },
                           bgColor: {
-                            type: String
+                            type: String,
                           },
                           borderColor: {
-                            type: String
+                            type: String,
                           },
                           font: {
-                            type: String
+                            type: String,
                           },
                           image: {
-                            type: String
+                            type: String,
                           },
                           label: {
-                            type: String
+                            type: String,
                           },
                           circleRadius: {
-                            type: Number
+                            type: Number,
                           },
                           circleColor: {
-                            type: String
+                            type: String,
                           },
                           circleDashline: {
-                            type: Boolean
+                            type: Boolean,
                           },
                           circleGap: {
-                            type: Number
+                            type: Number,
                           },
                           circleMax: {
-                            type: Number
+                            type: Number,
                           }
                         }
                       }

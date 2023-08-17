@@ -1,11 +1,12 @@
-import { sideGame, playerGameData, player } from "src/database/db.interface";
-import { createPlayerGameData } from "../sideGame.if";
+import { createPlayerGameData } from "../../class.if";
+import { sideGame, playerGameData, games } from "../../../database/db.interface";
+import HcpAssign from "../handicap/HcpAssign";
 
 export default class SideGameScore implements createPlayerGameData {
-	constructor(private sideG:sideGame, private players:player[]){}
+	constructor(private sideG:sideGame, private game:Partial<games>){}
 	create(): playerGameData[] {
 		const sideG = this.sideG;
-		this.players.forEach((player) => {
+		this.game.players.forEach((player) => {
 			const f = sideG.playerGameData.find((itm) => itm.playerName === player.playerName);
 			if (f) {
 				f.holes = player.holes.map((hole) => {
@@ -13,6 +14,6 @@ export default class SideGameScore implements createPlayerGameData {
 				});
 			}
 		});
-		return sideG.playerGameData;
+		return new HcpAssign(sideG, this.game).doit();
 	}
 }

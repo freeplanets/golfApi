@@ -1,10 +1,12 @@
-import { sideGame, playerGameData } from "src/database/db.interface";
-import { createPlayerGameData } from "../sideGame.if";
+import { createPlayerGameData } from "../../../class/class.if";
+import { sideGame, playerGameData, games } from "../../../database/db.interface";
+import HcpAssign from "../handicap/HcpAssign";
 
 export default class NassauOrSixesScore implements createPlayerGameData {
-	constructor(private sideG:sideGame){}
+	constructor(private sideG:sideGame, private game:Partial<games>){
+	}
 	create(): playerGameData[] {
-		return this.sideG.playerGameData.map((player) => {
+		this.sideG.playerGameData.map((player) => {
 			player.holes = [1, 2, 3].map((id) => {
 				return {
 					holeNo: id,
@@ -15,6 +17,7 @@ export default class NassauOrSixesScore implements createPlayerGameData {
 				}
 			});
 			return player
-		 });
+		});
+		return new HcpAssign(this.sideG, this.game).doit();
 	}
 }

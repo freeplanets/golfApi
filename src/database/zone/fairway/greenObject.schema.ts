@@ -20,6 +20,9 @@ const greenObject = new Schema({
 	bottomEdge: {
 		type: Number,
 	}, // 距下邊界距離
+	image: {
+		type:String,
+	},
 	assets: {
 		type: Array,
 		schema: mapAssetObject,

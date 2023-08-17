@@ -234,6 +234,9 @@ const GamesSchema = new Schema({
                         }
                       }
                     ]
+                  },
+                  extraInfo: {
+                    type: Object,
                   }
                 }
               }
@@ -243,5 +246,5 @@ const GamesSchema = new Schema({
       }
     ]
   }
-}, { timestamps: true, saveUnknown: ["players.**"] });
+}, { timestamps: true, saveUnknown: ["players.**","sideGames.**"] });
 export default GamesSchema;

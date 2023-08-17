@@ -29,6 +29,11 @@ export default class _greenObject implements greenObject {
 	bottomEdge: number;
 
 	@ApiProperty({
+		description: '圖片網址',
+	})
+	image: string;
+
+	@ApiProperty({
 		description:'球道上物件',
 		isArray: true,
 		type: _mapAssetObject,

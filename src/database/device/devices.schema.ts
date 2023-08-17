@@ -1,4 +1,5 @@
 import { Schema } from "dynamoose";
+import mapLatLongSchema from "../common/mapLatLong.schema";
 
 const DevicesSchema = new Schema({
   deviceid: {
@@ -43,6 +44,11 @@ const DevicesSchema = new Schema({
   },
   cartid: {
     type: String,
+  },
+  location: {
+    type: Object,
+    schema: mapLatLongSchema,
+    required: false,
   },
 	modifyid: {
 		type: String,

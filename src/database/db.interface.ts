@@ -79,6 +79,7 @@ export interface greenObject {
   leftEdge?:number; //距左邊界距離
   rightEdge?:number; //距右邊界距離
   bottomEdge?:number; //距下邊界距離
+  image:string;
   assets:mapAssetObject[]; //球道上物件
   width:number; //圖片寛度
   height:number; //圖片高度
@@ -147,6 +148,7 @@ export interface devices extends deviceKey {
   status: string;
   siteid: string;
   cartid?: string;
+  location?: mapLatLong;
 }
 
 

@@ -172,9 +172,9 @@ export default class DataTransController {
 				const pDef:playerDefault = {
 					playerName: itm.name,
 					fullHcp: HcpType.NoHcp,
-					allowance: 100,
-					hcp: '',
-					hcpRound: false,
+					allowance: 1,
+					hcp: '0',
+					hcpRound: true,
 				}
 				game.playerDefaults.push(pDef);
 				return tmp;

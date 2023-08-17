@@ -9,6 +9,9 @@ const mapAssetObjectSchema = new Schema({
 		type: String,
 		enum: Object.keys(mapAssetObjectType).map((val) => mapAssetObjectType[val]),
 	}, // 物件類型
+	show: {
+		type:Boolean,
+	}, // 顯示與否
 	x: {
 		type: Number,
 	}, // x座標
@@ -35,6 +38,10 @@ const mapAssetObjectSchema = new Schema({
 		type: String,
 		required: false,
 	}, // 底色
+	borderColor: {
+		type: String,
+		required: false,
+	},
 	font: {
 		type: String,
 		required: false,

@@ -4,6 +4,7 @@ import { gameKey, games, playerDefault, playerGameData, sideGame } from "../db.i
 import { InjectModel, Model } from "nestjs-dynamoose";
 import _partialPlayerObject from "../../models/game/_partialPlayerObject";
 import { HcpType } from "../../models/enum";
+import SideGameCreator from "../../class/sidegame/SideGameCreator";
 
 @Injectable()
 export default class GamesService extends defaultService<games, gameKey> {
@@ -17,10 +18,12 @@ export default class GamesService extends defaultService<games, gameKey> {
 		const key:gameKey = {
 			gameid,
 		};
-		const ans = await super.query(key, ['playerDefaults','sideGames']);
-		if (ans.count > 0) {
-			const game = ans[0];
+		const f = await super.query(key, ['stepInZone', 'stepInFairway', 'players', 'playerDefaults', 'sideGames']);
+		if (f.count > 0) {
+			const game = f[0];
+			if (!game.sideGames) game.sideGames = [];
 			const fIdx = game.sideGames.findIndex((itm) => itm.sideGameName === data.sideGameName);
+			data = new SideGameCreator(data, game).create();
 			if (fIdx === -1){
 				game.sideGames.push(data);
 			} else {

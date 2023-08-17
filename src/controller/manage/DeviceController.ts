@@ -1,13 +1,17 @@
 import { Body, Controller, Headers, Post, Get, Param, Delete, Put, Patch } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { deviceKey, devices } from "../../database/db.interface";
+import { deviceKey, devices, mapLatLong } from "../../database/db.interface";
 import commonResponse from "../../models/common/commonResponse";
 import { createTableData, deleteTableData, getTableData, hashKey, queryTable, updateTableData } from "../../function/Commands";
 import DevicesService from "../../database/device/devices.service";
 import deviceData from "../../models/device/deviceData";
-import { deviceEx, deviceResEx, queryDeviceRequestEx } from "../../models/examples/device/deviceEx";
+import { deviceEx, deviceResEx, locationEx, queryDeviceRequestEx } from "../../models/examples/device/deviceEx";
 import deviceReponse from "../../models/device/deviceResponse";
 import queryDevicesRequest from "../../models/device/queryDevicesRequest";
+import _mapLatLong from "../../models/common/_mapLatLong";
+import { commonRes } from "../../models/if";
+import { ErrCode } from "../../models/enumError";
+import { errorMsg } from "../../function/Errors";
 
 @ApiBearerAuth()
 @ApiTags('Manage')
@@ -64,6 +68,32 @@ export default class DeviceController {
 	@ApiResponse({status: 200, description:'裝置回傳物件', type: deviceReponse})
 	async query(@Body() body:Partial<devices>, @Headers('WWW-AUTH') token:Record<string, string>){
 		const resp = await queryTable(String(token), this.devicesService, body);
+		return resp;
+	}
+
+	@Post('deviceLocation/:deviceid')
+	@ApiOperation({summary:'裝置位置更新/ update device location', description:'裝置位置更新/ update device location'})
+	@ApiParam({name:'deviceid', description:'裝置代號'})
+	@ApiBody({description: '位置物件', type: _mapLatLong, examples: locationEx})
+	@ApiResponse({status: 200, type: commonResponse})
+	async deviceLocation(@Param('deviceid') deviceid:string, @Body() body:mapLatLong){
+		console.log('deviceLocation', deviceid, body);
+		const data:Partial<devices> = {
+			location: body,
+		};
+		const resp:commonRes = {
+			errcode: ErrCode.OK,
+		}
+		try {
+			const ans =	await this.devicesService.update({deviceid}, data);
+			console.log('update:', ans);
+		} catch(error) {
+			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR,
+			resp.error = {
+				message: errorMsg('DATABASE_ACCESS_ERROR'),
+				extra: error,
+			}
+		}
 		return resp;
 	}
 }

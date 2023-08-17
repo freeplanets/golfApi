@@ -6,7 +6,7 @@ const player1: playerDefault = {
 	hcp: '',
 	fullHcp: '+2',
 	allowance: 1,
-	hcpRound: false,
+	hcpRound: true,
 }
 
 const player2: playerDefault = {
@@ -14,7 +14,7 @@ const player2: playerDefault = {
 	hcp: '',
 	fullHcp: '5',
 	allowance: 1,
-	hcpRound: false,
+	hcpRound: true,
 }
 
 const player3: playerDefault = {
@@ -22,7 +22,7 @@ const player3: playerDefault = {
 	hcp: '',
 	fullHcp: '10',
 	allowance: 1,
-	hcpRound: false,
+	hcpRound: true,
 }
 
 const player4: playerDefault = {
@@ -30,7 +30,7 @@ const player4: playerDefault = {
 	hcp: '',
 	fullHcp: '20',
 	allowance: 0.7,
-	hcpRound: false,
+	hcpRound: true,
 }
 
 const playerDefaultExVal:Partial<games> = {

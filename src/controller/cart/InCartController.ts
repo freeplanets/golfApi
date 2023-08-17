@@ -99,8 +99,9 @@ export default class InCartController {
 			errcode: '0',
 		}
 		if (tokenCheck(String(token))) {
-			try {
+			// try {
 				resp.data = await this.gamesService.registerSideGame(gameid, body);
+				/*
 			} catch(e) {
 				resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
 				resp.error = {
@@ -108,6 +109,7 @@ export default class InCartController {
 					extra: e,
 				}
 			}
+			*/
 		} else {
 			resp.errcode = ErrCode.TOKEN_ERROR;
 			resp.error = {
@@ -153,7 +155,7 @@ export default class InCartController {
 		const data:Partial<games> = {
 			startTime: parseInt(startTime, 10),
 		}
-		const resp = await updateTableData(String(token), this.gamesService, {gameid}, data);
+		const resp = await updateTableData(String(token), this.gamesService, data, {gameid});
 		return resp;
 	}
 
@@ -166,7 +168,7 @@ export default class InCartController {
 		const data:Partial<games> = {
 			endTime: parseInt(endTime, 10),
 		}
-		const resp = await updateTableData(String(token), this.gamesService, {gameid}, data);
+		const resp = await updateTableData(String(token), this.gamesService, data, {gameid});
 		return resp;
 	}
 
@@ -186,9 +188,12 @@ export default class InCartController {
 			let cond = new Condition({siteid: user.siteid}).where('endTime').eq(0);
 			const game = await this.gamesService.query(cond);
 			if (game.count > 0) {
-				game.forEach((g) => {
+				game.forEach((g,idx) => {
 					 const fIdx = g.caddies.findIndex((itm) => itm.caddieid === caddieid)
-					 if (fIdx > -1) resp.data.game = game[0];
+					 if (fIdx > -1){
+						console.log('fIdx', fIdx, idx, caddieid, g.caddies);
+						resp.data.game = game[idx];
+					 }
 				})
 			}
 			if (!resp.data.game) {
@@ -201,7 +206,10 @@ export default class InCartController {
 				const zones = [g.outZone, g.inZone];
 				console.log('zones:', zones);
 				cond = new Condition({siteid: user.siteid}).where('zoneid').in(zones)
-				resp.data.zones = await this.zonesService.query(cond);
+				const fZones = await this.zonesService.query(cond);
+				resp.data.zones = zones.map((zoneid) => {
+					return fZones.find((itm) => itm.zoneid === zoneid);
+				})
 				console.log('after query zones');
 				/*
 				const searchKey:Partial<carts> = {
