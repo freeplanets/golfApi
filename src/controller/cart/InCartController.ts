@@ -4,14 +4,14 @@ import { Condition } from "dynamoose";
 import GamesService from "../../database/game/games.service";
 import CartsService from "../../database/cart/carts.service";
 import { playerDefaultHcpCal, tokenCheck, updateTableData } from "../../function/Commands";
-import { carts, devices, games, sideGame } from "../../database/db.interface";
+import { carts, games, sideGame } from "../../database/db.interface";
 import { commonResWithData, positonReq } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
 import positionRequest from "../../models/cart/positionRequest";
 import { positionReqEx } from "../../models/examples/carposition/carPositionEx";
 import _sideGameObject from "../../models/game/_sideGameObject";
-import { sideGameReqEx, updateGamePointEx } from "../../models/examples/game/gameDataEx";
+import { scoresEx, sideGameReqEx, updateGamePointEx } from "../../models/examples/game/gameDataEx";
 import positionResponse from "../../models/cart/positionResponse";
 import _partialPlayerObject from "../../models/game/_partialPlayerObject";
 import commonResponse from "../../models/common/commonResponse";
@@ -21,6 +21,7 @@ import checkInResponse from "../../models/game/checkInResponse";
 import { playerDefaultEx } from "../../models/examples/game/playerDefaultEx";
 import { CartStatus } from "../../function/func.interface";
 import DevicesService from "../../database/device/devices.service";
+import scoresRequest from "../../models/game/scoresRequest";
 
 @ApiBearerAuth()
 @ApiTags('Cart')
@@ -122,14 +123,14 @@ export default class InCartController {
 	@Post('updateGamePoint/:gameid')
 	@ApiOperation({summary:'擊球資料輸入 / updateGamePoint', description:'擊球資料輸入 / updateGamePoint'})
 	@ApiParam({name:'gameid', description: '來賓分組代號'})
-	@ApiBody({description: '擊球結果', type: _partialPlayerObject, isArray: true, examples: updateGamePointEx})
-	async updateGamePoint(@Param('gameid') gameid:string, @Body() body:_partialPlayerObject, @Headers('WWW-AUTH') token:Record<string, string>){
+	@ApiBody({description: '擊球結果', type: scoresRequest , isArray: true, examples: scoresEx})
+	async updateGamePoint(@Param('gameid') gameid:string, @Body() body:Partial<games>, @Headers('WWW-AUTH') token:Record<string, string>){
 		const resp:commonResponse = {
 			errcode: '0',
 		}
 		if (tokenCheck(String(token))) {
 			try {
-				 await this.gamesService.updateGamePoint(gameid, body);
+				 await this.gamesService.updateGamesPoint(gameid, body); // 更新中
 			} catch(e) {
 				resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
 				resp.error = {
@@ -185,7 +186,8 @@ export default class InCartController {
 		}		
 		const user = tokenCheck(token);
 		if (user) {
-			let cond = new Condition({siteid: user.siteid}).where('endTime').eq(0);
+			const ts = this.todayStartTs();
+			let cond = new Condition({siteid: user.siteid}).where('esttimatedStartTime').gt(ts).and().where('endTime').eq(0);
 			const game = await this.gamesService.query(cond);
 			if (game.count > 0) {
 				game.forEach((g,idx) => {
@@ -286,5 +288,11 @@ export default class InCartController {
 			}		
 		}
 		return resp;
+	}
+	todayStartTs() {
+		const today = new Date().toLocaleDateString('zh-TW');
+		const tsms = new Date(today).getTime();
+		console.log('todayStartTs', today, tsms);
+		return Math.floor(tsms/1000);
 	}	
 }	

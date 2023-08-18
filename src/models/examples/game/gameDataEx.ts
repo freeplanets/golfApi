@@ -10,7 +10,7 @@ const caddies:caddie[] = [
 ];
 const playerD: playerDefault = {
   playerName: 'James',
-  tee: 'ReadTee',
+  tee: 'Red',
   fullHcp: '20',
   allowance: 100,
   hcp: '20',
@@ -131,7 +131,9 @@ const partialPlayer:Partial<player> = {
   playerName: playerO.playerName,
   holes: playerO.holes,
 }
-
+const scoresExVal = {
+  players:[partialPlayer]
+}
 const gameRexExVal:commonResWithData<games> = {
 	errcode: '0',
 	error: {
@@ -183,6 +185,12 @@ export const sideGameReqEx:Record<'Request', ExampleObject> = {
 export const updateGamePointEx:Record<'Request', ExampleObject> = {
   Request: {
     value: partialPlayer,
+  }
+}
+
+export const scoresEx:Record<'Request', ExampleObject> = {
+  Request: {
+    value: scoresExVal,
   }
 }
 

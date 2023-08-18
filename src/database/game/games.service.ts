@@ -33,11 +33,25 @@ export default class GamesService extends defaultService<games, gameKey> {
 		}
 		return undefined;
 	}
+
+	async updateGamesPoint(gameid:string, data:Partial<games>){
+		const key:gameKey = {
+			gameid,
+		};
+		const f = await super.query(key, ['players','sideGames']);
+		if (f) {
+			const sideGames = f[0].sideGames;
+			const oldPlayers = f[0].players;
+
+		}
+		return this.update(key, data);
+	}
+
 	async updateGamePoint(gameid:string, data:_partialPlayerObject){
 		const key:gameKey = {
 			gameid,
 		};
-		const f = await super.query(key, ['player']);
+		const f = await super.query(key, ['players']);
 		if (f[0]) {
 			const players = f[0].players.map((item) => {
 				if (item.playerName === data.playerName) {
@@ -52,7 +66,7 @@ export default class GamesService extends defaultService<games, gameKey> {
 				} 
 				return item;
 			});
-			return super.update(key, {players});
+			return this.update(key, {players});
 		}
 		return undefined;		
 	}

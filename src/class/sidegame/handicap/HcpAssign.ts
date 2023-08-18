@@ -5,6 +5,7 @@ import { AnyObject } from "../../../models/if";
 
 export default class HcpAssign {
 	private sampleHcps = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+	private holesOrder = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 	constructor(private sideG:sideGame, private game:Partial<games>){
 		switch(sideG.hcpType){
 			case HcpType.NoHcp:
@@ -38,6 +39,7 @@ export default class HcpAssign {
 					} else {
 						pg.extraInfo.hcp = this.assignFromOrders(pg.hcp, f.holes);	
 					}
+					pg.extraInfo.order = this.holesOrder;
 					console.log('check hcp', pg.extraInfo.hcp);					
 				}
 			}
@@ -45,7 +47,7 @@ export default class HcpAssign {
 		})
 	}
 
-	hcpDiff(sideG:sideGame, playDfs:playerDefault[]) {
+	private hcpDiff(sideG:sideGame, playDfs:playerDefault[]) {
 		const ary:AnyObject[] = playDfs.map((itm) => {
 			return {
 				playerName: itm.playerName,
@@ -65,7 +67,20 @@ export default class HcpAssign {
 		});
 		return sideG;
 	}
-	assignFromHardest(hcp:string, holes: score[]){
+	private sideGameHolesOrder(holes:score[]){
+		if (this.holesOrder[0] > 0) return;
+		const f = holes.find((itm) => itm.zoneid === this.game.stepInZone && itm.fairwayno === this.game.stepInFairway);
+		if (f) {
+			let idx = f.holeNo - 1;
+			for(let i = 0, n = this.holesOrder.length; i < n; i += 1) {
+				this.holesOrder[idx] = i + 1;
+				idx+=1;
+				if (idx === n) idx = 0;
+			}
+		}
+	}
+	private assignFromHardest(hcp:string, holes: score[]){
+		this.sideGameHolesOrder(holes);
 		console.log('assignFromHardest', hcp);
 		const hcps = [...this.sampleHcps];
 		let hardstart = 1;
@@ -89,7 +104,8 @@ export default class HcpAssign {
 		}
 		return hcps;
 	}
-	assignFromOrders(hcp:string, holes:score[]){
+	private assignFromOrders(hcp:string, holes:score[]){
+		this.sideGameHolesOrder(holes);
 		console.log('assignFromOrders', hcp);
 		const hcps = [ ...this.sampleHcps ];
 		const f = holes.find((itm) => itm.zoneid === this.game.stepInZone && itm.fairwayno === this.game.stepInFairway);
