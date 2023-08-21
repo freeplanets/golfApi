@@ -152,8 +152,10 @@ export default class DataTransController {
 							zoneid: z.zoneid,
 							fairwayno: f.fairwayno,
 							handicap: f.handicap,
+							par: f.par,
 							holeNo: no,
 							gross: 0,
+							parDiff: 0,
 						};
 						holes.push(sco);
 					})
@@ -167,6 +169,10 @@ export default class DataTransController {
 					playerOrder: idx,
 					gross: 0,
 					holes,
+					frontGross: 0,
+					backGross: 0,
+					parDiff: '',
+					stablefordPoint: 0,
 					extra: itm.extra,
 				};
 				const pDef:playerDefault = {

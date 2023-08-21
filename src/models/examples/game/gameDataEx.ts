@@ -21,7 +21,9 @@ const scores1: score = {
   zoneid:'zone1',
   fairwayno: 1,
   handicap: 1,
+  par: 4,
   gross: 0,
+  parDiff: 0,
   extraInfo:{},
 }
 const playerGD: playerGameData = {
@@ -44,6 +46,10 @@ const playerO: player = {
   tee: myTee,
   playerOrder: 1,
   gross: 0,
+  frontGross: 0,
+  backGross: 0,
+  parDiff: '',
+  stablefordPoint:  0,
   holes: [scores1],
   extra: {},	
 }

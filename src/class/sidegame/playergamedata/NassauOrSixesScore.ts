@@ -12,8 +12,10 @@ export default class NassauOrSixesScore implements createPlayerGameData {
 					holeNo: id,
 					zoneid: '',
 					fairwayno: 0,
+					par:0,
 					handicap: 0,
 					gross: 0,
+					parDiff: 0,
 				}
 			});
 			return player

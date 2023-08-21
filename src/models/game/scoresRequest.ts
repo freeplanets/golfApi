@@ -1,12 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { games, player } from "../../database/db.interface";
-import _partialPlayerObject from "./_partialPlayerObject";
+import { score } from "../../database/db.interface";
+import _scoreObject from "./_scoreObject";
 
-export default class scoresRequest implements Partial<games> {
+export default class scoresRequest {
 	@ApiProperty({
 		description: '來賓擊球單一洞或多洞結果',
 		isArray: true,
-		type: _partialPlayerObject,
+		type: _scoreObject,
 	})
-	players?: player[];
+	holes: score[];
 }

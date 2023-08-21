@@ -86,6 +86,18 @@ const GamesSchema = new Schema({
           gross: {
             type: Number
           },
+          frontGross: {
+            type: Number,
+          },
+          backGross: {
+            type: Number,
+          },
+          parDiff: {
+            type: String,
+          },
+          stablefordPoint: {
+            type: Number,
+          },
           holes: {
             type: Array,
             schema: [
@@ -93,16 +105,25 @@ const GamesSchema = new Schema({
                 type: Object,
                 schema: {
                   holeNo: {
-                    type: Number
+                    type: Number,
                   },
                   zoneid: {
-                    type: String
+                    type: String,
                   },
                   fairwayno: {
-                    type: Number
+                    type: Number,
+                  },
+                  handicap: {
+                    type: Number,
+                  },
+                  par: {
+                    type: Number,
                   },
                   gross: {
-                    type: Number
+                    type: Number,
+                  },
+                  parDiff: {
+                    type: Number,
                   },
                   extraInfo: {
                     type: Object

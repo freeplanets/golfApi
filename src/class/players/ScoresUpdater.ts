@@ -1,4 +1,5 @@
-import { player } from "src/database/db.interface";
+import { player } from "../../database/db.interface";
+import { holesPlayerScore } from "../class.if";
 import PlayerUpdater from "./playerUpdater";
 
 export default class ScoresUpdater {
@@ -28,10 +29,11 @@ export default class ScoresUpdater {
 			this.updatedHoles.sort((a, b) => a - b);
 		}
 	}
-	getScores(holeNo:number) {
-		this.newPlayers.map((player) => {
+	getScores(holeNo:number):holesPlayerScore {
+		const scores = this.newPlayers.map((player) => {
 			const tmp = {
 				playerName: player.playerName,
+				playerOrder:player.playerOrder,
 				gross: 0,
 			}
 			const f = player.holes.find((hole) => hole.holeNo === holeNo);
@@ -39,7 +41,11 @@ export default class ScoresUpdater {
 				tmp.gross = f.gross;
 			}
 			return tmp;
-		})
+		});
+		return {
+			holeNo,
+			scores,
+		}
 	}
 	get UpdatedHoles() {
 		if (this.updatedHoles.length > 0) {

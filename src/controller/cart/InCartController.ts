@@ -120,17 +120,19 @@ export default class InCartController {
 		return resp;
 	}
 
-	@Post('updateGamePoint/:gameid')
+	@Post('updateGamePoint/:gameid/:playerName')
 	@ApiOperation({summary:'擊球資料輸入 / updateGamePoint', description:'擊球資料輸入 / updateGamePoint'})
 	@ApiParam({name:'gameid', description: '來賓分組代號'})
+	@ApiParam({name:'playerName', description: '來賓分組代號'})
 	@ApiBody({description: '擊球結果', type: scoresRequest , isArray: true, examples: scoresEx})
-	async updateGamePoint(@Param('gameid') gameid:string, @Body() body:Partial<games>, @Headers('WWW-AUTH') token:Record<string, string>){
+	async updateGamePoint(@Param('gameid') gameid:string, @Param('playerName') playerName:string, 
+		@Body() body:scoresRequest, @Headers('WWW-AUTH') token:Record<string, string>){
 		const resp:commonResponse = {
 			errcode: '0',
 		}
 		if (tokenCheck(String(token))) {
 			try {
-				 await this.gamesService.updateGamesPoint(gameid, body); // 更新中
+				 await this.gamesService.updatePlayerGamePoint(gameid, playerName, body); // 更新中
 			} catch(e) {
 				resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
 				resp.error = {

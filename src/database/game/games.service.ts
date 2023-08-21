@@ -5,6 +5,7 @@ import { InjectModel, Model } from "nestjs-dynamoose";
 import _partialPlayerObject from "../../models/game/_partialPlayerObject";
 import { HcpType } from "../../models/enum";
 import SideGameCreator from "../../class/sidegame/SideGameCreator";
+import scoresRequest from "../../models/game/scoresRequest";
 
 @Injectable()
 export default class GamesService extends defaultService<games, gameKey> {
@@ -46,7 +47,21 @@ export default class GamesService extends defaultService<games, gameKey> {
 		}
 		return this.update(key, data);
 	}
-
+	async updatePlayerGamePoint(gameid:string, playerName:string, data:scoresRequest){
+		const key:gameKey = {
+			gameid,
+		};
+		const f = await super.query(key, ['players','sideGames']);
+		if (f) {
+			const sideGames = f[0].sideGames;
+			const oldPlayers = f[0].players;
+			const pl = oldPlayers.find((player) => player.playerName === playerName);
+			if (pl) {
+				pl.holes = data.holes;
+			}
+			return this.update(key, {players:oldPlayers});
+		}	
+	}
 	async updateGamePoint(gameid:string, data:_partialPlayerObject){
 		const key:gameKey = {
 			gameid,

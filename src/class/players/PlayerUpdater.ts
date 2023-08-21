@@ -9,6 +9,10 @@ export default class PlayerUpdater {
 	update(newPlayer:player){
 		if (newPlayer.playerName === this.playerName) {
 			this.holes.update(newPlayer.holes);
+			newPlayer.gross = this.holes.gross;
+			newPlayer.frontGross = this.holes.frontGross;
+			newPlayer.backGross = this.holes.backGross;
+			newPlayer.parDiff = this.holes.parDiff > 0 ? `${this.holes.parDiff}` : `+${this.holes.parDiff}`;
 		}
 	}
 	get gross() {

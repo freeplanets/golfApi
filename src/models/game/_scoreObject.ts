@@ -24,9 +24,19 @@ export default class _scoreObject implements score {
 	handicap: number;
 
 	@ApiProperty({
+		description: '標準桿',
+	})
+	par: number;
+
+	@ApiProperty({
 		description: '桿數/點數(sideGame)',
 	})
 	gross: number;
+
+	@ApiProperty({
+		description: '標準桿差',
+	})
+	parDiff: number;
 
 	@ApiProperty({
 		description:'其他訊息, sideGame 結果核對值, ...etc',

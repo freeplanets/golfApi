@@ -403,7 +403,9 @@ function createNassauOrSixes(sideG:sideGame) {
 			zoneid: '',
 			fairwayno: 0,
 			handicap: 0,
+			par: 0,
 			gross: 0,
+			parDiff: 0,
 		}
 	});
 	return player

@@ -32,6 +32,26 @@ export default class _playerObject implements player {
 	gross: number;
 
 	@ApiProperty({
+		description: '前九洞總桿數',
+	})
+	frontGross: number;
+
+	@ApiProperty({
+		description: '後九洞總桿數',
+	})	
+	backGross: number;
+
+	@ApiProperty({
+		description: '標準桿差',
+	})
+	parDiff: string;
+
+	@ApiProperty({
+		description: 'Stableford 分數',
+	})
+	stablefordPoint: number;
+
+	@ApiProperty({
 		description: '擊球結果',
 		isArray: true,
 		type: _scoreObject,

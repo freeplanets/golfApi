@@ -157,7 +157,9 @@ export interface score {
   zoneid:string;
   fairwayno:number;
   handicap:number;
+  par:number;
   gross: number;
+  parDiff:number;
   extraInfo?:AnyObject;
 }
 
@@ -187,6 +189,10 @@ export interface player {
   tee: teeObject;
   playerOrder:number;
   gross:number;
+  frontGross:number;
+  backGross:number;
+  parDiff:string;
+  stablefordPoint:number;
   holes: score[],
   extra?: AnyObject,
 }
