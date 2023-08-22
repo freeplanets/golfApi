@@ -262,6 +262,9 @@ const GamesSchema = new Schema({
                 }
               }
             ]
+          },
+          extraInfo: {
+            type: Object,
           }
         }
       }

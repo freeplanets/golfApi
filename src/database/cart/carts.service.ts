@@ -1,10 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel, Model, ModelUpdateSettings } from "nestjs-dynamoose";
 import { cartHistory, cartKey, carts } from "../db.interface";
-import { hashKey } from "../../function/Commands";
+import { createCondition, hashKey } from "../../function/Commands";
 import { Condition } from "dynamoose";
 import defaultService from "../common/defaultService";
 import { positonReq } from "../../models/if";
+import { queryReq } from "../../function/func.interface";
 
 
 @Injectable()
@@ -79,7 +80,7 @@ export default class CartsService extends defaultService<carts, cartKey> {
 		console.log(ans);
 		*/
 		const fields = ['cartid', 'cartName', 'zoneid', 'fairwayno', 'location', 'distance'];
-		return super.query({zoneid: data.zoneid, fairwayno: data.fairwayno}, fields);
+		return this.query({zoneid: data.zoneid, fairwayno: data.fairwayno}, fields);
 	}
 	async getHistroy(cartid:string, start:number, end:number) {
 		const key:cartKey = {
@@ -87,6 +88,21 @@ export default class CartsService extends defaultService<carts, cartKey> {
 		}
 		const cond = new Condition(key).where('ts').between(start, end);
 		return this.cartHistoryModel.query(cond).exec();
+	}
+	async queryHistory(cartid:string, filter?:queryReq, fields?:string[]) {
+		const key:cartKey = {
+			cartid,
+		}
+		const cond = new Condition(key);
+		if (filter && filter.queryKey) {
+			const subCond = createCondition(filter);
+			cond.parenthesis(subCond)
+		}
+		const query = this.cartHistoryModel.query(cond);
+		if (fields && fields.length > 0) {
+			query.attributes(fields);
+		}
+		return query.exec();
 	}
 	createHistoryData(data:carts, key?:cartKey) {
 		const dat:cartHistory = {

@@ -1,6 +1,6 @@
 import { Body, Controller, Headers, Post, Get, Param, Delete, Put, Patch } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { cartKey, carts, deviceKey, devices } from "../../database/db.interface";
+import { cartHistory, cartKey, carts, deviceKey, devices } from "../../database/db.interface";
 import zoneModifyResponse from "../../models/zone/zoneModifyResponse";
 import commonResponse from "../../models/common/commonResponse";
 import zoneResponse from "../../models/zone/zoneResponse";
@@ -12,10 +12,11 @@ import cartResponse from "../../models/cart/cartResponse";
 import queryCartsRequest from "../../models/cart/queryCartsRequest";
 import cartsResponse from "../../models/cart/cartsResponse";
 import DevicesService from "../../database/device/devices.service";
-import { DeviceStatus } from "../../function/func.interface";
+import { DeviceStatus, queryReq } from "../../function/func.interface";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
-import { commonRes } from "../../models/if";
+import { commonRes, commonResWithData } from "../../models/if";
+import queryRequest from "../../models/common/queryRequest";
 
 @ApiBearerAuth()
 @ApiTags('Manage')
@@ -99,6 +100,35 @@ export default class CartController {
 		return resp;
 	}
 
+	@Post('carthistory/:cartid')
+	@ApiOperation({summary:'查詢某球車歷史紀錄資料 / query cart history via cartid and time range', description:'查詢某球車歷史紀錄資料 / query cart history via cartid'})
+	@ApiParam({name:'cartid', description:'球車代號'})
+	@ApiBody({description:'查詢參數', type:queryRequest})
+	async queryCartHistory(@Param('cartid') cartid:string, @Body() body:queryReq, @Headers('WWW-AUTH') token:Record<string, string>){
+		const resp:commonResWithData<cartHistory[]> = {
+			errcode: ErrCode.OK,
+		}
+		const user = tokenCheck(String(token));
+		if (user) {
+			try {
+				// console.log('carthistory', cartid, body);
+				resp.data = await this.cartsService.queryHistory(cartid, body);
+				// console.log(resp.data);
+			} catch(error) {
+				resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
+				resp.error = {
+					message: errorMsg('DATABASE_ACCESS_ERROR'),
+					extra: error,
+				}
+			}
+		} else {
+			resp.errcode = ErrCode.TOKEN_ERROR;
+			resp.error = {
+				message: errorMsg('TOKEN_ERROR'),
+			}
+		}
+		return resp;
+	}
 
 	async updateCartAndDevice(cartid:string, deviceid:string) {
 		const resp:commonRes = {
@@ -112,27 +142,49 @@ export default class CartController {
 		};
 		try {
 			// console.log(devicesKey);
-			let ans = await this.devicesService.findOne(devicesKey);
+			// find cart
+			// let ans = await this.devicesService.findOne(devicesKey);
+			let cart = await this.cartsService.findOne(cartsKey);
 			// console.log('device', ans);
-			let device:devices;
-			if (device = ans) {
+			// let device:devices;
+			if (cart) {
 				// resign old device to idle
-				let cart = await this.cartsService.query(cartsKey, ['deviceid']);
-				if (cart.count > 0 && cart[0].deviceid) {
+				// let cart = await this.cartsService.query(cartsKey, ['deviceid']);
+				if (cart.deviceid) {
+				// if (cart.count > 0 && cart[0].deviceid) {
 					// console.log('check1');
-					await this.setDeviceStatue(cart[0].deviceid, DeviceStatus.idle);				
+					await this.setDeviceStatue(cart.deviceid, DeviceStatus.idle);
 				}
+				let device = await this.devicesService.findOne(devicesKey); 
 				// update cart device
-				const partialCart:Partial<carts> = {
-					deviceid,
-					deviceName: device.deviceName,
-					deviceType: device.deviceType,
+				if (device) {
+					if (device.cartid) {
+						const pcart:Partial<carts> = {
+							deviceid:'',
+							deviceName: '',
+							deviceType: '',
+						}
+						await this.cartsService.update({cartid: device.cartid}, pcart);
+					}
+					const partialCart:Partial<carts> = {
+						deviceid,
+						deviceName: device.deviceName,
+						deviceType: device.deviceType,
+					}
+					// console.log('check2', partialCart);
+					await this.cartsService.update(cartsKey, partialCart);
+					// set new device to onduty
+					// console.log('check3');
+					await this.setDeviceStatue(deviceid, DeviceStatus.onduty, cartid);	
+				} else {
+					resp.errcode = ErrCode.ITEM_NOT_FOUND;
+					resp.error = {
+						message: errorMsg('ITEM_NOT_FOUND'),
+						extra: {
+							deviceid,
+						}
+					}
 				}
-				// console.log('check2', partialCart);
-				await this.cartsService.update(cartsKey, partialCart);
-				// set new device to onduty
-				// console.log('check3');
-				await this.setDeviceStatue(deviceid, DeviceStatus.onduty, cartid);
 			} else {
 				resp.errcode = ErrCode.ITEM_NOT_FOUND;
 				resp.error = {

@@ -57,7 +57,12 @@ export default class GamesService extends defaultService<games, gameKey> {
 			const oldPlayers = f[0].players;
 			const pl = oldPlayers.find((player) => player.playerName === playerName);
 			if (pl) {
-				pl.holes = data.holes;
+				 data.holes.forEach((score) => {
+					const f = pl.holes.find((hole) => hole.holeNo === score.holeNo);
+					if (f) {
+						f.gross = score.gross;
+					}
+				 });
 			}
 			return this.update(key, {players:oldPlayers});
 		}	

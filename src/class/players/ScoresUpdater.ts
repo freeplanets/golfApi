@@ -1,5 +1,5 @@
 import { player } from "../../database/db.interface";
-import { holesPlayerScore } from "../class.if";
+import { holesPlayerScore, playerScore } from "../class.if";
 import PlayerUpdater from "./playerUpdater";
 
 export default class ScoresUpdater {
@@ -31,14 +31,16 @@ export default class ScoresUpdater {
 	}
 	getScores(holeNo:number):holesPlayerScore {
 		const scores = this.newPlayers.map((player) => {
-			const tmp = {
+			const tmp:playerScore = {
 				playerName: player.playerName,
 				playerOrder:player.playerOrder,
 				gross: 0,
+				parDiff: 0,
 			}
 			const f = player.holes.find((hole) => hole.holeNo === holeNo);
 			if (f) {
 				tmp.gross = f.gross;
+				tmp.parDiff = f.parDiff;
 			}
 			return tmp;
 		});

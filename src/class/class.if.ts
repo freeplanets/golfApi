@@ -11,7 +11,8 @@ export interface sideGameCreate {
 export interface playerScore {
   playerName: string;
   playerOrder:number;
-  gross:number;		
+  gross:number;
+	parDiff:number;
 }
 export interface holesPlayerScore {
 	holeNo:number;

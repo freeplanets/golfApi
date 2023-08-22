@@ -156,7 +156,8 @@ export async function updateTableData<D extends K, K extends defaultKey>(token:s
 	}
 	const user = tokenCheck(token);
 	if (user) {
-		console.log('updateTableData:', data);
+		console.log('updateTableData:')
+		console.dir(data, {	depth: 8 });
 		data.modifyid = user.uid;
 		const service = (dbservice as defaultMethod<D, K>);
 		try {
@@ -245,7 +246,7 @@ export function isMyClub(user:platformUser, siteid:string):boolean {
 	return ans;
 }
 
-function createCondition(dta:queryReq){
+export function createCondition(dta:queryReq){
 	const cond = new Condition().filter(dta.queryKey);
 	switch(dta.queryType){
 		case ConditionComparisonComparatorName.equals:

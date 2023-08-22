@@ -180,7 +180,8 @@ export interface sideGame {
   wagerMax?:number;
   carryOver?:boolean;
   hcpType: HcpType;
-  playerGameData:playerGameData[]; 
+  playerGameData:playerGameData[];
+  extraInfo?:AnyObject; 
 }
 
 export interface player {
