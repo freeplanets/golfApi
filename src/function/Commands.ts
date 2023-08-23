@@ -4,9 +4,8 @@ import { AnyObject, commonRes, commonResWithData } from "../models/if";
 import { errorMsg } from "./Errors";
 // import {v4 as uuidv4} from 'uuid';
 import { JwtService } from "@nestjs/jwt";
-import { ConditionComparisonComparatorName, queryReq } from "./func.interface";
+import { CompArr, ConditionComparisonComparatorName, pageData, queryReq } from "./func.interface";
 import { Condition } from "dynamoose";
-import { HcpType, sideGames } from "../models/enum";
 import _scoreObject from "../models/game/_scoreObject";
 
 const jwt = new JwtService();
@@ -294,7 +293,7 @@ function removeUnderLineData(dta:any) {
 	const a:AnyObject = {};
 	Object.keys(dta).forEach((key) => {
 		// console.log('key:', key);
-		if (key.indexOf('_') === -1) {
+		if (key.indexOf('_') === -1 && dta[key]) {
 			if (typeof dta[key] === 'object') {
 				if (Array.isArray(dta[key]) ) {
 					a[key] = dta[key].map((itm:any) => removeUnderLineData(itm))
@@ -318,98 +317,34 @@ export function playerDefaultHcpCal(data:playerDefault[]){
 	})
 }
 
-export function createSideGameData(sideG:sideGame, playerDfs:playerDefault[], players:player[] ){
-	switch(sideG.sideGameName) {
-		case sideGames.NASSAU:
-		case sideGames.SIXES:
-			sideG = createNassauOrSixes(sideG);
-			break;
-		default:
-			sideG = createSideGameScore(sideG, players);
+export function createPageData(gameid:string, players:player[]) {
+	const data:pageData = {
+		gameid,
+		front:[],
+		back:[],
+		total:[],
 	}
-	switch(sideG.hcpType){
-		case HcpType.NoHcp:
-			sideG.playerGameData.forEach((itm) => itm.hcp = '0');
-			break;
-		case HcpType.FullHcp:
-			sideG.playerGameData.forEach((itm) => {
-				const f = playerDfs.find((player) => player.playerName === itm.playerName);
-				if (f) {
-					itm.hcp = f.hcp;
-				}
-			});
-			break;
-		case HcpType.HcpDiff:
-			sideG = hcpDiff(sideG, playerDfs);
-		//case HcpType.Handicap:
-	}
-	sideG.playerGameData.forEach((itm) => {
-		if (!itm.extraInfo) itm.extraInfo = {};
-		itm.extraInfo.hcp = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-		const hcp = parseInt(itm.hcp, 10);
-		if (hcp) {
-			const f = playerDfs.find((player)=> player.playerName === itm.playerName);
-			if (f && f.hcpRound) {
-				if (hcp > 0) {
-
-				} else {
-				}
-			} else {
-				if (hcp > 0) {
-				} else {
-				}				
-			}
-		}
-	})
-}
-function hcpRound(hcp:string[], scores:score[]) {
-	// const myhcp = 
-}
-function hcpDiff(sideG:sideGame, playDfs:playerDefault[]) {
-	const ary:AnyObject[] = playDfs.map((itm) => {
-		return {
-			playerName: itm.playerName,
-			hcp: parseInt(itm.hcp, 10),
-		}
-	});
-	ary.sort((a:AnyObject, b:AnyObject) => a.hcp - b.hcp);
-	for(let i=1; i<ary.length - 1; i++) {
-		ary[i].hcp = ary[i].hcp - ary[0].hcp;
-	}
-	ary[0].hcp = 0;
-	sideG.playerGameData.forEach((itm) => {
-		const f = ary.find((aa) => aa.playerName === itm.playerName);
-		if (f) {
-			itm.hcp = String(f.hcp);
-		}
-	});
-	return sideG;
-}
-function createSideGameScore(sideG:sideGame, players:player[]){
 	players.forEach((player) => {
-		const f = sideG.playerGameData.find((itm) => itm.playerName === player.playerName);
-		if (f) {
-			f.holes = player.holes.map((hole) => {
-				return { ...hole };
-			});
-		}
-	});
-	return sideG;
+		data.total.push([player.playerName, player.frontGross, player.backGross, player.gross, player.parDiff]);
+		player.holes.forEach((hole) => {
+			if (hole.holeNo < 10) {
+				assignData(data.front, 'PAR', hole.fairwayno, hole.par);
+				assignData(data.front, 'HDCP', hole.fairwayno, hole.handicap);
+				assignData(data.front, player.playerName, hole.fairwayno, hole.gross);
+			} else {
+				assignData(data.back, 'PAR', hole.fairwayno, hole.par);
+				assignData(data.back, 'HDCP', hole.fairwayno, hole.handicap);
+				assignData(data.back, player.playerName, hole.fairwayno, hole.gross);				
+			}
+		})
+	})
+	return data;
 }
-function createNassauOrSixes(sideG:sideGame) {
- sideG.playerGameData = sideG.playerGameData.map((player) => {
-	player.holes = [1, 2, 3].map((id) => {
-		return {
-			holeNo: id,
-			zoneid: '',
-			fairwayno: 0,
-			handicap: 0,
-			par: 0,
-			gross: 0,
-			parDiff: 0,
-		}
-	});
-	return player
- });
- return sideG;
+function assignData(arr:CompArr[], key:string, idx:number, value:number){
+	const f = arr.find((itm) => itm[0] === key);
+	if (f) {
+		f[idx] = value;
+	} else {
+		arr.push([key, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+	}
 }

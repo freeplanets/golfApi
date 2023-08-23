@@ -52,3 +52,13 @@ export interface queryReq {
 	filters?:filterObj[];
 	anyFilters?:filterObj[];
 }
+
+export interface CompArr {
+	[idx:number]: string | number;
+}
+export interface pageData {
+	gameid:string;
+	front: CompArr[];
+	back: CompArr[];
+	total: CompArr[];
+}

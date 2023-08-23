@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } 
 import { Condition } from "dynamoose";
 import GamesService from "../../database/game/games.service";
 import CartsService from "../../database/cart/carts.service";
-import { playerDefaultHcpCal, tokenCheck, updateTableData } from "../../function/Commands";
+import { createPageData, playerDefaultHcpCal, tokenCheck, updateTableData } from "../../function/Commands";
 import { carts, games, sideGame } from "../../database/db.interface";
 import { commonResWithData, positonReq } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
@@ -214,6 +214,8 @@ export default class InCartController {
 				resp.data.zones = zones.map((zoneid) => {
 					return fZones.find((itm) => itm.zoneid === zoneid);
 				})
+				//for page show
+				resp.data.pageData = createPageData(g.gameid, g.players);
 				console.log('after query zones');
 				/*
 				const searchKey:Partial<carts> = {

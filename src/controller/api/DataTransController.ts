@@ -138,7 +138,7 @@ export default class DataTransController {
 			game.par = course.par;
 			game.slope = course.slope | 0;
 			game.rating = course.rating | 0;
-			game.esttimatedStartTime = data.teeOffTimestamp;
+			game.esttimatedStartTime = data.teeOffTimestamp < 9999999999 ? data.teeOffTimestamp * 1000 : data.teeOffTimestamp;
 			game.startTime = 0;
 			game.endTime = 0;
 			game.playerDefaults = [];
