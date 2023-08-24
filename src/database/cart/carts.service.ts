@@ -1,40 +1,29 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel, Model, ModelUpdateSettings } from "nestjs-dynamoose";
-import { cartHistory, cartKey, carts } from "../db.interface";
-import { createCondition, hashKey } from "../../function/Commands";
+import { cartKey, carts, deviceKey } from "../db.interface";
 import { Condition } from "dynamoose";
 import defaultService from "../common/defaultService";
 import { positonReq } from "../../models/if";
-import { queryReq } from "../../function/func.interface";
+import DevicesService from "../device/devices.service";
 
 
 @Injectable()
 export default class CartsService extends defaultService<carts, cartKey> {
+	
 	constructor(
 		@InjectModel('Carts')
 		private cartsModel:Model<carts, cartKey>,
-		@InjectModel('CartHistory')
-		private cartHistoryModel:Model<cartHistory, cartKey>
+		private deviceService:DevicesService,
 	){
 		super(cartsModel);
+		// this.deviceService = new DevicesService(deviceModel, deviceHistoryModel);
 	}
 	
 	async create(data: carts): Promise<carts> {
-		const carth = this.createHistoryData(data);
-		await this.cartsModel.create(data);
-		await this.cartHistoryModel.create(carth);
-		/*
-		await transaction([
-			this.cartsModel.transaction.create(data),
-			this.cartHistoryModel.transaction.create(carth),
-		], transSet);
-		*/
-		return super.findOne({cartid: data.cartid});
+		return super.create(data);
 	}
 
 	async update(key: cartKey, data: Partial<carts>, cond?: Partial<carts>): Promise<carts> {
-		if (data.status !== undefined) {
-			const carth = this.createHistoryData(data as carts, key);
 			let conds:ModelUpdateSettings | any = null;
 			if (cond) {
 				const condition = new Condition(cond).eq(true);
@@ -42,77 +31,51 @@ export default class CartsService extends defaultService<carts, cartKey> {
 			}
 			if (conds) {
 				console.log('update with cond', conds);
-				await this.cartsModel.update(key, data, conds);
+				return super.update(key, data, conds);
 			} else {
-				await this.cartsModel.update(key, data);	
+				return super.update(key, data);
 			}
-			await this.cartHistoryModel.create(carth);
-			/*
-			const ans = await transaction([
-				this.cartsModel.transaction.update(key, data, conds),
-				this.cartHistoryModel.transaction.create(carth),
-			], transSet);
-			console.log('update trans:', ans);
-			*/
-			return super.findOne(key);
-		} else {
-			return super.update(key, data, cond);
-		}
 	}
-	async positionUpdate(data:positonReq){
+	async positionUpdate(deviceid:string, data:positonReq){
 		const partialCart:Partial<carts> = {
 			zoneid: data.zoneid,
 			fairwayno: data.fairwayno,
 			location: data.location,
 			distance: data.distance,
 		}
-		const key:cartKey = {
-			cartid: data.cartid,
+		if (data.location) {
+			await this.deviceService.update({deviceid}, {location: data.location});
 		}
-		const carth = this.createHistoryData((data as unknown) as carts, key);
-		await this.cartsModel.update(key, partialCart);
-		await this.cartHistoryModel.create(carth);
-		/*
-		const ans = await transaction([
-			this.cartsModel.transaction.update(key, partialCart),
-			this.cartHistoryModel.transaction.create(carth),
-		], transSet);
-		console.log(ans);
-		*/
-		const fields = ['cartid', 'cartName', 'zoneid', 'fairwayno', 'location', 'distance'];
-		return this.query({zoneid: data.zoneid, fairwayno: data.fairwayno}, fields);
+		const device = await this.deviceService.findOne({deviceid});
+		if (device) {
+			if (device.cartid) {
+				const cart = await super.update({cartid: device.cartid}, data);
+			}
+			if (data.zoneid && data.fairwayno) {
+				const fields = ['cartid', 'cartName', 'zoneid', 'fairwayno', 'location', 'distance'];
+				return super.query({zoneid: data.zoneid, fairwayno: data.fairwayno}, fields);
+			}
+		}
 	}
-	async getHistroy(cartid:string, start:number, end:number) {
-		const key:cartKey = {
-			cartid,
+	async getHistroy(deviceid:string, start:number, end:number) {
+		const key:deviceKey = {
+			deviceid,
 		}
 		const cond = new Condition(key).where('ts').between(start, end);
-		return this.cartHistoryModel.query(cond).exec();
+		return this.deviceService.getHistory(cond);
 	}
-	async queryHistory(cartid:string, filter?:queryReq, fields?:string[]) {
-		const key:cartKey = {
-			cartid,
+	async queryHistory(siteid:string) {
+		const cond = new Condition({ siteid });
+		const ans = await this.deviceService.query(cond, ['deviceid']);
+		if (ans.count > 0) {
+			const ids = ans.map((itm) => itm.deviceid);
+			const today = new Date().toLocaleDateString();
+			const start = new Date(`${today} 00:00:00`).getTime();
+			const end = new Date(`${today} 23:59:59`).getTime();
+			const cond = new Condition().where('deviceid').in(ids).and().where('ts').between(start, end);
+			return this.deviceService.getHistory(cond);
+		} else {
+			return ans;
 		}
-		const cond = new Condition(key);
-		if (filter && filter.queryKey) {
-			const subCond = createCondition(filter);
-			cond.parenthesis(subCond)
-		}
-		const query = this.cartHistoryModel.query(cond);
-		if (fields && fields.length > 0) {
-			query.attributes(fields);
-		}
-		return query.exec();
-	}
-	createHistoryData(data:carts, key?:cartKey) {
-		const dat:cartHistory = {
-			carthistoryid: hashKey(),
-			cartid: data.cartid ? data.cartid : key.cartid,
-			//status: data.status,
-			ts: new Date().getTime()/1000,
-		}
-		if (data.status !== undefined) dat.status = data.status;
-		if (data.location !== undefined) dat.location = data.location;
-		return dat;
 	}
 }

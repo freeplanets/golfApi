@@ -1,10 +1,10 @@
-import { defaultKey, defaultMethod, platformUser, player, playerDefault, score, sideGame } from "../database/db.interface";
+import { defaultKey, defaultMethod, platformUser, player, playerDefault } from "../database/db.interface";
 import { ErrCode } from "../models/enumError";
 import { AnyObject, commonRes, commonResWithData } from "../models/if";
 import { errorMsg } from "./Errors";
 // import {v4 as uuidv4} from 'uuid';
 import { JwtService } from "@nestjs/jwt";
-import { CompArr, ConditionComparisonComparatorName, pageData, queryReq } from "./func.interface";
+import { ConditionComparisonComparatorName, queryReq, scoreLine, scoresData } from "./func.interface";
 import { Condition } from "dynamoose";
 import _scoreObject from "../models/game/_scoreObject";
 
@@ -317,34 +317,51 @@ export function playerDefaultHcpCal(data:playerDefault[]){
 	})
 }
 
-export function createPageData(gameid:string, players:player[]) {
-	const data:pageData = {
+export function createScoreData(gameid:string, players:player[]) {
+	const data:scoresData = {
 		gameid,
 		front:[],
 		back:[],
 		total:[],
 	}
 	players.forEach((player) => {
-		data.total.push([player.playerName, player.frontGross, player.backGross, player.gross, player.parDiff]);
+		data.total.push(createLineData([player.playerName, convString(player.frontGross), convString(player.backGross), convString(player.gross), convString(player.parDiff, true)]));
 		player.holes.forEach((hole) => {
 			if (hole.holeNo < 10) {
-				assignData(data.front, 'PAR', hole.fairwayno, hole.par);
-				assignData(data.front, 'HDCP', hole.fairwayno, hole.handicap);
-				assignData(data.front, player.playerName, hole.fairwayno, hole.gross);
+				assignLineData(data.front, 'PAR', hole.fairwayno, hole.par);
+				assignLineData(data.front, 'HDCP', hole.fairwayno, hole.handicap);
+				assignLineData(data.front, player.playerName, hole.fairwayno, hole.gross);
 			} else {
-				assignData(data.back, 'PAR', hole.fairwayno, hole.par);
-				assignData(data.back, 'HDCP', hole.fairwayno, hole.handicap);
-				assignData(data.back, player.playerName, hole.fairwayno, hole.gross);				
+				assignLineData(data.back, 'PAR', hole.fairwayno, hole.par);
+				assignLineData(data.back, 'HDCP', hole.fairwayno, hole.handicap);
+				assignLineData(data.back, player.playerName, hole.fairwayno, hole.gross);				
 			}
 		})
 	})
 	return data;
 }
-function assignData(arr:CompArr[], key:string, idx:number, value:number){
-	const f = arr.find((itm) => itm[0] === key);
+function assignLineData(arr:scoreLine[], key:string, idx:number, value:number){
+	const f = arr.find((itm) => itm.f0 === key);
 	if (f) {
-		f[idx] = value;
+		f[`f${idx}`] = convString(value);
 	} else {
-		arr.push([key, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+		const tmp = createLineData([key]);
+		tmp[`f${idx}`] = convString(value);
+		arr.push(tmp);
 	}
+}
+function createLineData(arr:string[]) {
+	const tmp:scoreLine = {
+		f0: '',
+		f1: '',
+	}
+	arr.forEach((itm,idx) => {
+		tmp[`f${idx}`] = itm ? itm : '';
+	});
+	return tmp;
+}
+function convString(n:number,withSign = false) {
+	if (n === 0) return '';
+	if (n > 0 && withSign) return `+${n}`;
+	return String(n);
 }

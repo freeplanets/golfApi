@@ -3,15 +3,15 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } 
 import { Condition } from "dynamoose";
 import GamesService from "../../database/game/games.service";
 import CartsService from "../../database/cart/carts.service";
-import { createPageData, playerDefaultHcpCal, tokenCheck, updateTableData } from "../../function/Commands";
-import { carts, games, sideGame } from "../../database/db.interface";
-import { commonResWithData, positonReq } from "../../models/if";
+import { createScoreData, playerDefaultHcpCal, tokenCheck, updateTableData } from "../../function/Commands";
+import { carts, devices, games, mapLatLong, sideGame } from "../../database/db.interface";
+import { commonRes, commonResWithData, positonReq } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
 import positionRequest from "../../models/cart/positionRequest";
 import { positionReqEx } from "../../models/examples/carposition/carPositionEx";
 import _sideGameObject from "../../models/game/_sideGameObject";
-import { scoresEx, sideGameReqEx, updateGamePointEx } from "../../models/examples/game/gameDataEx";
+import { scoresEx, sideGameReqEx } from "../../models/examples/game/gameDataEx";
 import positionResponse from "../../models/cart/positionResponse";
 import _partialPlayerObject from "../../models/game/_partialPlayerObject";
 import commonResponse from "../../models/common/commonResponse";
@@ -19,9 +19,10 @@ import playerDefaultRequest from "../../models/game/playerDefaultsRequest";
 import ZonesService from "../../database/zone/zones.service";
 import checkInResponse from "../../models/game/checkInResponse";
 import { playerDefaultEx } from "../../models/examples/game/playerDefaultEx";
-import { CartStatus } from "../../function/func.interface";
+import { CartStatus, scoresData } from "../../function/func.interface";
 import DevicesService from "../../database/device/devices.service";
-import scoresRequest from "../../models/game/scoresRequest";
+import _mapLatLong from "../../models/common/_mapLatLong";
+import { locationEx } from "../../models/examples/device/deviceEx";
 
 @ApiBearerAuth()
 @ApiTags('Cart')
@@ -51,19 +52,48 @@ export default class InCartController {
 		const resp = await this.searchCheckInData(String(token), caddieid, deviceid);
 		return resp;
 	}
-
+	@Post('deviceLocation/:deviceid')
+	@ApiOperation({summary:'裝置位置更新/ update device location', description:'裝置位置更新/ update device location'})
+	@ApiParam({name:'deviceid', description:'裝置代號'})
+	@ApiBody({description: '位置物件', type: _mapLatLong, examples: locationEx})
+	@ApiResponse({status: 200, type: commonResponse})
+	async deviceLocation(@Param('deviceid') deviceid:string, @Body() body:mapLatLong){
+		console.log('deviceLocation', deviceid, body);
+		const loc: mapLatLong = {
+			latitude: body.latitude,
+			longitude: body.longitude,
+		} 
+		const data:Partial<devices> = {
+			location: loc,
+		};
+		const resp:commonRes = {
+			errcode: ErrCode.OK,
+		}
+		try {
+			const ans =	await this.devicesService.update({deviceid}, data);
+			console.log('update:', ans);
+		} catch(error) {
+			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR,
+			resp.error = {
+				message: errorMsg('DATABASE_ACCESS_ERROR'),
+				extra: error,
+			}
+		}
+		return resp;
+	}
 	@Post('updatePosition')
 	@ApiOperation({summary:'更新球車位/ updatePosition',description:'更新球車位/ updatePosition'})
+	@ApiParam({name:'deviceid', description:'裝置代號'})
 	@ApiBody({description: '位置資料', type: positionRequest, examples: positionReqEx })
 	@ApiResponse({status: 200, type:positionResponse})
-	async updatePosition(@Body() body:positonReq, @Headers('WWW-AUTH') token:Record<string, string>){
+	async updatePosition(@Param('deviceid') deviceid:string,@Body() body:positonReq, @Headers('WWW-AUTH') token:Record<string, string>){
 		const resp:commonResWithData<Partial<carts>[]> = {
 			errcode: '0',
 		};
 		const user = tokenCheck(String(token));
 		if (user) {
 			try {
-				resp.data = await this.cartService.positionUpdate(body);
+				resp.data = await this.cartService.positionUpdate(deviceid, body);
 			} catch(e) {
 				resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
 				resp.error = {
@@ -120,19 +150,16 @@ export default class InCartController {
 		return resp;
 	}
 
-	@Post('updateGamePoint/:gameid/:playerName')
+	@Post('updateGamePoint')
 	@ApiOperation({summary:'擊球資料輸入 / updateGamePoint', description:'擊球資料輸入 / updateGamePoint'})
-	@ApiParam({name:'gameid', description: '來賓分組代號'})
-	@ApiParam({name:'playerName', description: '來賓分組代號'})
-	@ApiBody({description: '擊球結果', type: scoresRequest , isArray: true, examples: scoresEx})
-	async updateGamePoint(@Param('gameid') gameid:string, @Param('playerName') playerName:string, 
-		@Body() body:scoresRequest, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp:commonResponse = {
+	@ApiBody({description: '擊球結果' })
+	async updateGamePoint(@Body() body:scoresData, @Headers('WWW-AUTH') token:Record<string, string>){
+		const resp:commonResWithData<scoresData> = {
 			errcode: '0',
 		}
 		if (tokenCheck(String(token))) {
 			try {
-				 await this.gamesService.updatePlayerGamePoint(gameid, playerName, body); // 更新中
+				 resp.data = await this.gamesService.updatePlayerGamePoint(body); // 更新中
 			} catch(e) {
 				resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
 				resp.error = {
@@ -215,7 +242,8 @@ export default class InCartController {
 					return fZones.find((itm) => itm.zoneid === zoneid);
 				})
 				//for page show
-				resp.data.pageData = createPageData(g.gameid, g.players);
+				console.log('for page show');
+				resp.data.score = createScoreData(g.gameid, g.players);
 				console.log('after query zones');
 				/*
 				const searchKey:Partial<carts> = {
@@ -297,6 +325,6 @@ export default class InCartController {
 		const today = new Date().toLocaleDateString('zh-TW');
 		const tsms = new Date(today).getTime();
 		console.log('todayStartTs', today, tsms);
-		return Math.floor(tsms/1000);
+		return tsms;
 	}	
 }	

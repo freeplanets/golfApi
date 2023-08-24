@@ -71,29 +71,4 @@ export default class DeviceController {
 		return resp;
 	}
 
-	@Post('deviceLocation/:deviceid')
-	@ApiOperation({summary:'裝置位置更新/ update device location', description:'裝置位置更新/ update device location'})
-	@ApiParam({name:'deviceid', description:'裝置代號'})
-	@ApiBody({description: '位置物件', type: _mapLatLong, examples: locationEx})
-	@ApiResponse({status: 200, type: commonResponse})
-	async deviceLocation(@Param('deviceid') deviceid:string, @Body() body:mapLatLong){
-		console.log('deviceLocation', deviceid, body);
-		const data:Partial<devices> = {
-			location: body,
-		};
-		const resp:commonRes = {
-			errcode: ErrCode.OK,
-		}
-		try {
-			const ans =	await this.devicesService.update({deviceid}, data);
-			console.log('update:', ans);
-		} catch(error) {
-			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR,
-			resp.error = {
-				message: errorMsg('DATABASE_ACCESS_ERROR'),
-				extra: error,
-			}
-		}
-		return resp;
-	}
 }

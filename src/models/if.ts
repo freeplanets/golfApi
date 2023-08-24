@@ -28,7 +28,7 @@ export default interface siteDateReq {
 }
 
 export interface positonReq {
-  cartid:string; // 球車代號	TRUE
+  // cartid:string; // 球車代號	TRUE
   zoneid?:string; // 分區代號
   fairwayno:number; //球道代號	TRUE
   location:mapLatLong; // 經緯度物件	TRUE																				

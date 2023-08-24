@@ -1,11 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import defaultService from "../common/defaultService";
-import { gameKey, games, playerDefault, playerGameData, sideGame } from "../db.interface";
+import { gameKey, games, playerDefault, playerGameData, score, sideGame } from "../db.interface";
 import { InjectModel, Model } from "nestjs-dynamoose";
 import _partialPlayerObject from "../../models/game/_partialPlayerObject";
 import { HcpType } from "../../models/enum";
 import SideGameCreator from "../../class/sidegame/SideGameCreator";
-import scoresRequest from "../../models/game/scoresRequest";
+import { scoreLine, scoresData } from "../../function/func.interface";
+import { createScoreData } from "../../function/Commands";
 
 @Injectable()
 export default class GamesService extends defaultService<games, gameKey> {
@@ -47,24 +48,61 @@ export default class GamesService extends defaultService<games, gameKey> {
 		}
 		return this.update(key, data);
 	}
-	async updatePlayerGamePoint(gameid:string, playerName:string, data:scoresRequest){
+	async updatePlayerGamePoint(data:scoresData){
 		const key:gameKey = {
-			gameid,
+			gameid: data.gameid,
 		};
 		const f = await super.query(key, ['players','sideGames']);
 		if (f) {
 			const sideGames = f[0].sideGames;
 			const oldPlayers = f[0].players;
-			const pl = oldPlayers.find((player) => player.playerName === playerName);
-			if (pl) {
-				 data.holes.forEach((score) => {
-					const f = pl.holes.find((hole) => hole.holeNo === score.holeNo);
-					if (f) {
-						f.gross = score.gross;
-					}
-				 });
+			let zone = '';
+			let score:scoreLine[];
+			if (data.front) {
+				zone = 'front';
+				score = data.front;
 			}
-			return this.update(key, {players:oldPlayers});
+			if (data.back){
+				zone = 'back';
+				score = data.back;
+			}
+			score.forEach((itm) => {
+				if (itm.f0 === 'PAR' || itm.f0 === 'HDCP') return;
+				const playerName = itm.f0;
+				const pl = oldPlayers.find((player) => player.playerName === playerName);
+				if (pl) {
+					Object.keys(itm).forEach((key) => {
+						// console.log(playerName, key, itm[key])
+						if (key != 'f0' && itm[key]) {
+							const fairwayno = parseInt(key.replace('f', ''), 10);
+							let f:score;
+							if (zone === 'front') {
+								f = pl.holes.find((hole) => hole.fairwayno === fairwayno && hole.holeNo < 10);
+							} else {
+								f = pl.holes.find((hole) => hole.fairwayno === fairwayno && hole.holeNo > 9);
+							}
+							if (f) {
+								f.gross = parseInt(itm[key], 10);
+								f.parDiff = f.gross - f.par;
+								// console.log('update:', f);
+							}
+						}
+					})
+					pl.parDiff = 0;
+					pl.gross = 0;
+					pl.frontGross = 0;
+					pl.backGross = 0;
+					pl.holes.forEach((s) => {
+						if (s.holeNo < 10) pl.frontGross += s.gross;
+						else pl.backGross += s.gross;
+						pl.gross += s.gross;
+						pl.parDiff += s.parDiff;
+					})
+					// console.log('update:', pl);
+				}
+			});
+			await this.update(key, {players:oldPlayers});
+			return createScoreData(data.gameid, oldPlayers);
 		}	
 	}
 	async updateGamePoint(gameid:string, data:_partialPlayerObject){

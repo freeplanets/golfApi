@@ -6,7 +6,7 @@ const loc:mapLatLong = {
 	longitude: 25.088817,
 }
 const carPositionExVal:positonReq = {
-	cartid: '1KafHC5GHhIcYyqGuS3ocN',
+	// cartid: '1KafHC5GHhIcYyqGuS3ocN',
 	zoneid: '6R81eqZpYujVAeJotqeVEZ',
 	fairwayno: 1,
 	location: loc,

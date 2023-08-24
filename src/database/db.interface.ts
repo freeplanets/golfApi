@@ -142,6 +142,12 @@ export interface deviceKey {
   deviceid: string;
 }
 
+export interface deviceHistory extends deviceKey {
+  historyid:string;
+  location: mapLatLong;
+  ts?:number;
+}
+
 export interface devices extends deviceKey {
   deviceName: string;
   deviceType: string;
@@ -192,7 +198,7 @@ export interface player {
   gross:number;
   frontGross:number;
   backGross:number;
-  parDiff:string;
+  parDiff:number;
   stablefordPoint:number;
   holes: score[],
   extra?: AnyObject,

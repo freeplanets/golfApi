@@ -1,6 +1,6 @@
 import { Body, Controller, Headers, Post, Get, Param, Delete, Put, Patch } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { cartHistory, cartKey, carts, deviceKey, devices } from "../../database/db.interface";
+import { cartKey, carts, deviceKey, devices } from "../../database/db.interface";
 import zoneModifyResponse from "../../models/zone/zoneModifyResponse";
 import commonResponse from "../../models/common/commonResponse";
 import zoneResponse from "../../models/zone/zoneResponse";
@@ -12,11 +12,10 @@ import cartResponse from "../../models/cart/cartResponse";
 import queryCartsRequest from "../../models/cart/queryCartsRequest";
 import cartsResponse from "../../models/cart/cartsResponse";
 import DevicesService from "../../database/device/devices.service";
-import { DeviceStatus, queryReq } from "../../function/func.interface";
+import { DeviceStatus } from "../../function/func.interface";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
-import { commonRes, commonResWithData } from "../../models/if";
-import queryRequest from "../../models/common/queryRequest";
+import { commonRes } from "../../models/if";
 
 @ApiBearerAuth()
 @ApiTags('Manage')
@@ -91,36 +90,6 @@ export default class CartController {
 		const user = tokenCheck(String(token));
 		if (user) {
 			resp = await this.updateCartAndDevice(cartid, deviceid)
-		} else {
-			resp.errcode = ErrCode.TOKEN_ERROR;
-			resp.error = {
-				message: errorMsg('TOKEN_ERROR'),
-			}
-		}
-		return resp;
-	}
-
-	@Post('carthistory/:cartid')
-	@ApiOperation({summary:'查詢某球車歷史紀錄資料 / query cart history via cartid and time range', description:'查詢某球車歷史紀錄資料 / query cart history via cartid'})
-	@ApiParam({name:'cartid', description:'球車代號'})
-	@ApiBody({description:'查詢參數', type:queryRequest})
-	async queryCartHistory(@Param('cartid') cartid:string, @Body() body:queryReq, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp:commonResWithData<cartHistory[]> = {
-			errcode: ErrCode.OK,
-		}
-		const user = tokenCheck(String(token));
-		if (user) {
-			try {
-				// console.log('carthistory', cartid, body);
-				resp.data = await this.cartsService.queryHistory(cartid, body);
-				// console.log(resp.data);
-			} catch(error) {
-				resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
-				resp.error = {
-					message: errorMsg('DATABASE_ACCESS_ERROR'),
-					extra: error,
-				}
-			}
 		} else {
 			resp.errcode = ErrCode.TOKEN_ERROR;
 			resp.error = {
@@ -210,7 +179,7 @@ export default class CartController {
 			deviceid
 		};
 		const data:Partial<devices> = {
-			status,
+			// status,
 			cartid,
 		}
 		// console.log('setDeviceStatus:', data);

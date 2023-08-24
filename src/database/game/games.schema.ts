@@ -93,7 +93,7 @@ const GamesSchema = new Schema({
             type: Number,
           },
           parDiff: {
-            type: String,
+            type: Number,
           },
           stablefordPoint: {
             type: Number,

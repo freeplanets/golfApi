@@ -2,6 +2,7 @@ import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.int
 import { caddie, games, player, playerDefault, playerGameData, score, sideGame, teeObject } from "../../../database/db.interface";
 import { HcpType, sideGameFormat, sideGameGroup, sideGames } from "../../../models/enum";
 import siteDateReq, { commonResWithData } from "../../../models/if";
+import { scoreLine } from "../../../function/func.interface";
 
 const caddies:caddie[] = [
 	{
@@ -48,7 +49,7 @@ const playerO: player = {
   gross: 0,
   frontGross: 0,
   backGross: 0,
-  parDiff: '',
+  parDiff: 0,
   stablefordPoint:  0,
   holes: [scores1],
   extra: {},	
@@ -137,9 +138,20 @@ const partialPlayer:Partial<player> = {
   playerName: playerO.playerName,
   holes: playerO.holes,
 }
-const scoresExVal = {
-  players:[partialPlayer]
+const scoreLineData:scoreLine = {
+  f0: 'player001',
+  f1: '5',
+  f2: '',
+  f3: '',
+  f4: '',
+  f5: '',
+  f6: '',
+  f7: '',
+  f8: '',
+  f9: '',
 }
+const scoresExVal = scoreLineData;
+
 const gameRexExVal:commonResWithData<games> = {
 	errcode: '0',
 	error: {

@@ -5,11 +5,6 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export default class positionRequest implements positonReq {
 	@ApiProperty({
-		description: '球車代號',
-	})
-	cartid: string;
-
-	@ApiProperty({
 		description: '分區代號',
 		required: false,
 	})

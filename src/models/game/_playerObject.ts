@@ -44,7 +44,7 @@ export default class _playerObject implements player {
 	@ApiProperty({
 		description: '標準桿差',
 	})
-	parDiff: string;
+	parDiff: number;
 
 	@ApiProperty({
 		description: 'Stableford 分數',

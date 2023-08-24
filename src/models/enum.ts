@@ -56,3 +56,8 @@ export enum sideGameFormat {
 	betterball = 'better ball', 
 	team = 'team',
 }
+
+export enum scoreZone {
+	front = 'front',
+	back = 'back',
+}

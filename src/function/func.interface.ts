@@ -1,3 +1,5 @@
+import { AnyObject } from "src/models/if";
+
 export interface defaultFunc {
 	(args:any, F:Function):any;
 }
@@ -53,12 +55,21 @@ export interface queryReq {
 	anyFilters?:filterObj[];
 }
 
-export interface CompArr {
-	[idx:number]: string | number;
+export interface scoreLine {
+	f0:string;
+	f1:string;
+	f2?:string;
+	f3?:string;
+	f4?:string;
+	f5?:string;
+	f6?:string;
+	f7?:string;
+	f8?:string;
+	f9?:string;
 }
-export interface pageData {
+export interface scoresData {
 	gameid:string;
-	front: CompArr[];
-	back: CompArr[];
-	total: CompArr[];
+	front?: scoreLine[];
+	back?: scoreLine[];
+	total?: scoreLine[];
 }

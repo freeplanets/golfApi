@@ -12,7 +12,7 @@ export default class PlayerUpdater {
 			newPlayer.gross = this.holes.gross;
 			newPlayer.frontGross = this.holes.frontGross;
 			newPlayer.backGross = this.holes.backGross;
-			newPlayer.parDiff = this.holes.parDiff > 0 ? `${this.holes.parDiff}` : `+${this.holes.parDiff}`;
+			newPlayer.parDiff = this.holes.parDiff;
 		}
 	}
 	get gross() {

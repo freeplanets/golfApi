@@ -171,7 +171,7 @@ export default class DataTransController {
 					holes,
 					frontGross: 0,
 					backGross: 0,
-					parDiff: '',
+					parDiff: 0,
 					stablefordPoint: 0,
 					extra: itm.extra,
 				};

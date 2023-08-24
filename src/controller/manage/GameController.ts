@@ -115,8 +115,8 @@ export default class GameController {
 					message: errorMsg('MISS_PARAMETER', missKey),
 				}				
 			} else {
-				const startTime = new Date(`${siteDate.queryDate} 00:00:00`).getTime()/1000;
-				const endTime = new Date(`${siteDate.queryDate} 23:59:59`).getTime()/1000;
+				const startTime = new Date(`${siteDate.queryDate} 00:00:00`).getTime();
+				const endTime = new Date(`${siteDate.queryDate} 23:59:59`).getTime();
 				console.log('queryGame', siteDate, startTime, endTime);
 				const cond = new Condition({siteid: siteDate.siteid}).where('esttimatedStartTime').between(startTime, endTime);
 				resp.data = await this.gamesService.query(cond);
