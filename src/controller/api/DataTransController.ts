@@ -178,7 +178,7 @@ export default class DataTransController {
 				const pDef:playerDefault = {
 					playerName: itm.name,
 					fullHcp: HcpType.NoHcp,
-					allowance: 1,
+					allowance: 100,
 					hcp: '0',
 					hcpRound: true,
 				}

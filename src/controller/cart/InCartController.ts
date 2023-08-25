@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } 
 import { Condition } from "dynamoose";
 import GamesService from "../../database/game/games.service";
 import CartsService from "../../database/cart/carts.service";
-import { createScoreData, playerDefaultHcpCal, tokenCheck, updateTableData } from "../../function/Commands";
+import { createScoreData, playerDefaultHcpCal, tokenCheck, updatePlayerGamePoint, updateTableData } from "../../function/Commands";
 import { carts, devices, games, mapLatLong, sideGame } from "../../database/db.interface";
 import { commonRes, commonResWithData, positonReq } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
@@ -154,25 +154,7 @@ export default class InCartController {
 	@ApiOperation({summary:'擊球資料輸入 / updateGamePoint', description:'擊球資料輸入 / updateGamePoint'})
 	@ApiBody({description: '擊球結果' })
 	async updateGamePoint(@Body() body:scoresData, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp:commonResWithData<scoresData> = {
-			errcode: '0',
-		}
-		if (tokenCheck(String(token))) {
-			try {
-				 resp.data = await this.gamesService.updatePlayerGamePoint(body); // 更新中
-			} catch(e) {
-				resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
-				resp.error = {
-					message: errorMsg('DATABASE_ACCESS_ERROR'),
-					extra: e,
-				}
-			}
-		} else {
-			resp.errcode = ErrCode.TOKEN_ERROR;
-			resp.error = {
-				message: errorMsg('TOKEN_ERROR'),
-			}
-		}
+	 	const resp = await updatePlayerGamePoint(String(token), this.gamesService, body); // 更新中
 		return resp;		
 	}
 

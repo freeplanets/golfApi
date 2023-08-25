@@ -1,4 +1,4 @@
-import { score } from "src/database/db.interface";
+import { score } from "../../database/db.interface";
 import ScoreUpdater from "./ScoreUpdater";
 
 export default class HolesUpdater {
@@ -16,33 +16,31 @@ export default class HolesUpdater {
 		this.pDiff=0;
 		this.scoreObj = this.oldHoles.map((score) => new ScoreUpdater(score));
 	}
-	update(newHoles:score[]){
+	update(newHoles:Partial<score>[]){
 		newHoles.forEach((itm) => {
-			this.total += itm.gross;
-			if (itm.holeNo<10) {
-				this.frontTotal += itm.gross;
-			} else {
-				this.frontTotal += itm.gross;
-			}
-			itm.parDiff = itm.gross - itm.par;
-			this.pDiff += itm.parDiff;
-			const f = this.scoreObj.find((so)=>so.heloNo === itm.holeNo);
+			const f = this.scoreObj.find((so)=>so.holeNo === itm.holeNo);
 			if (f) {
 				f.update(itm);
-				if (f.isUpdated) this.updated.push(f.heloNo);
+				if (f.isUpdated) {
+					this.updated.push(f.holeNo);
+					this.total += f.GrossGap;
+					if (f.holeNo > 9) this.backTotal += f.GrossGap;
+					else this.frontTotal += f.GrossGap;
+					this.pDiff += f.ParDiffGap;
+				}
 			}
 		});
 	}
-	get gross():number {
+	get grossGap():number {
 		return this.total;
 	}
-	get frontGross():number {
+	get frontGrossGap():number {
 		return this.frontTotal;
 	}
-	get backGross():number {
+	get backGrossGap():number {
 		return this.backTotal;
 	}
-	get parDiff():number {
+	get parDiffGap():number {
 		return this.pDiff;
 	}
 	get updatedHoles():number[] {

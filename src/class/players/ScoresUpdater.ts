@@ -1,8 +1,8 @@
-import { scoreLine, scoresData } from "src/function/func.interface";
+import { scoreLine, scoresData } from "../../function/func.interface";
 import { player, score } from "../../database/db.interface";
 import { holesPlayerScore, playerScore } from "../class.if";
 import PlayerUpdater from "./playerUpdater";
-import { scoreZone } from "src/models/enum";
+import { scoreZone } from "../../models/enum";
 
 export default class ScoresUpdater {
 	private playerObjs:PlayerUpdater[];
@@ -12,7 +12,7 @@ export default class ScoresUpdater {
 		this.playerObjs = this.oldPlayers.map((itm) => new PlayerUpdater(itm));
 		// this.update();
 	}
-	private update(scores:scoresData) {
+	update(scores:scoresData) {
 		let data:scoreLine[];
 		let zone='';
 		if (scores.front) {
@@ -22,14 +22,21 @@ export default class ScoresUpdater {
 			data = scores.back;
 			zone = 'back';
 		}
+		// console.log(data, zone);
 		data.forEach((itm) => {
 			if (itm.f0 === 'PAR' || itm.f0 === 'HDCP') return;
 			const playerName = itm.f0;
+			const scores = this.regroupdata(zone, itm);
 			const f = this.playerObjs.find((p) => p.playerName === playerName);
 			if (f) {
-				f.update(itm);
-				itm.gross = f.gross;
+				// console.log('do update:', f.playerName, scores);
+				f.update(scores);
+				// itm.gross = f.gross;
+				// console.log(f.updatedHoles);
 				this.checkUpdatedHoles(f.updatedHoles);
+				// console.log(this.UpdatedHoles);
+			} else {
+				console.log(`${playerName} data not found`);
 			}
 		});
 	}
@@ -43,7 +50,7 @@ export default class ScoresUpdater {
 		}
 	}
 	getScores(holeNo:number):holesPlayerScore {
-		const scores = this.newPlayers.map((player) => {
+		const scores = this.oldPlayers.map((player) => {
 			const tmp:playerScore = {
 				playerName: player.playerName,
 				playerOrder:player.playerOrder,
@@ -77,11 +84,15 @@ export default class ScoresUpdater {
 		if (zone === scoreZone.back) {
 			add = 9;
 		}
+		// console.log('regroupdata', data);
 		Object.keys(data).forEach((key) => {
-			if (key='f0') return;
+			if (key==='f0') return;
 			const hole:Partial<score> = {
-				
-			}
-		})
+				holeNo: add + parseInt(key.replace('f', ''),10),
+				gross: data[key] ?  parseInt(data[key], 10) : 0,
+			};
+			holes.push(hole);
+		});
+		return holes;
 	}
 }

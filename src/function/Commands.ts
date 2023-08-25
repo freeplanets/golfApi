@@ -1,4 +1,4 @@
-import { defaultKey, defaultMethod, platformUser, player, playerDefault } from "../database/db.interface";
+import { defaultKey, defaultMethod, gameKey, platformUser, player, playerDefault } from "../database/db.interface";
 import { ErrCode } from "../models/enumError";
 import { AnyObject, commonRes, commonResWithData } from "../models/if";
 import { errorMsg } from "./Errors";
@@ -7,6 +7,7 @@ import { JwtService } from "@nestjs/jwt";
 import { ConditionComparisonComparatorName, queryReq, scoreLine, scoresData } from "./func.interface";
 import { Condition } from "dynamoose";
 import _scoreObject from "../models/game/_scoreObject";
+import ScoresUpdater from "../class/players/ScoresUpdater";
 
 const jwt = new JwtService();
 const pfSite = 'union';
@@ -312,9 +313,50 @@ function removeUnderLineData(dta:any) {
 export function playerDefaultHcpCal(data:playerDefault[]){
 	return data.map((pd) => {
 		const hcp = parseInt(pd.fullHcp.replace('+', '-'), 10);
-		pd.hcp = `${hcp * pd.allowance}`;
+		pd.hcp = `${Math.round(hcp * pd.allowance/100)}`;
 		return pd;
 	})
+}
+
+export async function updatePlayerGamePoint(token:string, dbservice:any, data:scoresData){
+	const resp:commonResWithData<scoresData> = {
+		errcode: ErrCode.OK,
+	}
+	const user = tokenCheck(token);
+	if (user) {
+		const key:gameKey = {
+			gameid: data.gameid,
+		};
+		const f = await dbservice.query(key, ['players','sideGames']);
+		if (f) {
+			// const sideGames = f[0].sideGames;
+			// try {
+				const oldPlayers = f[0].players;
+				const sUpdater = new ScoresUpdater(oldPlayers);
+				sUpdater.update(data)
+				await dbservice.update(key, {players:oldPlayers});
+				if (sUpdater.UpdatedHoles) {
+					console.log(sUpdater.UpdatedHoles, sUpdater.getScores(sUpdater.UpdatedHoles));
+				}
+				resp.data = createScoreData(data.gameid, oldPlayers);	
+				console.log('createScoreData:', resp.data);
+				/*
+			} catch(error) {
+				resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
+				resp.error = {
+					message: errorMsg('DATABASE_ACCESS_ERROR'),
+					extra: error,
+				}
+			}
+			*/
+		}		
+	} else {
+		resp.errcode = ErrCode.TOKEN_ERROR,
+		resp.error = {
+			message: errorMsg('TOKEN_ERROR'),
+		}
+	}
+	return resp;	
 }
 
 export function createScoreData(gameid:string, players:player[]) {
