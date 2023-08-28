@@ -5,7 +5,7 @@ import ASideGameScore from "./ASideGameScore";
  * 比桿賽 (Stroke play)
 以18洞的總桿數扣除球員的差點計算。
  */
-export default class StockePlay extends ASideGameScore {
+export default class StrokePlay extends ASideGameScore {
 	calc(holeScore: holesPlayerScore): void {
 		holeScore.scores.forEach((player)=>{
 			if (player.gross>0) {
