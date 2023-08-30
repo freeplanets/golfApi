@@ -141,6 +141,9 @@ export default class DataTransController {
 			game.esttimatedStartTime = data.teeOffTimestamp < 9999999999 ? data.teeOffTimestamp * 1000 : data.teeOffTimestamp;
 			game.startTime = 0;
 			game.endTime = 0;
+			if (data.event && data.event.name) {
+				game.gameTitle = data.event.name;
+			}
 			game.playerDefaults = [];
 			game.players = data.players.map((itm, idx) => {
 				let holes:score[] = [];
@@ -178,7 +181,7 @@ export default class DataTransController {
 				const pDef:playerDefault = {
 					playerName: itm.name,
 					fullHcp: HcpType.NoHcp,
-					allowance: 100,
+					allowance: '100',
 					hcp: '0',
 					hcpRound: true,
 				}

@@ -313,7 +313,8 @@ function removeUnderLineData(dta:any) {
 export function playerDefaultHcpCal(data:playerDefault[]){
 	return data.map((pd) => {
 		const hcp = parseInt(pd.fullHcp.replace('+', '-'), 10);
-		pd.hcp = `${Math.round(hcp * pd.allowance/100)}`;
+		const allowance = parseInt(pd.allowance, 10)
+		pd.hcp = `${Math.round(hcp * allowance/100)}`;
 		return pd;
 	})
 }

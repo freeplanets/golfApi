@@ -13,7 +13,7 @@ const playerD: playerDefault = {
   playerName: 'James',
   tee: 'Red',
   fullHcp: '20',
-  allowance: 100,
+  allowance: '100',
   hcp: '20',
   hcpRound: false,
 }

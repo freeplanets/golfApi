@@ -1,3 +1,4 @@
+import { scoreLine } from "../../function/func.interface";
 import StrokePlay from "./StrokePlay";
 
 /**
@@ -11,5 +12,9 @@ import StrokePlay from "./StrokePlay";
 另，當有小鳥或更好成績出現時，對方要翻牌，即，桿數多的排前面。
  */
 export default class LasVegas extends StrokePlay {
-	
+	protected getResult(): { title: scoreLine; total: scoreLine; scoreLines: scoreLine[]; } {
+		const res = super.getResult();
+		const startHoleNo = this.sg.extraInfo.startHoleNo as number | 1;
+		return res;
+	}
 }

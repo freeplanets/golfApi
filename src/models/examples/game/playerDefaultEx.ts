@@ -5,7 +5,7 @@ const player1: playerDefault = {
 	playerName: '李小明',
 	hcp: '',
 	fullHcp: '+2',
-	allowance: 1,
+	allowance: '100',
 	hcpRound: true,
 }
 
@@ -13,7 +13,7 @@ const player2: playerDefault = {
 	playerName: '張小四',
 	hcp: '',
 	fullHcp: '5',
-	allowance: 1,
+	allowance: '100',
 	hcpRound: true,
 }
 
@@ -21,7 +21,7 @@ const player3: playerDefault = {
 	playerName: '王大大',
 	hcp: '',
 	fullHcp: '10',
-	allowance: 1,
+	allowance: '100',
 	hcpRound: true,
 }
 
@@ -29,7 +29,7 @@ const player4: playerDefault = {
 	playerName: '周明人',
 	hcp: '',
 	fullHcp: '20',
-	allowance: 0.7,
+	allowance: '70',
 	hcpRound: true,
 }
 

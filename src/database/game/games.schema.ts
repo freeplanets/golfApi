@@ -171,7 +171,7 @@ const GamesSchema = new Schema({
             type: String
           },
           allowance: {
-            type: Number
+            type: String
           },
           hcp: {
             type: String
@@ -269,6 +269,9 @@ const GamesSchema = new Schema({
         }
       }
     ]
-  }
+  },
+  gameTitle: {
+    type: String,
+  },
 }, { timestamps: true, saveUnknown: ["players.**","sideGames.**"] });
 export default GamesSchema;

@@ -207,7 +207,7 @@ export interface playerDefault {
   playerName: string;
   tee?: string;
   fullHcp: string;
-  allowance: number;
+  allowance: string;
   hcp: string;
   hcpRound: boolean;  //從難洞算起或開始洞
 }
@@ -237,6 +237,7 @@ export interface games extends gameKey {
   caddies: caddie[];
   playerDefaults: playerDefault[];
   sideGames:sideGame[];
+  gameTitle?:string;
 }
 
 export interface courseKey extends defaultKey {

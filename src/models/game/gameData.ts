@@ -11,5 +11,4 @@ export default class gameData extends gamePartialData implements games {
 		description: 'hbu hashkey',
 	})
 	gameid: string;
-
 }

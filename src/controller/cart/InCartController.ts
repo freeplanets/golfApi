@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } 
 import { Condition } from "dynamoose";
 import GamesService from "../../database/game/games.service";
 import CartsService from "../../database/cart/carts.service";
-import { createScoreData, playerDefaultHcpCal, tokenCheck, updatePlayerGamePoint, updateTableData } from "../../function/Commands";
+import { createScoreData, playerDefaultHcpCal, queryTable, tokenCheck, updatePlayerGamePoint, updateTableData } from "../../function/Commands";
 import { carts, devices, games, mapLatLong, sideGame } from "../../database/db.interface";
 import { commonRes, commonResWithData, positonReq } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
@@ -11,7 +11,7 @@ import { errorMsg } from "../../function/Errors";
 import positionRequest from "../../models/cart/positionRequest";
 import { positionReqEx } from "../../models/examples/carposition/carPositionEx";
 import _sideGameObject from "../../models/game/_sideGameObject";
-import { scoresEx, sideGameReqEx } from "../../models/examples/game/gameDataEx";
+import { sideGameReqEx } from "../../models/examples/game/gameDataEx";
 import positionResponse from "../../models/cart/positionResponse";
 import _partialPlayerObject from "../../models/game/_partialPlayerObject";
 import commonResponse from "../../models/common/commonResponse";
@@ -19,10 +19,11 @@ import playerDefaultRequest from "../../models/game/playerDefaultsRequest";
 import ZonesService from "../../database/zone/zones.service";
 import checkInResponse from "../../models/game/checkInResponse";
 import { playerDefaultEx } from "../../models/examples/game/playerDefaultEx";
-import { CartStatus, scoresData } from "../../function/func.interface";
+import { CartStatus, scoresData, sideGameRes } from "../../function/func.interface";
 import DevicesService from "../../database/device/devices.service";
 import _mapLatLong from "../../models/common/_mapLatLong";
 import { locationEx } from "../../models/examples/device/deviceEx";
+import CoursesService from "../../database/course/courses.service";
 
 @ApiBearerAuth()
 @ApiTags('Cart')
@@ -33,16 +34,29 @@ export default class InCartController {
 		private readonly cartService:CartsService,
 		private readonly zonesService:ZonesService,
 		private readonly devicesService:DevicesService,
+		private readonly coursesService:CoursesService
 	){}
-/*
-	@Get('site/:siteid')
-	@ApiOperation({summary:'取得整資料 / get golf club complete information(working.....)', description: '取得球場完整資料 / get golf club complete information'})
+	@Get(':siteid')
+	@ApiOperation({summary:'取得整資料 / get golf club complete information', description: '取得球場完整資料 / get golf club complete information'})
 	@ApiParam({name: 'siteid', description: '球場代號'})
 	async getSiteData(@Param('siteid') siteid:string, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await queryTable(String(token), this.zonesService, { siteid } );
+		const resp:commonResWithData<any> = {
+			errcode: ErrCode.OK,
+		}
+		try {
+			resp.data = {};
+			resp.data.zones = await this.zonesService.query({siteid});
+			resp.data.courses = await this.coursesService.query({siteid});
+		} catch (error) {
+			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
+			resp.error = {
+				message: errorMsg('DATABASE_ACCESS_ERROR'),
+				extra: error,
+			}
+		}
 		return resp;
 	}
-*/
+
 	@Get('getCheckInData/:caddieid/:deviceid')
 	@ApiOperation({summary:'取得來賓編組、分區、球車等資料/ getCheckInData', description:'取得來賓編組、分區、球車等資料/ getCheckInData'})
 	@ApiParam({name: 'caddieid', description:'桿弟代號'})
@@ -126,7 +140,7 @@ export default class InCartController {
 	@ApiParam({name:'gameid', description: '來賓分組代號'})
 	@ApiBody({description:'', type: _sideGameObject, examples:sideGameReqEx})
 	async sidegameRegister(@Param('gameid') gameid:string, @Body() body:sideGame, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp:commonResWithData<Partial<games>> = {
+		const resp:commonResWithData<sideGameRes> = {
 			errcode: '0',
 		}
 		if (tokenCheck(String(token))) {
@@ -216,6 +230,7 @@ export default class InCartController {
 				}
 			} else {
 				const g = resp.data.game as games
+				/*
 				const zones = [g.outZone, g.inZone];
 				console.log('zones:', zones);
 				cond = new Condition({siteid: user.siteid}).where('zoneid').in(zones)
@@ -223,6 +238,7 @@ export default class InCartController {
 				resp.data.zones = zones.map((zoneid) => {
 					return fZones.find((itm) => itm.zoneid === zoneid);
 				})
+				*/
 				//for page show
 				console.log('for page show');
 				resp.data.score = createScoreData(g.gameid, g.players);

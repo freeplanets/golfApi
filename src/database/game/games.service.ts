@@ -5,7 +5,7 @@ import { InjectModel, Model } from "nestjs-dynamoose";
 import _partialPlayerObject from "../../models/game/_partialPlayerObject";
 import { HcpType } from "../../models/enum";
 import SideGameCreator from "../../class/sidegame/SideGameCreator";
-import { scoreLine, scoresData } from "../../function/func.interface";
+import { scoreLine, scoresData, sideGameRes } from "../../function/func.interface";
 import { createScoreData } from "../../function/Commands";
 
 @Injectable()
@@ -20,6 +20,11 @@ export default class GamesService extends defaultService<games, gameKey> {
 		const key:gameKey = {
 			gameid,
 		};
+		const res:sideGameRes = {
+			sideGameTitle: this.newline('name'),
+			sideGameScore:[],
+			sideGameTotal: this.newline('total')
+		}
 		const f = await super.query(key, ['stepInZone', 'stepInFairway', 'players', 'playerDefaults', 'sideGames']);
 		if (f.count > 0) {
 			const game = f[0];
@@ -31,9 +36,10 @@ export default class GamesService extends defaultService<games, gameKey> {
 			} else {
 				game.sideGames[fIdx] = data;
 			}
-			return this.update(key, game);
+			await this.update(key, game);
+			res.sideGameScore = game.sideGames.map((sg) => this.newline(sg.sideGameName));
 		}
-		return undefined;
+		return res;
 	}
 
 	async updateGamesPoint(gameid:string, data:Partial<games>){
@@ -154,5 +160,8 @@ export default class GamesService extends defaultService<games, gameKey> {
 		hcps.forEach((itm) => {
 			newHcps[itm] = parseInt(itm.replace('+', '-'), 10);
 		})
+	}
+	private newline(f0='', f1='', f2='', f3='', f4=''):scoreLine {
+		return { f0, f1, f2, f3, f4 };
 	}
 }

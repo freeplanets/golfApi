@@ -100,4 +100,10 @@ export default class gamePartialData implements Partial<games> {
 		type: _sideGameObject,
 	})
 	sideGames: sideGame[];
+
+	@ApiProperty({
+		description:'賽事/球隊名稱',
+		required: false,
+	})
+	gameTitle?: string;
 }

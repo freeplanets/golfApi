@@ -21,7 +21,7 @@ export default class _playerDefault implements playerDefault {
 	@ApiProperty({
 		description: '採用比率/ default 100%',
 	})
-	allowance: number;
+	allowance: string;
 
 	@ApiProperty({
 		description: '採用差點/ fullHcp * percent(playing Hcp)',

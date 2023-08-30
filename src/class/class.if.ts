@@ -19,8 +19,9 @@ export interface holesPlayerScore {
 	scores:playerScore[],
 }
 export interface iScoreLine {
+	f0:number;
 	f1:number;
 	f2:number;
-	f3:number;
-	f4:number;
+	f3?:number;
+	f4?:number;
 }

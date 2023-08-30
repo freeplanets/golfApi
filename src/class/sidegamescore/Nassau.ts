@@ -29,9 +29,15 @@ export default class Nassau extends StrokePlay {
 		});		
 		return { title, total, scoreLines }		
 	}
-	protected findMax(obj:iScoreLine) {
+	protected findMax(obj:iScoreLine, scoreL:scoreLine) {
 		const arr:number[] = Object.keys(obj).map((key) => obj[key]); 
 		const max = Math.max(...arr);
-		
+		if (arr.filter((x) => x === max).length > 1) {
+			
+		} else {
+			arr.forEach((v, idx) => {
+				if (v === max) scoreL[`f${idx + 1}`] = 1 * this.sg.wager;
+			});			
+		}
 	}
 }

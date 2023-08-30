@@ -73,3 +73,9 @@ export interface scoresData {
 	back?: scoreLine[];
 	total?: scoreLine[];
 }
+
+export interface sideGameRes {
+	sideGameTitle: scoreLine;
+	sideGameScore: scoreLine[];
+	sideGameTotal: scoreLine;
+}
