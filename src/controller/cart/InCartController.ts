@@ -5,7 +5,7 @@ import GamesService from "../../database/game/games.service";
 import CartsService from "../../database/cart/carts.service";
 import { createScoreData, playerDefaultHcpCal, queryTable, tokenCheck, updatePlayerGamePoint, updateTableData } from "../../function/Commands";
 import { carts, devices, games, mapLatLong, sideGame } from "../../database/db.interface";
-import { commonRes, commonResWithData, positonReq } from "../../models/if";
+import { AnyObject, commonRes, commonResWithData, positonReq } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
 import positionRequest from "../../models/cart/positionRequest";
@@ -36,7 +36,7 @@ export default class InCartController {
 		private readonly devicesService:DevicesService,
 		private readonly coursesService:CoursesService
 	){}
-	@Get(':siteid')
+	@Get('getSideInfo/:siteid')
 	@ApiOperation({summary:'取得整資料 / get golf club complete information', description: '取得球場完整資料 / get golf club complete information'})
 	@ApiParam({name: 'siteid', description: '球場代號'})
 	async getSiteData(@Param('siteid') siteid:string, @Headers('WWW-AUTH') token:Record<string, string>){
@@ -63,6 +63,7 @@ export default class InCartController {
 	@ApiParam({name: 'deviceid', description:'設備代號'})
 	@ApiResponse({status: 200, description: '編組、分區、球車等資料', type: checkInResponse})
 	async getCheckInData(@Param('caddieid') caddieid:string, @Param('deviceid') deviceid:string, @Headers('WWW-AUTH') token:Record<string, string>){
+		console.log(new Date().toLocaleString());
 		const resp = await this.searchCheckInData(String(token), caddieid, deviceid);
 		return resp;
 	}
@@ -85,7 +86,7 @@ export default class InCartController {
 		}
 		try {
 			const ans =	await this.devicesService.update({deviceid}, data);
-			console.log('update:', ans);
+			// console.log('update:', ans);
 		} catch(error) {
 			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR,
 			resp.error = {
@@ -208,21 +209,27 @@ export default class InCartController {
 		let resp:commonResWithData<any> = {
 			errcode: '0',
 			data: {}		
-		}		
+		}
+		const chk:AnyObject = {
+			start: new Date().toLocaleString(),
+		}
 		const user = tokenCheck(token);
+		chk.tokenCheck = new Date().toLocaleString(); 
 		if (user) {
 			const ts = this.todayStartTs();
 			let cond = new Condition({siteid: user.siteid}).where('esttimatedStartTime').gt(ts).and().where('endTime').eq(0);
-			const game = await this.gamesService.query(cond);
+			const game = await this.gamesService.query(cond, [], 'siteidesttimatedstarttimeGlobalIndex');
+			chk.queryGame = new Date().toLocaleString();
 			if (game.count > 0) {
 				game.forEach((g,idx) => {
-					 const fIdx = g.caddies.findIndex((itm) => itm.caddieid === caddieid)
-					 if (fIdx > -1){
+					const fIdx = g.caddies.findIndex((itm) => itm.caddieid === caddieid)
+					if (fIdx > -1){
 						console.log('fIdx', fIdx, idx, caddieid, g.caddies);
 						resp.data.game = game[idx];
-					 }
+					}
 				})
 			}
+			chk.findGame = new Date().toLocaleString();
 			if (!resp.data.game) {
 				resp.errcode = ErrCode.ITEM_NOT_FOUND;
 				resp.error = {
@@ -242,6 +249,7 @@ export default class InCartController {
 				//for page show
 				console.log('for page show');
 				resp.data.score = createScoreData(g.gameid, g.players);
+				chk.scoreData = new Date().toLocaleString();
 				console.log('after query zones');
 				/*
 				const searchKey:Partial<carts> = {
@@ -250,6 +258,7 @@ export default class InCartController {
 				};
 				*/
 				const device = await this.devicesService.findOne({deviceid});
+				chk.findDevice = new Date().toLocaleString();
 				if (device && device.cartid) {
 					const cartid = device.cartid;
 					const cart = await this.cartService.findOne({ cartid });
@@ -263,12 +272,17 @@ export default class InCartController {
 					}
 					await this.cartService.update({cartid:cart.cartid}, {status:CartStatus.onduty});	
 				}
+				chk.updateDevice = new Date().toLocaleString();
 			}
 		} else {
 			resp.errcode = ErrCode.TOKEN_ERROR,
 			resp.error = {
 				message: errorMsg('TOKEN_ERROR'),
 			}		
+		}
+		resp.error = {
+			message: 'time check',
+			extra: chk,
 		}
 		return resp;
 	}

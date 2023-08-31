@@ -30,5 +30,5 @@ const DeviceHistorySchema = new Schema({
   ts: {
     type: Number
   }
-}, { timestamps: true, saveUnknown: false, validate: (obj) => (new Date().getTime() - obj.ts) > 604800000 });
+}, { timestamps: true, saveUnknown: false});
 export default DeviceHistorySchema;

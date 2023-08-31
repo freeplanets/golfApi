@@ -57,7 +57,7 @@ export interface queryReq {
 
 export interface scoreLine {
 	f0:string;
-	f1:string;
+	f1?:string;
 	f2?:string;
 	f3?:string;
 	f4?:string;
@@ -66,6 +66,16 @@ export interface scoreLine {
 	f7?:string;
 	f8?:string;
 	f9?:string;
+	f10?:string;
+	f11?:string;
+	f12?:string;
+	f13?:string;
+	f14?:string;
+	f15?:string;
+	f16?:string;
+	f17?:string;
+	f18?:string;
+	f19?:string;
 }
 export interface scoresData {
 	gameid:string;

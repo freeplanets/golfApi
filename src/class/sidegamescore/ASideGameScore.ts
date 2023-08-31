@@ -22,6 +22,7 @@ export default abstract class ASideGameScore {
 	}
 	protected getResult() {
 		const title:scoreLine = this.newline('HOLE');
+		const gameDetail:scoreLine[] = [];
 		const iScoreLines: iScoreLine[] = [];
 		const group:string[]=[];
 		const isplayed:boolean[] =[];
@@ -31,6 +32,7 @@ export default abstract class ASideGameScore {
 		}
 		this.sg.playerGameData.forEach((player, idx) => {
 			title[`f${idx+1}`] = player.playerName;
+			gameDetail.push(this.createGameDetail(player.playerName));
 			group.push(player.betterballGroup);
 			isplayed.push(player.selected);
 			player.holes.forEach((score) => {
@@ -48,7 +50,6 @@ export default abstract class ASideGameScore {
 	protected ResultByIndividual(title:scoreLine, scores:iScoreLine[], isplayed:boolean[]) {	
 		const scoreLines:scoreLine[] = []
 		let iT1=0, iT2=0, iT3=0, iT4=0;
-		let t3Chk=false, t4Chk=false;
 		scores.map((score) => {
 				this.playerDiff(score, 1, isplayed);
 				//iT1 += a1;
@@ -103,6 +104,10 @@ export default abstract class ASideGameScore {
 		});
 		const total = this.newline(this.sg.sideGameName, String(iT1), String(iT2), String(iT3), String(iT4));
 		return { title, total, scoreLines }; 
+	}
+	protected createGameDetail(f0='', f1='', f2='', f3='', f4='', f5='', f6='', f7='', f8='', f9='', f10=''
+		, f11='', f12='', f13='', f14='', f15='', f16='', f17='', f18='', f19=''){
+		return {f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19};
 	}
 	protected newline(f0='', f1='', f2='', f3='', f4=''):scoreLine {
 		return { f0, f1, f2, f3, f4 };

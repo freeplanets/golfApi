@@ -26,6 +26,7 @@ export default class DevicesService extends defaultService<devices, deviceKey> {
 				location: data.location,
 				ts: new Date().getTime(),
 			}
+			// console.log('his:', his);
 			await this.historyService.create(his);
 		}
 		return super.update(key, data, cond);
