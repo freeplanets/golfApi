@@ -4,8 +4,8 @@ import { Condition } from "dynamoose";
 import GamesService from "../../database/game/games.service";
 import CartsService from "../../database/cart/carts.service";
 import { createScoreData, playerDefaultHcpCal, queryTable, tokenCheck, updatePlayerGamePoint, updateTableData } from "../../function/Commands";
-import { carts, devices, games, mapLatLong, sideGame } from "../../database/db.interface";
-import { AnyObject, commonRes, commonResWithData, positonReq } from "../../models/if";
+import { cartKey, carts, devices, games, mapLatLong, sideGame } from "../../database/db.interface";
+import { AnyObject, commonResWithData, locReq, positonReq } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
 import positionRequest from "../../models/cart/positionRequest";
@@ -19,11 +19,13 @@ import playerDefaultRequest from "../../models/game/playerDefaultsRequest";
 import ZonesService from "../../database/zone/zones.service";
 import checkInResponse from "../../models/game/checkInResponse";
 import { playerDefaultEx } from "../../models/examples/game/playerDefaultEx";
-import { CartStatus, scoresData, sideGameRes } from "../../function/func.interface";
+import { CartStatus, scoreLine, scoresData, sideGameRes } from "../../function/func.interface";
 import DevicesService from "../../database/device/devices.service";
 import _mapLatLong from "../../models/common/_mapLatLong";
 import { locationEx } from "../../models/examples/device/deviceEx";
 import CoursesService from "../../database/course/courses.service";
+import locRequest from "../../models/common/locRequest";
+import { ConditionInitializer } from "dynamoose/dist/Condition";
 
 @ApiBearerAuth()
 @ApiTags('Cart')
@@ -70,9 +72,9 @@ export default class InCartController {
 	@Post('deviceLocation/:deviceid')
 	@ApiOperation({summary:'裝置位置更新/ update device location', description:'裝置位置更新/ update device location'})
 	@ApiParam({name:'deviceid', description:'裝置代號'})
-	@ApiBody({description: '位置物件', type: _mapLatLong, examples: locationEx})
-	@ApiResponse({status: 200, type: commonResponse})
-	async deviceLocation(@Param('deviceid') deviceid:string, @Body() body:mapLatLong){
+	@ApiBody({description: '位置物件', type: locRequest, examples: locationEx})
+	@ApiResponse({status: 200, type: positionResponse})
+	async deviceLocation(@Param('deviceid') deviceid:string, @Body() body:locReq){
 		console.log('deviceLocation', deviceid, body);
 		const loc: mapLatLong = {
 			latitude: body.latitude,
@@ -81,12 +83,38 @@ export default class InCartController {
 		const data:Partial<devices> = {
 			location: loc,
 		};
-		const resp:commonRes = {
+		const resp:commonResWithData<carts[]> = {
 			errcode: ErrCode.OK,
 		}
 		try {
-			const ans =	await this.devicesService.update({deviceid}, data);
-			// console.log('update:', ans);
+			let ans:any =	await this.devicesService.update({deviceid}, data);
+			if (ans.cartid) {
+				const key:cartKey = {
+					cartid: ans.cartid,
+				}
+				const cart:Partial<carts> = {
+					location: loc,
+				}
+				// let zoneSearch:Partial<carts>;
+				let cond:ConditionInitializer;
+				if (body.zoneid && body.fairwayno){
+					cart.zoneid = body.zoneid;
+					cart.fairwayno = body.fairwayno;
+					const token = Headers('WWW-AUTH');
+					const user = tokenCheck(String(token));
+					if (user) {
+						cond = new Condition({
+							siteid: user.siteid, 
+							zoneid: body.zoneid,
+							fairwayno: body.fairwayno});						
+					}
+					if (body.distance) cart.distance = body.distance;
+				}
+				ans = await this.cartService.update(key, cart);
+				if (cond) {
+					resp.data = await this.cartService.query(cond);
+				}
+			}
 		} catch(error) {
 			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR,
 			resp.error = {
@@ -247,7 +275,18 @@ export default class InCartController {
 				})
 				*/
 				//for page show
+				const stitle:scoreLine= this.newline('name');
+				g.playerDefaults.forEach((player, idx) => {
+					stitle[`f${idx+1}`] = player.playerName;
+				});
+				const sideGameScore:sideGameRes = {
+					sideGameTitle: [stitle],
+					sideGameScore: [],
+					sideGameTotal: [this.newline('total')],
+				}
+
 				console.log('for page show');
+				resp.data.sideGameScore = sideGameScore;
 				resp.data.score = createScoreData(g.gameid, g.players);
 				chk.scoreData = new Date().toLocaleString();
 				console.log('after query zones');
@@ -338,5 +377,8 @@ export default class InCartController {
 		const tsms = new Date(today).getTime();
 		console.log('todayStartTs', today, tsms);
 		return tsms;
+	}
+	private newline(f0='', f1='', f2='', f3='', f4=''):scoreLine {
+		return { f0, f1, f2, f3, f4 };
 	}	
 }	

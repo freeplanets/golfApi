@@ -8,6 +8,7 @@ export default class positionResponse extends commonResponse implements commonRe
 		description: '球道中所有球車資料',
 		isArray: true,
 		type: positionRequest,
+		required: false,
 	})
 	data?: positonReq[];
 }

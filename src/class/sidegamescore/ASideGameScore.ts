@@ -37,31 +37,43 @@ export default abstract class ASideGameScore {
 			isplayed.push(player.selected);
 			player.holes.forEach((score) => {
 				//scoreLines[score.holeNo-1][`f${idx}`]=score.gross ? `${score.gross}` : '';
+				if (!iScoreLines[score.holeNo-1]) iScoreLines[score.holeNo-1]= this.newILine(score.holeNo);
 				iScoreLines[score.holeNo-1][`f${idx+1}`] = player.selected ? score.gross : 0;
 				// iTotal[`f${idx}`] +=  score.gross;
 			});
 		});		
 		if (this.sg.format === sideGameFormat.individual) {
-			return this.ResultByIndividual(title, iScoreLines, isplayed);
+			return this.ResultByIndividual(title, iScoreLines, gameDetail, isplayed);
 		} else {
-			return this.resultByBetterGame(group, title, iScoreLines);
+			return this.resultByBetterGame(group, title, iScoreLines, gameDetail);
 		}
 	}
-	protected ResultByIndividual(title:scoreLine, scores:iScoreLine[], isplayed:boolean[]) {	
-		const scoreLines:scoreLine[] = []
+	protected ResultByIndividual(title:scoreLine, scores:iScoreLine[], gameDetail:scoreLine[], isplayed:boolean[]) {	
+		let a1=0, a2=0, a3=0, a4=0;
 		let iT1=0, iT2=0, iT3=0, iT4=0;
 		scores.map((score) => {
-				this.playerDiff(score, 1, isplayed);
-				//iT1 += a1;
-				//iT2 += a2;
-				//iT3 += a3;
-				//iT4 += a4;
-			// return this.newline(String(score.f0), String(a1), String(a2), String(a3), String(a4));
-		})
+				// this.playerDiff(score, 1, isplayed);
+				a1 = this.playerDiff(score, 1, isplayed);
+				a2 = this.playerDiff(score, 2, isplayed);	
+				a3 = this.playerDiff(score, 3, isplayed);
+				a4 = this.playerDiff(score, 4, isplayed);
+				iT1 += a1;
+				iT2 += a2;
+				iT3 += a3;
+				iT4 += a4;
+				gameDetail[0][`f${score.f0}`] = a1 ? String(a1) : '';
+				gameDetail[1][`f${score.f0}`] = a2 ? String(a2) : '';
+				gameDetail[2][`f${score.f0}`] = a3 ? String(a3) : '';
+				gameDetail[3][`f${score.f0}`] = a4 ? String(a4) : '';
+		});
+		gameDetail[0][`f19`] = iT1 ? String(iT1) : '';
+		gameDetail[1][`f19`] = iT2 ? String(iT2) : '';
+		gameDetail[2][`f19`] = iT3 ? String(iT3) : '';
+		gameDetail[3][`f19`] = iT4 ? String(iT4) : '';
 		const total = this.newline(this.sg.sideGameName, String(iT1), String(iT2), String(iT3), String(iT4));
-		return { title, total, scoreLines };
+		return { title, total, gameDetail };
 	}
-	protected resultByBetterGame(group:string[], title:scoreLine, scores:iScoreLine[]) {
+	protected resultByBetterGame(group:string[], title:scoreLine, scores:iScoreLine[], gameDetail:scoreLine[]) {
 		const g1:iGroup = {
 			name: '',
 			betterScore:999,
@@ -74,7 +86,7 @@ export default abstract class ASideGameScore {
 		}
 		const groups = [g1, g2];
 		let iT1=0, iT2=0, iT3=0, iT4=0;
-		const scoreLines = scores.map((score) => {
+		scores.map((score) => {
 			// 檢查分組最佳成績
 			group.forEach((g,idx) => {
 				let f = groups.find((itm) => itm.name === g);
@@ -100,10 +112,18 @@ export default abstract class ASideGameScore {
 			iT2+= score.f2;
 			iT3+= score.f3;
 			iT4+= score.f4;
-			return this.newline(String(score.f0),String(score.f1),String(score.f2),String(score.f3),String(score.f4));
+			gameDetail[0][`f${score.f0}`] = score.f1 ? String(score.f1) : '';
+			gameDetail[1][`f${score.f0}`] = score.f2 ? String(score.f2) : '';
+			gameDetail[2][`f${score.f0}`] = score.f3 ? String(score.f3) : '';
+			gameDetail[3][`f${score.f0}`] = score.f4 ? String(score.f4) : '';
+			// return this.newline(String(score.f0),String(score.f1),String(score.f2),String(score.f3),String(score.f4));
 		});
+		gameDetail[0][`f19`] = iT1 ? String(iT1) : '';
+		gameDetail[1][`f19`] = iT2 ? String(iT2) : '';
+		gameDetail[2][`f19`] = iT3 ? String(iT3) : '';
+		gameDetail[3][`f19`] = iT4 ? String(iT4) : '';		
 		const total = this.newline(this.sg.sideGameName, String(iT1), String(iT2), String(iT3), String(iT4));
-		return { title, total, scoreLines }; 
+		return { title, total, gameDetail }; 
 	}
 	protected createGameDetail(f0='', f1='', f2='', f3='', f4='', f5='', f6='', f7='', f8='', f9='', f10=''
 		, f11='', f12='', f13='', f14='', f15='', f16='', f17='', f18='', f19=''){
@@ -116,18 +136,25 @@ export default abstract class ASideGameScore {
 		return { f0, f1, f2, f3, f4 };
 	}
 	protected playerDiff(score:iScoreLine, pos:number, isplayed:boolean[]) {
-		switch(pos) {
-			case 1:
-				// return this.scoreDiff(score.f1, score.f2, score.f3, score.f4);
-			case 2:
-				// return this.scoreDiff(score.f2, score.f1, score.f3, score.f4);
-			case 3:
-				// return this.scoreDiff(score.f3, score.f2, score.f1, score.f4);
-			case 4:
-				// return this.scoreDiff(score.f4, score.f3, score.f2, score.f1);
-		}
+		const iAt = pos - 1;
+		if(isplayed[pos-1]) {
+			const tmp:number[] = [score[`f${pos}`]];
+			isplayed.forEach((iAmGamed, idx) => {
+				if(idx !== iAt) {
+					if (iAmGamed) tmp.push(score[`f${idx+1}`]);
+				}
+			});
+			return this.scoreDiff(tmp);
+		} 
+		return 0;
 	}
-	protected scoreDiff(sl:iScoreLine,pos:number, isplayed:boolean[]) {
-
+	protected scoreDiff(s:number[]) {
+		const count = s.length;
+		if (count<2) return 0;
+		let total = 0;
+		for(let i = count; i>0; i++) {
+			total += s[i] - s[0];
+		}
+		return total;
 	}
 }

@@ -15,7 +15,7 @@ import DevicesModule from "../device/devices.module";
 				options: {
 					throughput: 'ON_DEMAND',
 				}
-			},
+			},						
 		])
 	],
 	controllers: [CartController],

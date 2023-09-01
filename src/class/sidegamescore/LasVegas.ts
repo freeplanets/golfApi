@@ -1,4 +1,6 @@
 import { scoreLine } from "../../function/func.interface";
+import { holesPlayerScore } from "../class.if";
+import ASideGameScore from "./ASideGameScore";
 import StrokePlay from "./StrokePlay";
 
 /**
@@ -11,8 +13,21 @@ import StrokePlay from "./StrokePlay";
 當有桿數10桿或以上時，桿數多的排前面，例如1個打11桿，1個打4桿，得分為114。
 另，當有小鳥或更好成績出現時，對方要翻牌，即，桿數多的排前面。
  */
-export default class LasVegas extends StrokePlay {
-	protected getResult(): { title: scoreLine; total: scoreLine; scoreLines: scoreLine[]; } {
+export default class LasVegas extends ASideGameScore {  // extends StrokePlay {
+	calc(holeScore: holesPlayerScore): void {
+		holeScore.scores.forEach((player)=>{
+			if (player.gross>0) {
+				const f = this.sg.playerGameData.find((itm) => itm.playerName === player.playerName);
+				if (f) {
+					const handicap = f.extraInfo.hcp[holeScore.holeNo-1] | 0;
+					let points = player.gross - handicap;
+					// f.points = (this.sg.wager | 1) * points;
+					this.update(f, holeScore.holeNo, points)
+				}
+			}
+		});		
+	}	
+	protected getResult(): { title: scoreLine; total: scoreLine; gameDetail: scoreLine[]; } {
 		const res = super.getResult();
 		const startHoleNo = this.sg.extraInfo.startHoleNo as number | 1;
 		return res;

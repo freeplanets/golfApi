@@ -41,3 +41,9 @@ export interface checkInRes {
 	zones: zones[],
 	cart: carts,
 }
+
+export interface locReq extends mapLatLong {
+  zoneid?:string;
+  fairwayno?:number;
+  distance?:number;
+}

@@ -21,9 +21,8 @@ export default class GamesService extends defaultService<games, gameKey> {
 			gameid,
 		};
 		const res:sideGameRes = {
-			sideGameTitle: this.newline('name'),
 			sideGameScore:[],
-			sideGameTotal: this.newline('total')
+			sideGameTotal: [this.newline('total')],
 		}
 		const f = await super.query(key, ['stepInZone', 'stepInFairway', 'players', 'playerDefaults', 'sideGames']);
 		if (f.count > 0) {

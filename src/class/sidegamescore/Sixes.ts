@@ -8,9 +8,10 @@ import StrokePlay from "./StrokePlay";
 選分組或BetterGame:系統自動分組，前6洞(1&2, 3&4),中6洞(1&3, 2&4)，後6洞(1&4, 2&3)
  */
 export default class Sixes extends StrokePlay {
-	protected getResult(): { title: scoreLine; total: scoreLine; scoreLines: scoreLine[]; } {
+	protected getResult(): { title: scoreLine; total: scoreLine; gameDetail: scoreLine[]; } {
 		const title:scoreLine = this.newline('HOLE');
 		const total:scoreLine = this.newline(this.sg.sideGameName);
+		const gameDetail:scoreLine[] = [];
 		const scoreLines:scoreLine[] = [];
 		const first6 = { f1:0, f2:0, f3:0, f4:0 };
 		const mid6 = { f1:0, f2:0, f3:0, f4:0 };
@@ -30,6 +31,6 @@ export default class Sixes extends StrokePlay {
 				}
 			});
 		});		
-		return { title, total, scoreLines }		
+		return { title, total, gameDetail }		
 	}
 }

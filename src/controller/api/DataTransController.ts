@@ -180,7 +180,7 @@ export default class DataTransController {
 				};
 				const pDef:playerDefault = {
 					playerName: itm.name,
-					fullHcp: HcpType.NoHcp,
+					fullHcp: '0',
 					allowance: '100',
 					hcp: '0',
 					hcpRound: true,
