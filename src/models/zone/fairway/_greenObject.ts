@@ -54,4 +54,14 @@ export default class _greenObject implements greenObject {
 		description:'寬度的距離長度(米)',
 	})
 	widthDistance: number;
+
+	@ApiProperty({
+		description: '啟用',
+	})
+	enable: boolean;
+
+	@ApiProperty({
+		description: '果嶺速度',
+	})
+	speed: number;
 }

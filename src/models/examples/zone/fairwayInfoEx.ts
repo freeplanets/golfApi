@@ -70,6 +70,8 @@ const green:greenObject = {
 	width: 12,
 	height: 10,
 	widthDistance: 24,
+	enable: false,
+	speed: 10,
 }
 const fairwayInfoExVal: fairwayObject = {
 	fairwayno: 1,

@@ -69,6 +69,16 @@ export default class InCartController {
 		const resp = await this.searchCheckInData(String(token), caddieid, deviceid);
 		return resp;
 	}
+
+	@Get('getSideGameScore/:gameid')
+	@ApiOperation({summary:'來賓小遊戲結果 / side game result', description:'來賓小遊戲結果 / side game result'})
+	@ApiParam({name:'gameid', description: '來賓分組代號'})
+	@ApiResponse({status:200, type:commonResponse})
+	async getSideGameScore(@Param('gameid') gameid:string,@Headers('WWW-AUTH') token:Record<string, string>){
+		const resp = await this.querySideGameScore(String(token), gameid);
+		return resp;
+	}
+
 	@Post('deviceLocation/:deviceid')
 	@ApiOperation({summary:'裝置位置更新/ update device location', description:'裝置位置更新/ update device location'})
 	@ApiParam({name:'deviceid', description:'裝置代號'})
@@ -275,18 +285,8 @@ export default class InCartController {
 				})
 				*/
 				//for page show
-				const stitle:scoreLine= this.newline('name');
-				g.playerDefaults.forEach((player, idx) => {
-					stitle[`f${idx+1}`] = player.playerName;
-				});
-				const sideGameScore:sideGameRes = {
-					sideGameTitle: [stitle],
-					sideGameScore: [],
-					sideGameTotal: [this.newline('total')],
-				}
 
 				console.log('for page show');
-				resp.data.sideGameScore = sideGameScore;
 				resp.data.score = createScoreData(g.gameid, g.players);
 				chk.scoreData = new Date().toLocaleString();
 				console.log('after query zones');
@@ -378,7 +378,48 @@ export default class InCartController {
 		console.log('todayStartTs', today, tsms);
 		return tsms;
 	}
-	private newline(f0='', f1='', f2='', f3='', f4=''):scoreLine {
-		return { f0, f1, f2, f3, f4 };
-	}	
+	private newline(f0='', f1='', f2='', f3='', f4='', f5= ''):scoreLine {
+		const ans:scoreLine = { f0, f1, f2, f3, f4 };
+		if (f5) ans.f5 = f5;
+		return ans;
+	}
+	async querySideGameScore(token:string, gameid:string){
+		const resp:commonResWithData<any> = {
+			errcode: ErrCode.OK,
+		}
+		const user = tokenCheck(token);
+		if (user) {
+			const sideGameScore:sideGameRes = {
+				// gameid,
+				sideGameTitle: [],
+				sideGameScore: [],
+				sideGameTotal: [],
+			}
+			const ans = await this.gamesService.query({gameid}, ['playerDefaults', 'sideGames']);
+			if (ans.count>0) {
+				const g = ans[0];
+				if (g.sideGames && g.sideGames.length > 0) {
+					const stitle:scoreLine= this.newline('name');
+					g.playerDefaults.forEach((player, idx) => {
+						stitle[`f${idx+1}`] = player.playerName;
+					});
+					sideGameScore.sideGameTitle.push(stitle);
+					sideGameScore.sideGameScore = g.sideGames.map((sg) => this.newline(sg.sideGameName, '', '', '', '', sg.sidegameid));
+					sideGameScore.sideGameTotal.push(this.newline('total'));
+				}
+				resp.data = sideGameScore;
+			} else {
+				resp.errcode = ErrCode.ITEM_NOT_FOUND;
+				resp.error = {
+					message: errorMsg('ITEM_NOT_FOUND'),
+				}
+			}
+		} else {
+			resp.errcode = ErrCode.TOKEN_ERROR;
+			resp.error = {
+				message: errorMsg('TOKEN_ERROR'),
+			}
+		}
+		return resp;
+	}
 }	

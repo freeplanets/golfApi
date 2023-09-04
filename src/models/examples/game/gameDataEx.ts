@@ -88,6 +88,7 @@ const player4: playerGameData = {
   holes:[scores1],
 }
 const sideGameO:sideGame = {
+  sidegameid: '',
   sideGameName:sideGames.STABLEFORD,
   format: sideGameFormat.individual,
   wager: 1,

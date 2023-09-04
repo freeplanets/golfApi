@@ -8,7 +8,7 @@ import StrokePlay from "./StrokePlay";
 選分組或BetterGame:系統自動分組，前6洞(1&2, 3&4),中6洞(1&3, 2&4)，後6洞(1&4, 2&3)
  */
 export default class Sixes extends StrokePlay {
-	protected getResult(): { title: scoreLine; total: scoreLine; gameDetail: scoreLine[]; } {
+	getResult(): { title: scoreLine; total: scoreLine; gameDetail: scoreLine[]; } {
 		const title:scoreLine = this.newline('HOLE');
 		const total:scoreLine = this.newline(this.sg.sideGameName);
 		const gameDetail:scoreLine[] = [];

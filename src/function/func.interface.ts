@@ -85,6 +85,7 @@ export interface scoresData {
 }
 
 export interface sideGameRes {
+	// gameid?:string;
 	sideGameTitle?: scoreLine[];
 	sideGameScore?: scoreLine[];
 	sideGameTotal?: scoreLine[];

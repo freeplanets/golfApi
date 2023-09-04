@@ -133,7 +133,7 @@ export default class DataTransController {
 			game.courseid = course.courseid;
 			game.outZone = course.outZone;
 			game.inZone = course.inZone;
-			game.stepInZone = '';
+			game.stepInZone = course.outZone;
 			game.stepInFairway = 1;
 			game.par = course.par;
 			game.slope = course.slope | 0;

@@ -5,6 +5,11 @@ import _playerGameData from "./_playerGameData";
 
 export default class _sideGameObject implements sideGame {
 	@ApiProperty({
+		description: '小遊戲hashkey',
+	})
+	sidegameid: string;
+
+	@ApiProperty({
 		description: '小遊戲名稱',
 		enumName: '小遊戲各項目名稱',
 		enum: sideGames,

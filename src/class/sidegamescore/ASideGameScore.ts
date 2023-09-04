@@ -1,7 +1,7 @@
 import { scoreLine } from "../../function/func.interface";
 import { playerGameData, sideGame } from "../../database/db.interface";
 import { holesPlayerScore, iScoreLine } from "../class.if";
-import { sideGameFormat } from "src/models/enum";
+import { sideGameFormat } from "../../models/enum";
 
 interface iGroup {
 	name:string;
@@ -20,7 +20,7 @@ export default abstract class ASideGameScore {
 			pgd.points += f.gross;
 		}
 	}
-	protected getResult() {
+	getResult() {
 		const title:scoreLine = this.newline('HOLE');
 		const gameDetail:scoreLine[] = [];
 		const iScoreLines: iScoreLine[] = [];
@@ -70,7 +70,7 @@ export default abstract class ASideGameScore {
 		gameDetail[1][`f19`] = iT2 ? String(iT2) : '';
 		gameDetail[2][`f19`] = iT3 ? String(iT3) : '';
 		gameDetail[3][`f19`] = iT4 ? String(iT4) : '';
-		const total = this.newline(this.sg.sideGameName, String(iT1), String(iT2), String(iT3), String(iT4));
+		const total = this.newline(this.sg.sideGameName, String(iT1), String(iT2), String(iT3), String(iT4), this.sg.sidegameid);
 		return { title, total, gameDetail };
 	}
 	protected resultByBetterGame(group:string[], title:scoreLine, scores:iScoreLine[], gameDetail:scoreLine[]) {
@@ -122,15 +122,17 @@ export default abstract class ASideGameScore {
 		gameDetail[1][`f19`] = iT2 ? String(iT2) : '';
 		gameDetail[2][`f19`] = iT3 ? String(iT3) : '';
 		gameDetail[3][`f19`] = iT4 ? String(iT4) : '';		
-		const total = this.newline(this.sg.sideGameName, String(iT1), String(iT2), String(iT3), String(iT4));
+		const total = this.newline(this.sg.sideGameName, String(iT1), String(iT2), String(iT3), String(iT4), this.sg.sidegameid);
 		return { title, total, gameDetail }; 
 	}
 	protected createGameDetail(f0='', f1='', f2='', f3='', f4='', f5='', f6='', f7='', f8='', f9='', f10=''
 		, f11='', f12='', f13='', f14='', f15='', f16='', f17='', f18='', f19=''){
 		return {f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19};
 	}
-	protected newline(f0='', f1='', f2='', f3='', f4=''):scoreLine {
-		return { f0, f1, f2, f3, f4 };
+	protected newline(f0='', f1='', f2='', f3='', f4='', f5= ''):scoreLine {
+		const ans:scoreLine = { f0, f1, f2, f3, f4 };
+		if (f5) ans.f5 = f5;
+		return ans;
 	}
 	protected newILine(f0=-1, f1=0,f2=0, f3=0, f4=0):iScoreLine {
 		return { f0, f1, f2, f3, f4 };

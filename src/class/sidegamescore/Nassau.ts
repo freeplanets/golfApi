@@ -22,7 +22,7 @@ export default class Nassau extends ASideGameScore { //extends StrokePlay {
 			}
 		});		
 	}	
-	protected getResult(): { title: scoreLine; total: scoreLine; gameDetail: scoreLine[]; } {
+	getResult(): { title: scoreLine; total: scoreLine; gameDetail: scoreLine[]; } {
 		const title:scoreLine = this.newline('HOLE');
 		const total:scoreLine = this.newline(this.sg.sideGameName);
 		const gameDetail:scoreLine[] = [];

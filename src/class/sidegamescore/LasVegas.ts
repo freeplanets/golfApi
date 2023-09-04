@@ -27,7 +27,7 @@ export default class LasVegas extends ASideGameScore {  // extends StrokePlay {
 			}
 		});		
 	}	
-	protected getResult(): { title: scoreLine; total: scoreLine; gameDetail: scoreLine[]; } {
+	getResult(): { title: scoreLine; total: scoreLine; gameDetail: scoreLine[]; } {
 		const res = super.getResult();
 		const startHoleNo = this.sg.extraInfo.startHoleNo as number | 1;
 		return res;

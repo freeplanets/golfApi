@@ -13,6 +13,7 @@ import Pars from "./Pars";
 import Sixes from "./Sixes";
 import Skin from "./Skin";
 import StrokePlay from "./StrokePlay";
+import { holesPlayerScore } from "../class.if";
 
 export default class SideGameScoreFactory {
 	private sideG:ASideGameScore[]=[];
@@ -58,5 +59,10 @@ export default class SideGameScoreFactory {
 			}
 		})
 	}
-	addScore(){}
+	addScore(score:holesPlayerScore){
+		this.sideG.forEach((sg) => {
+			sg.calc(score);
+			const tmp = sg.getResult();
+		});
+	}
 }

@@ -40,6 +40,14 @@ const greenObject = new Schema({
 		type: Number,
 		required: false,
 	}, // 寬度的距離長度(米)
+	enable: {
+		type: Boolean,
+		required: false,
+	},
+	speed: {
+		type: Number,
+		required: false,
+	},
 	memo: {
 		type: String,
 	},	// 備註

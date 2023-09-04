@@ -6,7 +6,7 @@ import _partialPlayerObject from "../../models/game/_partialPlayerObject";
 import { HcpType } from "../../models/enum";
 import SideGameCreator from "../../class/sidegame/SideGameCreator";
 import { scoreLine, scoresData, sideGameRes } from "../../function/func.interface";
-import { createScoreData } from "../../function/Commands";
+import { createScoreData, removeUnderLineData } from "../../function/Commands";
 
 @Injectable()
 export default class GamesService extends defaultService<games, gameKey> {
@@ -21,22 +21,43 @@ export default class GamesService extends defaultService<games, gameKey> {
 			gameid,
 		};
 		const res:sideGameRes = {
+			sideGameTitle: [],
 			sideGameScore:[],
 			sideGameTotal: [this.newline('total')],
 		}
 		const f = await super.query(key, ['stepInZone', 'stepInFairway', 'players', 'playerDefaults', 'sideGames']);
 		if (f.count > 0) {
+			data = removeUnderLineData(data);
+			//沒有人參加則刪除
+			let forDel = true;
+			data.playerGameData.forEach((pl) => {
+				if (pl.selected) forDel = false;
+			})
+			if ((data as any).gameid) delete (data as any).gameid;
 			const game = f[0];
-			if (!game.sideGames) game.sideGames = [];
-			const fIdx = game.sideGames.findIndex((itm) => itm.sideGameName === data.sideGameName);
-			data = new SideGameCreator(data, game).create();
-			if (fIdx === -1){
+			const stitle:scoreLine= this.newline('name');
+			game.playerDefaults.forEach((player, idx) => {
+				stitle[`f${idx+1}`] = player.playerName;
+			});
+			res.sideGameTitle.push(stitle);
+			if (!data.sidegameid) {
+				if (!game.sideGames) game.sideGames = [];
+				data = new SideGameCreator(data, game).create();
 				game.sideGames.push(data);
 			} else {
-				game.sideGames[fIdx] = data;
+				const fIdx = game.sideGames.findIndex((itm) => itm.sidegameid === data.sidegameid);			
+				if (fIdx === -1){
+					game.sideGames.push(data);
+				} else {
+					if (forDel) {
+						game.sideGames.splice(fIdx,1);
+					} else {
+						game.sideGames[fIdx] = data;
+					}
+				}
 			}
 			await this.update(key, game);
-			res.sideGameScore = game.sideGames.map((sg) => this.newline(sg.sideGameName));
+			res.sideGameScore = game.sideGames.map((sg) => this.newline(sg.sideGameName, '', '', '', '', sg.sidegameid));
 		}
 		return res;
 	}
@@ -160,7 +181,9 @@ export default class GamesService extends defaultService<games, gameKey> {
 			newHcps[itm] = parseInt(itm.replace('+', '-'), 10);
 		})
 	}
-	private newline(f0='', f1='', f2='', f3='', f4=''):scoreLine {
-		return { f0, f1, f2, f3, f4 };
+	private newline(f0='', f1='', f2='', f3='', f4='', f5= ''):scoreLine {
+		const ans:scoreLine = { f0, f1, f2, f3, f4 };
+		if (f5) ans.f5 = f5;
+		return ans;
 	}
 }

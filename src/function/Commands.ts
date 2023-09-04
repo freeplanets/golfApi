@@ -286,7 +286,7 @@ export function createCondition(dta:queryReq){
 	return cond;
 }
 
-function removeUnderLineData(dta:any) {
+export function removeUnderLineData(dta:any) {
 	// console.log(dta);
 	if (typeof dta !== 'object') {
 		return dta;

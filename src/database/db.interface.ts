@@ -84,6 +84,8 @@ export interface greenObject {
   width:number; //圖片寛度
   height:number; //圖片高度
   widthDistance:number; // 寛度的距離長度(米)
+  enable:boolean;
+  speed:number;
   memo?:string; //備註
 }
 
@@ -180,6 +182,7 @@ export interface playerGameData {
 }
 
 export interface sideGame {
+  sidegameid:string;
   sideGameName:sideGames;
   format:sideGameFormat | null;
   wager:number;
