@@ -79,6 +79,26 @@ export default class InCartController {
 		return resp;
 	}
 
+	@Get('getSideGameDetail/:gameid/:sidegameid')
+	@ApiOperation({summary:'來賓小遊戲結果明細 / side game result detail', description:'來賓小遊戲結果明細 / side game result detail'})
+	@ApiParam({name:'gameid', description: '來賓分組代號'})
+	@ApiParam({name:'sidegameid', description: '小遊戲代號'})
+	@ApiResponse({status:200, type:commonResponse})
+	async getSideGameDetail(@Param('gameid') gameid:string, @Param('sidegameid') sidegameid:string,@Headers('WWW-AUTH') token:Record<string, string>){
+		const resp = await this.querySideGameDetail(String(token), gameid, sidegameid);
+		return resp;
+	}
+
+	@Get('getSideGameData/:gameid/:sidegameid')
+	@ApiOperation({summary:'來賓小遊戲資料 / side game data', description:'來賓小遊戲資料 / side game data'})
+	@ApiParam({name:'gameid', description: '來賓分組代號'})
+	@ApiParam({name:'sidegameid', description: '小遊戲代號'})
+	@ApiResponse({status:200, type:commonResponse})
+	async getSideGameData(@Param('gameid') gameid:string, @Param('sidegameid') sidegameid:string,@Headers('WWW-AUTH') token:Record<string, string>){
+		const resp = await this.querySideGameData(String(token), gameid, sidegameid);
+		return resp;
+	}	
+
 	@Post('deviceLocation/:deviceid')
 	@ApiOperation({summary:'裝置位置更新/ update device location', description:'裝置位置更新/ update device location'})
 	@ApiParam({name:'deviceid', description:'裝置代號'})
@@ -383,6 +403,68 @@ export default class InCartController {
 		if (f5) ans.f5 = f5;
 		return ans;
 	}
+	async querySideGameData(token:string, gameid:string, sidegameid:string) {
+		const resp:commonResWithData<sideGame> = {
+			errcode: ErrCode.OK,
+		}
+		const user = tokenCheck(token);
+		if (user) {
+			const ans = await this.gamesService.query({gameid}, ['sideGames']);
+			if (ans.count>0) {
+				const g = ans[0];
+				if (g.sideGames && g.sideGames.length > 0) {
+					const f = g.sideGames.find((sg) => sg.sidegameid === sidegameid);
+					if (f) {
+						resp.data = f;
+					}
+				}
+			} else {
+				resp.errcode = ErrCode.ITEM_NOT_FOUND;
+				resp.error = {
+					message: errorMsg('ITEM_NOT_FOUND'),
+				}
+			}
+		} else {
+			resp.errcode = ErrCode.TOKEN_ERROR;
+			resp.error = {
+				message: errorMsg('TOKEN_ERROR'),
+			}
+		}
+		return resp;
+	}	
+	async querySideGameDetail(token:string, gameid:string, sidegameid:string) {
+		const resp:commonResWithData<any> = {
+			errcode: ErrCode.OK,
+		}
+		const user = tokenCheck(token);
+		if (user) {
+			const sideGameDetail:AnyObject = {}
+			const ans = await this.gamesService.query({gameid}, ['sideGames']);
+			if (ans.count>0) {
+				const g = ans[0];
+				if (g.sideGames && g.sideGames.length > 0) {
+					const f = g.sideGames.find((sg) => sg.sidegameid === sidegameid);
+					if (f && f.extraInfo && f.extraInfo.gameDetail) {
+						sideGameDetail[f.sideGameName] = f.extraInfo.gameDetail; 
+					} else {
+						sideGameDetail[f.sideGameName] = [];
+					}
+				}
+				resp.data = sideGameDetail;
+			} else {
+				resp.errcode = ErrCode.ITEM_NOT_FOUND;
+				resp.error = {
+					message: errorMsg('ITEM_NOT_FOUND'),
+				}
+			}
+		} else {
+			resp.errcode = ErrCode.TOKEN_ERROR;
+			resp.error = {
+				message: errorMsg('TOKEN_ERROR'),
+			}
+		}
+		return resp;
+	}
 	async querySideGameScore(token:string, gameid:string){
 		const resp:commonResWithData<any> = {
 			errcode: ErrCode.OK,
@@ -404,8 +486,20 @@ export default class InCartController {
 						stitle[`f${idx+1}`] = player.playerName;
 					});
 					sideGameScore.sideGameTitle.push(stitle);
-					sideGameScore.sideGameScore = g.sideGames.map((sg) => this.newline(sg.sideGameName, '', '', '', '', sg.sidegameid));
-					sideGameScore.sideGameTotal.push(this.newline('total'));
+					const objT = {f1:0, f2:0, f3:0, f4: 0};
+					g.sideGames.forEach((sg) => {
+						if (sg.extraInfo && sg.extraInfo.total) {
+							sideGameScore.sideGameScore.push(sg.extraInfo.total);
+							objT.f1 += parseInt(sg.extraInfo.total.f1,10)
+							objT.f2 += parseInt(sg.extraInfo.total.f2,10)
+							objT.f3 += parseInt(sg.extraInfo.total.f3,10)
+							objT.f4 += parseInt(sg.extraInfo.total.f4,10)
+						} else {
+							sideGameScore.sideGameScore.push(this.newline(sg.sideGameName, '', '', '', '', sg.sidegameid));
+						}
+					})
+					// sideGameScore.sideGameScore = g.sideGames.map((sg) => this.newline(sg.sideGameName, '', '', '', '', sg.sidegameid));
+					sideGameScore.sideGameTotal.push(this.newline('total', String(objT.f1), String(objT.f2), String(objT.f3) , String(objT.f4)));
 				}
 				resp.data = sideGameScore;
 			} else {

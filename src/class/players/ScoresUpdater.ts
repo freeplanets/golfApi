@@ -22,7 +22,7 @@ export default class ScoresUpdater {
 			data = scores.back;
 			zone = 'back';
 		}
-		// console.log(data, zone);
+		//console.log(data, zone);
 		data.forEach((itm) => {
 			if (itm.f0 === 'PAR' || itm.f0 === 'HDCP') return;
 			const playerName = itm.f0;

@@ -8,6 +8,8 @@ import { ConditionComparisonComparatorName, queryReq, scoreLine, scoresData } fr
 import { Condition } from "dynamoose";
 import _scoreObject from "../models/game/_scoreObject";
 import ScoresUpdater from "../class/players/ScoresUpdater";
+import SideGameScoreFactory from "../class/sidegamescore/SideGameScoreFactory";
+import GamesService from "../database/game/games.service";
 
 const jwt = new JwtService();
 const pfSite = 'union';
@@ -319,12 +321,14 @@ export function playerDefaultHcpCal(data:playerDefault[]){
 	})
 }
 
-export async function updatePlayerGamePoint(token:string, dbservice:any, data:scoresData){
+export async function updatePlayerGamePoint(token:string, dbservice:GamesService, data:scoresData){
 	const resp:commonResWithData<scoresData> = {
 		errcode: ErrCode.OK,
 	}
 	const user = tokenCheck(token);
 	if (user) {
+		data = removeUnderLineData(data);
+		console.log(data);
 		const key:gameKey = {
 			gameid: data.gameid,
 		};
@@ -333,12 +337,17 @@ export async function updatePlayerGamePoint(token:string, dbservice:any, data:sc
 			// const sideGames = f[0].sideGames;
 			// try {
 				const oldPlayers = f[0].players;
+				const sideGames = f[0].sideGames ?  f[0].sideGames : [];
 				const sUpdater = new ScoresUpdater(oldPlayers);
 				sUpdater.update(data)
-				await dbservice.update(key, {players:oldPlayers});
 				if (sUpdater.UpdatedHoles) {
 					console.log(sUpdater.UpdatedHoles, sUpdater.getScores(sUpdater.UpdatedHoles));
+					if (sideGames && sideGames.length > 0) {
+						const sideGF:SideGameScoreFactory = new SideGameScoreFactory(sideGames);
+						sideGF.addScore(sUpdater.getScores(sUpdater.UpdatedHoles));
+					}
 				}
+				await dbservice.update(key, {players:oldPlayers, sideGames:sideGames});
 				resp.data = createScoreData(data.gameid, oldPlayers);	
 				console.log('createScoreData:', resp.data);
 				/*

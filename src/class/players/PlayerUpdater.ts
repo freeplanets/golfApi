@@ -5,6 +5,7 @@ export default class PlayerUpdater {
 	private holes:HolesUpdater;
 	constructor(private oldPlayer:player){
 		this.holes = new HolesUpdater(this.oldPlayer.holes);
+		//console.log('playerupdater:', this.oldPlayer.playerName);
 	}
 	update(scores:Partial<score>[]){
 		this.holes.update(scores);

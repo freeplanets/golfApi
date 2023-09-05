@@ -61,8 +61,7 @@ export default class SideGameScoreFactory {
 	}
 	addScore(score:holesPlayerScore){
 		this.sideG.forEach((sg) => {
-			sg.calc(score);
-			const tmp = sg.getResult();
+			sg.calc(score);			
 		});
 	}
 }

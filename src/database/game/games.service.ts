@@ -29,11 +29,13 @@ export default class GamesService extends defaultService<games, gameKey> {
 		if (f.count > 0) {
 			data = removeUnderLineData(data);
 			//沒有人參加則刪除
-			let forDel = true;
+			let playerCounter = 0;
 			data.playerGameData.forEach((pl) => {
-				if (pl.selected) forDel = false;
-			})
+				if (pl.selected) playerCounter++;
+			});
+			const forDel = playerCounter > 1;
 			if ((data as any).gameid) delete (data as any).gameid;
+			if ((data as any).f0) delete (data as any).f0;
 			const game = f[0];
 			const stitle:scoreLine= this.newline('name');
 			game.playerDefaults.forEach((player, idx) => {
@@ -45,15 +47,11 @@ export default class GamesService extends defaultService<games, gameKey> {
 				data = new SideGameCreator(data, game).create();
 				game.sideGames.push(data);
 			} else {
-				const fIdx = game.sideGames.findIndex((itm) => itm.sidegameid === data.sidegameid);			
-				if (fIdx === -1){
-					game.sideGames.push(data);
+				const fIdx = game.sideGames.findIndex((itm) => itm.sidegameid === data.sidegameid);
+				if (forDel) {
+					game.sideGames.splice(fIdx,1);
 				} else {
-					if (forDel) {
-						game.sideGames.splice(fIdx,1);
-					} else {
-						game.sideGames[fIdx] = data;
-					}
+					game.sideGames[fIdx] = data;
 				}
 			}
 			await this.update(key, game);
