@@ -11,10 +11,15 @@ interface iGroup {
 
 export default abstract class ASideGameScore {
 	constructor(protected sg:sideGame){}
+	get name() {
+		return this.sg.sideGameName;
+	}
 	abstract calc(holeScore:holesPlayerScore):void;
 	protected update(pgd:playerGameData, holeNo:number, points:number){
 		const f = pgd.holes.find((hole) => hole.holeNo === holeNo);
+		//console.log(this.name, pgd.playerName, pgd.points);
 		if (f) {
+			if (pgd.points === undefined) pgd.points = 0;
 			pgd.points -= f.gross;
 			f.gross = points;
 			pgd.points += f.gross;
@@ -44,9 +49,9 @@ export default abstract class ASideGameScore {
 			});
 		});		
 		if (this.sg.format === sideGameFormat.individual) {
-			return this.ResultByIndividual(iScoreLines, gameDetail, isplayed);
+			this.ResultByIndividual(iScoreLines, gameDetail, isplayed);
 		} else {
-			return this.resultByBetterGame(group, iScoreLines, gameDetail);
+			this.resultByBetterGame(group, iScoreLines, gameDetail);
 		}
 	}
 	protected ResultByIndividual(scores:iScoreLine[], gameDetail:scoreLine[], isplayed:boolean[]) {	
@@ -72,6 +77,8 @@ export default abstract class ASideGameScore {
 		gameDetail[2][`f19`] = iT3 ? String(iT3) : '';
 		gameDetail[3][`f19`] = iT4 ? String(iT4) : '';
 		const total = this.newline(this.sg.sideGameName, String(iT1), String(iT2), String(iT3), String(iT4), this.sg.sidegameid);
+		// console.log('total:', total);
+		if (!this.sg.extraInfo) this.sg.extraInfo = {}; 
 		this.sg.extraInfo.total = total;
 		this.sg.extraInfo.gameDetail = gameDetail;
 	}
@@ -154,12 +161,14 @@ export default abstract class ASideGameScore {
 		return 0;
 	}
 	protected scoreDiff(s:number[]) {
+		// console.log('scoreDiff:', s);
 		const count = s.length;
 		if (count<2) return 0;
 		let total = 0;
-		for(let i = count; i>0; i++) {
+		for(let i = count-1; i>0; i--) {
 			total += s[i] - s[0];
 		}
+		// console.log('scoreDiff', total);
 		return total;
 	}
 }

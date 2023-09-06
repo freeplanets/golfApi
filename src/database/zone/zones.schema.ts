@@ -310,6 +310,12 @@ const ZonesSchema = new Schema({
                   widthDistance: {
                     type: Number
                   },
+                  enable: {
+                    type: Boolean,
+                  },
+                  speed: {
+                    type: Number,
+                  },
                   memo: {
                     type: String
                   }

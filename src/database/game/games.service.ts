@@ -33,7 +33,7 @@ export default class GamesService extends defaultService<games, gameKey> {
 			data.playerGameData.forEach((pl) => {
 				if (pl.selected) playerCounter++;
 			});
-			const forDel = playerCounter > 1;
+			const forDel = playerCounter < 2;
 			if ((data as any).gameid) delete (data as any).gameid;
 			if ((data as any).f0) delete (data as any).f0;
 			const game = f[0];

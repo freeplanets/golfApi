@@ -10,6 +10,7 @@ export default class ScoresUpdater {
 	constructor(private oldPlayers:player[]){
 		this.updatedHoles = [];
 		this.playerObjs = this.oldPlayers.map((itm) => new PlayerUpdater(itm));
+		console.log('Updater Created:', new Date().toLocaleString());
 		// this.update();
 	}
 	update(scores:scoresData) {

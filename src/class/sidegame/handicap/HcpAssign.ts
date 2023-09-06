@@ -40,7 +40,7 @@ export default class HcpAssign {
 						pg.extraInfo.hcp = this.assignFromOrders(pg.hcp, f.holes);	
 					}
 					pg.extraInfo.order = this.holesOrder;
-					console.log('check hcp', pg.extraInfo.hcp);					
+					console.log('check hcp', pg.playerName, pg.hcp, pg.extraInfo.hcp);					
 				}
 			}
 			return pg;
@@ -81,24 +81,27 @@ export default class HcpAssign {
 	}
 	private assignFromHardest(hcp:string, holes: score[]){
 		this.sideGameHolesOrder(holes);
-		console.log('assignFromHardest', hcp);
 		const hcps = [...this.sampleHcps];
+		console.log('assignFromHardest', hcp, hcps);
 		let hardstart = 1;
-		let ihcp = parseInt(hcp);
+		let ihcp = parseInt(hcp, 10);
 		for (let i=0, n=hcps.length; i <n; i+=1) {
+			if (ihcp === 0) break;
+			console.log(i, ihcp, hardstart);
 			const founds = holes.filter((itm) => itm.handicap === hardstart);
-			if (founds) {
-				for (let j=0, jn=founds.length; j < jn; jn += 1) {
-					if (ihcp > 0) {
-						hcps[founds[j].holeNo-1] -= 1;
-						ihcp -= 1;
-					} else {
-						hcps[founds[j].holeNo-1] += 1;
-						ihcp += 1;
-					}
-					if (ihcp === 0) break;
+			console.log('founds', founds.map((f) => f.holeNo));
+			founds.every((score) => {
+				if (ihcp > 0) {
+					hcps[score.holeNo-1] -= 1;
+					ihcp -= 1;
+				} else {
+					hcps[score.holeNo-1] += 1;
+					ihcp += 1;
 				}
-			}
+				console.log('holeNo', score.holeNo, ihcp);
+				if (ihcp === 0) return false;
+				return true;
+			})
 			hardstart+=1;
 			if (hardstart>9) hardstart = 1;
 		}

@@ -17,31 +17,33 @@ export default class ModifiedStableford extends ASideGameScore {
 			if (player.gross>0) {
 				const f = this.sg.playerGameData.find((itm) => itm.playerName === player.playerName);
 				if (f) {
-					const handicap = f.extraInfo.hcp[holeScore.holeNo-1] | 0;
-					const parDiff = player.parDiff - handicap;
 					let points = 0;
-					if (parDiff <= -3) points = 8;
-				 	//else if (parDiff > 1) f.points = -3;
-					else {
-						switch(parDiff) {
-							case -2:
-								points = 5;
-								break;
-							case -1:
-								points = 2;
-								break;
-							case 0:
-								points = 0;
-								break;
-							case 1:
-								points = -1;
-								break;
-							default: // > 1
-								points = -3;
+					if (f.selected) {
+						const handicap = f.extraInfo.hcp[holeScore.holeNo-1] | 0;
+						const parDiff = player.parDiff - handicap;
+						if (parDiff <= -3) points = 8;
+						 //else if (parDiff > 1) f.points = -3;
+						else {
+							switch(parDiff) {
+								case -2:
+									points = 5;
+									break;
+								case -1:
+									points = 2;
+									break;
+								case 0:
+									points = 0;
+									break;
+								case 1:
+									points = -1;
+									break;
+								default: // > 1
+									points = -3;
+							}
 						}
+						// f.points = (this.sg.wager | 1) * points;
+						points *= (this.sg.wager | 1);	
 					}
-					// f.points = (this.sg.wager | 1) * points;
-					points *= (this.sg.wager | 1);
 					this.update(f, holeScore.holeNo, points);
 				}
 			}

@@ -11,9 +11,12 @@ export default class StrokePlay extends ASideGameScore {
 			if (player.gross>0) {
 				const f = this.sg.playerGameData.find((itm) => itm.playerName === player.playerName);
 				if (f) {
-					const handicap = f.extraInfo.hcp[holeScore.holeNo-1] | 0;
-					let points = player.gross - handicap;
-					// f.points = (this.sg.wager | 1) * points;
+					let points = 0;
+					if (f.selected) {
+						const handicap = f.extraInfo.hcp[holeScore.holeNo-1] | 0;
+						points = player.gross - handicap;
+						// f.points = (this.sg.wager | 1) * points;
+					}
 					this.update(f, holeScore.holeNo, points)
 				}
 			}

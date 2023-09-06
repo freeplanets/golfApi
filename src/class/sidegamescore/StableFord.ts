@@ -17,17 +17,20 @@ export default class Stableford extends ASideGameScore {
 		holeScore.scores.forEach((player)=>{
 			if (player.gross>0) {
 				const f = this.sg.playerGameData.find((itm) => itm.playerName === player.playerName);
+				// console.log('info:', f.playerName ,f.extraInfo);
 				if (f) {
-					const handicap = f.extraInfo.hcp[holeScore.holeNo-1] | 0;
-					const parDiff = player.parDiff - handicap;
 					let points = 0;
-					if (parDiff <= -4) points = 6;
-					else if (parDiff > 1) points = 0;
-					else {
-						points = 2 - parDiff;
+					if (f.selected) {
+						const handicap = f.extraInfo.hcp[holeScore.holeNo-1] | 0;
+						const parDiff = player.parDiff - handicap;
+						if (parDiff <= -4) points = 6;
+						else if (parDiff > 1) points = 0;
+						else {
+							points = 2 - parDiff;
+						}
+						// f.points = (this.sg.wager | 1) * points;
+						points *= (this.sg.wager | 1);
 					}
-					// f.points = (this.sg.wager | 1) * points;
-					points *= (this.sg.wager | 1);
 					this.update(f, holeScore.holeNo, points)
 				}
 			}

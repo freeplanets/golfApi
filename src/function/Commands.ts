@@ -321,53 +321,7 @@ export function playerDefaultHcpCal(data:playerDefault[]){
 	})
 }
 
-export async function updatePlayerGamePoint(token:string, dbservice:GamesService, data:scoresData){
-	const resp:commonResWithData<scoresData> = {
-		errcode: ErrCode.OK,
-	}
-	const user = tokenCheck(token);
-	if (user) {
-		data = removeUnderLineData(data);
-		console.log(data);
-		const key:gameKey = {
-			gameid: data.gameid,
-		};
-		const f = await dbservice.query(key, ['players','sideGames']);
-		if (f) {
-			// const sideGames = f[0].sideGames;
-			// try {
-				const oldPlayers = f[0].players;
-				const sideGames = f[0].sideGames ?  f[0].sideGames : [];
-				const sUpdater = new ScoresUpdater(oldPlayers);
-				sUpdater.update(data)
-				if (sUpdater.UpdatedHoles) {
-					console.log(sUpdater.UpdatedHoles, sUpdater.getScores(sUpdater.UpdatedHoles));
-					if (sideGames && sideGames.length > 0) {
-						const sideGF:SideGameScoreFactory = new SideGameScoreFactory(sideGames);
-						sideGF.addScore(sUpdater.getScores(sUpdater.UpdatedHoles));
-					}
-				}
-				await dbservice.update(key, {players:oldPlayers, sideGames:sideGames});
-				resp.data = createScoreData(data.gameid, oldPlayers);	
-				console.log('createScoreData:', resp.data);
-				/*
-			} catch(error) {
-				resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
-				resp.error = {
-					message: errorMsg('DATABASE_ACCESS_ERROR'),
-					extra: error,
-				}
-			}
-			*/
-		}		
-	} else {
-		resp.errcode = ErrCode.TOKEN_ERROR,
-		resp.error = {
-			message: errorMsg('TOKEN_ERROR'),
-		}
-	}
-	return resp;	
-}
+
 
 export function createScoreData(gameid:string, players:player[]) {
 	const data:scoresData = {
