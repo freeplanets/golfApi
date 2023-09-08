@@ -179,6 +179,18 @@ const GamesSchema = new Schema({
           hcpRound: {
             type: Boolean,
             default: false,
+          },
+          selected: {
+            type: Boolean,
+            default: true,
+          },
+          betterballGroup: {
+            type: String,
+            default: '',
+          },
+          playOrder: {
+            type: String,
+            default: '',
           }
         }
       }
@@ -229,7 +241,10 @@ const GamesSchema = new Schema({
                     type: String
                   },
                   points: {
-                    type: Number
+                    type: Number,
+                  },
+                  playOrder: {
+                    type: Number,
                   },
                   holes: {
                     type: Array,

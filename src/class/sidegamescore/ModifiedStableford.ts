@@ -13,6 +13,7 @@ import ASideGameScore from "./ASideGameScore";
  */
 export default class ModifiedStableford extends ASideGameScore {
 	calc(holeScore: holesPlayerScore): void {
+		const scores:number[] = [];
 		holeScore.scores.forEach((player)=>{
 			if (player.gross>0) {
 				const f = this.sg.playerGameData.find((itm) => itm.playerName === player.playerName);
@@ -44,9 +45,11 @@ export default class ModifiedStableford extends ASideGameScore {
 						// f.points = (this.sg.wager | 1) * points;
 						points *= (this.sg.wager | 1);	
 					}
+					scores.push(points);
 					this.update(f, holeScore.holeNo, points);
 				}
 			}
 		});
+		this.updateResult(holeScore.holeNo, scores);
 	}	
 }

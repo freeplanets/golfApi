@@ -34,8 +34,8 @@ export default class GamesService extends defaultService<games, gameKey> {
 				if (pl.selected) playerCounter++;
 			});
 			const forDel = playerCounter < 2;
-			if ((data as any).gameid) delete (data as any).gameid;
-			if ((data as any).f0) delete (data as any).f0;
+			if ((data as any).gameid !== undefined) delete (data as any).gameid;
+			if ((data as any).f0 !== undefined) delete (data as any).f0;
 			const game = f[0];
 			const stitle:scoreLine= this.newline('name');
 			game.playerDefaults.forEach((player, idx) => {

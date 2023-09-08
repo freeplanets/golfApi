@@ -96,4 +96,7 @@ export default class ScoresUpdater {
 		});
 		return holes;
 	}
+	getStartHoleNo(zoneid:string, fairwayno:number) {
+		return this.oldPlayers[0].holes.find((h) => h.zoneid === zoneid && h.fairwayno === fairwayno).holeNo;
+	}
 }

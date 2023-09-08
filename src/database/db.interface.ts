@@ -213,6 +213,9 @@ export interface playerDefault {
   allowance: string;
   hcp: string;
   hcpRound: boolean;  //從難洞算起或開始洞
+  selected?:boolean;
+  betterballGroup?:string;
+  playOrder?:string;
 }
 export interface caddie {
   caddieid:string,

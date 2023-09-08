@@ -28,6 +28,7 @@ import locRequest from "../../models/common/locRequest";
 import { ConditionInitializer } from "dynamoose/dist/Condition";
 import ScoresUpdater from "../../class/players/ScoresUpdater";
 import SideGameScoreFactory from "../../class/sidegamescore/SideGameScoreFactory";
+import SideGameRegister from "../../class/sidegame/SideGameRegister";
 
 @ApiBearerAuth()
 @ApiTags('Cart')
@@ -216,7 +217,18 @@ export default class InCartController {
 		}
 		if (tokenCheck(String(token))) {
 			// try {
-				resp.data = await this.gamesService.registerSideGame(gameid, body);
+				//  = await this.gamesService.registerSideGame(gameid, body);
+				const sgR = new SideGameRegister(this.gamesService, gameid, body);
+				const sgr = await sgR.checkIn();
+				if (sgr) {
+					resp.data = sgr;
+				} else {
+					resp.errcode = ErrCode.ERROR_PARAMETER;
+					resp.error = {
+						message: errorMsg('ERROR_PARAMETER', 'sideGame'),
+					}
+				}
+
 				/*
 			} catch(e) {
 				resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
@@ -295,6 +307,12 @@ export default class InCartController {
 					const fIdx = g.caddies.findIndex((itm) => itm.caddieid === caddieid)
 					if (fIdx > -1){
 						console.log('fIdx', fIdx, idx, caddieid, g.caddies);
+						game[idx].playerDefaults = game[idx].playerDefaults.map((p) => {
+							p.betterballGroup = '';
+							p.selected = true;
+							p.playOrder = '';
+							return p;
+						}) 
 						resp.data.game = game[idx];
 					}
 				})
@@ -539,7 +557,7 @@ export default class InCartController {
 					sideGameScore.sideGameTitle.push(stitle);
 					const objT = {f1:0, f2:0, f3:0, f4: 0};
 					g.sideGames.forEach((sg) => {
-						console.log(sg.sideGameName, sg.extraInfo);
+						// console.log(sg.sideGameName, sg.extraInfo);
 						if (sg.extraInfo && sg.extraInfo.total) {
 							sideGameScore.sideGameScore.push(sg.extraInfo.total);
 							objT.f1 += parseInt(sg.extraInfo.total.f1,10)

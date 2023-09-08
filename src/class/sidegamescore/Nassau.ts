@@ -15,7 +15,7 @@ export default class Nassau extends ASideGameScore { //extends StrokePlay {
 				const f = this.sg.playerGameData.find((itm) => itm.playerName === player.playerName);
 				if (f) {
 					const handicap = f.extraInfo.hcp[holeScore.holeNo-1] | 0;
-					let points = player.gross - handicap;
+					let points = player.gross + handicap;
 					// f.points = (this.sg.wager | 1) * points;
 					this.update(f, holeScore.holeNo, points)
 				}
@@ -23,8 +23,8 @@ export default class Nassau extends ASideGameScore { //extends StrokePlay {
 		});		
 	}	
 	getResult(): { title: scoreLine; total: scoreLine; gameDetail: scoreLine[]; } {
-		const title:scoreLine = this.newline('HOLE');
-		const total:scoreLine = this.newline(this.sg.sideGameName);
+		const title:scoreLine = this.rline.newline('HOLE');
+		const total:scoreLine = this.rline.newline(this.sg.sideGameName);
 		const gameDetail:scoreLine[] = [];
 		const first9 = { f1:0, f2:0, f3:0, f4:0 };
 		const last9 = { f1:0, f2:0, f3:0, f4:0 };

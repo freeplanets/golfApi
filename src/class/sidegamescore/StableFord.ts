@@ -14,6 +14,7 @@ import ASideGameScore from "./ASideGameScore";
  */
 export default class Stableford extends ASideGameScore {
 	calc(holeScore: holesPlayerScore): void {
+		const scores:number[] = [];
 		holeScore.scores.forEach((player)=>{
 			if (player.gross>0) {
 				const f = this.sg.playerGameData.find((itm) => itm.playerName === player.playerName);
@@ -22,7 +23,7 @@ export default class Stableford extends ASideGameScore {
 					let points = 0;
 					if (f.selected) {
 						const handicap = f.extraInfo.hcp[holeScore.holeNo-1] | 0;
-						const parDiff = player.parDiff - handicap;
+						const parDiff = player.parDiff + handicap;
 						if (parDiff <= -4) points = 6;
 						else if (parDiff > 1) points = 0;
 						else {
@@ -31,9 +32,11 @@ export default class Stableford extends ASideGameScore {
 						// f.points = (this.sg.wager | 1) * points;
 						points *= (this.sg.wager | 1);
 					}
+					scores.push(points);
 					this.update(f, holeScore.holeNo, points)
 				}
 			}
 		});
+		this.updateResult(holeScore.holeNo, scores);
 	}
 }

@@ -9,8 +9,8 @@ import StrokePlay from "./StrokePlay";
  */
 export default class Sixes extends StrokePlay {
 	getResult(): { title: scoreLine; total: scoreLine; gameDetail: scoreLine[]; } {
-		const title:scoreLine = this.newline('HOLE');
-		const total:scoreLine = this.newline(this.sg.sideGameName);
+		const title:scoreLine = this.rline.newline('HOLE');
+		const total:scoreLine = this.rline.newline(this.sg.sideGameName);
 		const gameDetail:scoreLine[] = [];
 		const scoreLines:scoreLine[] = [];
 		const first6 = { f1:0, f2:0, f3:0, f4:0 };
