@@ -4,7 +4,6 @@ import { holesPlayerScore, iScoreLine } from "../class.if";
 import { sideGameFormat } from "../../models/enum";
 import recordLine from "../common/recordLine";
 import stringScore from "../common/stringScore";
-import { group } from "console";
 
 export interface iGroup {
 	name:string;
@@ -24,9 +23,10 @@ export default abstract class ASideGameScore {
 	abstract calc(holeScore:holesPlayerScore):void;
 	protected update(pgd:playerGameData, holeNo:number, points:number){
 		const f = pgd.holes.find((hole) => hole.holeNo === holeNo);
-		//console.log(this.name, pgd.playerName, pgd.points);
 		if (f) {
-			if (pgd.points === undefined) pgd.points = 0;
+			// console.log(pgd.playerName, pgd.points, f.gross, points);
+			if (pgd.points === undefined || isNaN(pgd.points)) pgd.points = 0;
+			if (f.gross === undefined || isNaN(f.gross)) f.gross = 0;
 			pgd.points -= f.gross;
 			f.gross = points;
 			pgd.points += f.gross;

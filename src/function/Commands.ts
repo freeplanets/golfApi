@@ -366,7 +366,8 @@ function createLineData(arr:string[]) {
 	});
 	return tmp;
 }
-function convString(n:number,withSign = false) {
+function convString(n:number, withSign = false) {
+	if (isNaN(n)) return '';
 	if (n === 0) return '';
 	if (n > 0 && withSign) return `+${n}`;
 	return String(n);

@@ -616,7 +616,7 @@ export default class InCartController {
 							console.log('after addScore', new Date().toLocaleString(), score);
 						}
 					}
-					// console.dir(sideGames, {depth: 8});
+					console.dir(sideGames, {depth: 8});
 					await this.gamesService.update(key, {players:oldPlayers, sideGames:sideGames});
 					// await this.gamesService.update(key, {players:oldPlayers});
 					console.log('after save data', new Date().toLocaleString());

@@ -1,3 +1,4 @@
+import { sideGame } from "src/database/db.interface";
 import StrokePlay from "./StrokePlay";
 
 /**
@@ -10,4 +11,73 @@ import StrokePlay from "./StrokePlay";
 賽程中，海珊的人選並非固定的，每一洞結束後，當洞擊球桿數排名第二（如桿數相同，則以開球順序為準）的球友自動成為下一洞的海珊。
 假使在某洞平手且打球順序不變時，當「海珊」的球友延續擔任，但在下一洞的輸贏點數加倍；若再相同時，在下下一洞再加倍，餘依此類推。
  */
-export default class Hessein extends StrokePlay {}
+export default class Hessein extends StrokePlay {
+	constructor(sg:sideGame){
+		super(sg);
+		if (!this.sg.extraInfo.curHessein) {
+			const countBase=0;
+			const curOrder = [];
+			this.sg.extraInfo.playerPos = []; 
+			this.sg.playerGameData.forEach((pg) => {
+				let countBase = 0;
+				this.sg.extraInfo.playerPos.push(pg.playerName);
+				// if (pg.playOrder === 2) this.sg.extraInfo.curHessein = pg.playerName;
+				if (pg.selected) countBase++;
+				curOrder.push(pg.playOrder);
+			});
+			this.sg.extraInfo.countBase = countBase - 1;
+			this.sg.extraInfo.carry = 1;
+			this.sg.extraInfo.curOrder = curOrder;
+		}
+	}
+	/*
+	protected ByIndividual(score: number[], isplayed: boolean[]): number[] {
+		
+	}
+	protected ByBetterGame(score: number[]): number[] {
+		
+	}
+	*/
+	protected hessienCal(score: number[], isplayed?: boolean[]) {
+		if (!isplayed) this.sg.extraInfo.isplayed;
+		const playPos = this.sg.extraInfo.playPos as string[];
+		// let curHessein = this.sg.extraInfo.curHessein as string;
+		const carry = this.sg.extraInfo.carry as number;
+		const wager = this.sg.wager;
+		const countBase = this.sg.extraInfo.countBase as number;
+		const curOrder = this.sg.extraInfo.curOrder as number[];
+		//const hsIdx = playPos.findIndex((p) => p === curHessein);
+		let hsScore = 0;
+		let others = 0;
+		let hsIdx = 0; // second place index;
+		score.forEach((v, idx) => {
+			if (curOrder[idx] === 2) {
+				hsIdx = idx;
+				hsScore = v * countBase;
+			} else {
+				if (isplayed[idx]) others += v;
+			}
+		});
+		const diff = hsScore - others;
+		if (diff === 0) {
+			this.sg.extraInfo.carry = carry * 2;
+			return [0, 0, 0, 0];
+		} else {
+			const otPoint = wager * diff * -1; 
+			const tmp = score.map((v, idx) => isplayed[idx] ? otPoint : 0);
+			tmp[hsIdx] = diff * wager * countBase;
+			return tmp;
+		}
+	}
+	private findSecondPlace(score:number[], isplayed:boolean[]) {
+		let playedScore:number[] = [];
+		isplayed.forEach((v, idx) => {
+			if (v) playedScore.push[idx];
+		});
+		playedScore = playedScore.sort().reverse();
+		let pop = 0;
+		while(pop = playedScore.pop()) {
+			let fIdx = score.findIndex((v) => v === pop);
+		}
+	}
+}

@@ -32,6 +32,7 @@ const playerGD: playerGameData = {
   playerName: 'James',
   hcp:'20',
   betterballGroup: sideGameGroup.NONE,
+  playOrder: 0,
   points: 0,
   holes:[scores1],
 }
@@ -60,6 +61,7 @@ const player1: playerGameData = {
   playerName: '李小明',
   hcp:'20',
   betterballGroup: sideGameGroup.NONE,
+  playOrder: 0,
   points: 0,
   holes:[scores1],
 }
@@ -68,6 +70,7 @@ const player2: playerGameData = {
   playerName: '張小四',
   hcp:'20',
   betterballGroup: sideGameGroup.NONE,
+  playOrder:0,
   points: 0,
   holes:[scores1],
 }
@@ -76,6 +79,7 @@ const player3: playerGameData = {
   playerName: '王大大',
   hcp:'20',
   betterballGroup: sideGameGroup.NONE,
+  playOrder:0,
   points: 0,
   holes:[scores1],
 }
@@ -85,6 +89,7 @@ const player4: playerGameData = {
   hcp:'20',
   betterballGroup: sideGameGroup.NONE,
   points: 0,
+  playOrder:0,
   holes:[scores1],
 }
 const sideGameO:sideGame = {

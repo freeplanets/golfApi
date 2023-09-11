@@ -177,6 +177,7 @@ export interface playerGameData {
   hcp:string
   betterballGroup:sideGameGroup;
   points:number;
+  playOrder:number;
   holes:score[];
   extraInfo?:AnyObject;
 }

@@ -32,6 +32,11 @@ export default class _playerGameData implements playerGameData {
 	points: number;
 
 	@ApiProperty({
+		description: '擊球序',
+	})
+	playOrder: number;
+
+	@ApiProperty({
 		description: '各洞分數',
 		isArray: true,
 		type: _scoreObject,

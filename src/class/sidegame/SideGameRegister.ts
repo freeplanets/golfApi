@@ -36,9 +36,9 @@ export default class SideGameRegister {
 				const game = qG[0];
 				let curSG:sideGame;
 				if (this.sidegame.sidegameid) {
-					curSG = game.sideGames.find((sg) => sg.sidegameid === this.sidegame.sidegameid);
-					if (curSG) {
-						curSG = new SideGameCreator(this.sidegame, game).create();
+					const fIdx = game.sideGames.findIndex((sg) => sg.sidegameid === this.sidegame.sidegameid);
+					if (fIdx !== -1) {
+						game.sideGames[fIdx] = new SideGameCreator(this.sidegame, game).create();
 					} else {
 						console.log('chk1', curSG);
 						return false;
