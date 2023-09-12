@@ -30,23 +30,19 @@ export default class Hessein extends StrokePlay {
 			this.sg.extraInfo.curOrder = curOrder;
 		}
 	}
-	/*
 	protected ByIndividual(score: number[], isplayed: boolean[]): number[] {
-		
+		return this.hessienCal(score, isplayed);		
 	}
 	protected ByBetterGame(score: number[]): number[] {
-		
+		const isplayed = this.sg.extraInfo.isplayed;
+		return this.hessienCal(score, isplayed);
 	}
-	*/
-	protected hessienCal(score: number[], isplayed?: boolean[]) {
-		if (!isplayed) this.sg.extraInfo.isplayed;
-		const playPos = this.sg.extraInfo.playPos as string[];
+	private hessienCal(score: number[], isplayed: boolean[]) {
 		// let curHessein = this.sg.extraInfo.curHessein as string;
 		const carry = this.sg.extraInfo.carry as number;
 		const wager = this.sg.wager;
 		const countBase = this.sg.extraInfo.countBase as number;
 		const curOrder = this.sg.extraInfo.curOrder as number[];
-		//const hsIdx = playPos.findIndex((p) => p === curHessein);
 		let hsScore = 0;
 		let others = 0;
 		let hsIdx = 0; // second place index;
@@ -66,18 +62,24 @@ export default class Hessein extends StrokePlay {
 			const otPoint = wager * diff * -1; 
 			const tmp = score.map((v, idx) => isplayed[idx] ? otPoint : 0);
 			tmp[hsIdx] = diff * wager * countBase;
+			this.assignSecondPlace(score, isplayed);
 			return tmp;
 		}
 	}
-	private findSecondPlace(score:number[], isplayed:boolean[]) {
-		let playedScore:number[] = [];
-		isplayed.forEach((v, idx) => {
-			if (v) playedScore.push[idx];
+	protected assignSecondPlace(score:number[], isplayed:boolean[]) {
+		const curOrder = this.sg.extraInfo.curOrder as number[];
+		const tmp = score.map((v, idx) => {
+			return {
+				index:idx,
+				score: v,
+				isplayed: isplayed[idx],
+				playOrder: curOrder[idx],
+			}
 		});
-		playedScore = playedScore.sort().reverse();
-		let pop = 0;
-		while(pop = playedScore.pop()) {
-			let fIdx = score.findIndex((v) => v === pop);
-		}
+		tmp.sort((a, b) => a.score - b.score + ( !a.isplayed ? 99 : (a.score === b.score) && (a.playOrder > b.playOrder) ? 1 : 0));
+		tmp.forEach((a, idx) => {
+			curOrder[a.index] = idx + 1;
+		});
+		this.sg.extraInfo.curOrder = curOrder;
 	}
 }

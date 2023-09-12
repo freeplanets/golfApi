@@ -1,7 +1,5 @@
-import { scoreLine } from "../../function/func.interface";
 import { holesPlayerScore } from "../class.if";
-import ASideGameScore from "./ASideGameScore";
-import StrokePlay from "./StrokePlay";
+import Hessein from "./Hessein";
 
 /**
  * 拉斯維加斯 (Las Vegas)
@@ -13,24 +11,68 @@ import StrokePlay from "./StrokePlay";
 當有桿數10桿或以上時，桿數多的排前面，例如1個打11桿，1個打4桿，得分為114。
 另，當有小鳥或更好成績出現時，對方要翻牌，即，桿數多的排前面。
  */
-export default class LasVegas extends ASideGameScore {  // extends StrokePlay {
+export default class LasVegas extends Hessein {
+	private partDiff:number[] = [];
 	calc(holeScore: holesPlayerScore): void {
-		holeScore.scores.forEach((player)=>{
-			if (player.gross>0) {
-				const f = this.sg.playerGameData.find((itm) => itm.playerName === player.playerName);
-				if (f) {
-					const handicap = f.extraInfo.hcp[holeScore.holeNo-1] | 0;
-					let points = player.gross - handicap;
-					// f.points = (this.sg.wager | 1) * points;
-					this.update(f, holeScore.holeNo, points)
+		this.partDiff = holeScore.scores.map((score) => score.parDiff);
+		super.calc(holeScore);
+	}
+	protected ByBetterGame(score: number[]): number[] {
+		const isplayed = this.sg.extraInfo.isplayed as boolean[]
+		return this.lvCal(score, isplayed);
+	}
+	protected ByIndividual(score: number[], isplayed: boolean[]): number[] {
+		return this.lvCal(score, isplayed);
+	}
+	private lvCal(score:number[], isplayed:boolean[]) {
+		const curOrder = this.sg.extraInfo.curOrder as number[];
+		const odrIdx1 = this.orderValueIndex(curOrder, 1);
+		const odrIdx2 = this.orderValueIndex(curOrder, 2);
+		const odrIdx3 = this.orderValueIndex(curOrder, 3);
+		const odrIdx4 = this.orderValueIndex(curOrder, 4);
+		const diff = (this.combineNumber(score, odrIdx1, odrIdx4) - this.combineNumber(score, odrIdx2, odrIdx3)) * this.sg.wager;
+		this.assignSecondPlace(score, isplayed);
+		const tmp = [0,0,0,0];
+		tmp[odrIdx1] = diff;
+		tmp[odrIdx4] = diff;
+		tmp[odrIdx2] = diff * -1;
+		tmp[odrIdx3] = diff * -1;
+		return tmp;
+	}
+	private combineNumber(score:number[], pos1:number, pos2:number) {
+		let unitsDigit = 0, tensDigit = 0;
+		const a = score[pos1-1];
+		const b = score[pos2-1];
+		if (a > b) {
+			if (a > 9) {
+				tensDigit = a;
+				unitsDigit = b;
+			} else {
+				if (this.partDiff[pos1 -1] < 0 || this.partDiff[pos2] < 0) {
+					tensDigit = a;
+					unitsDigit = b;					
+				} else {
+					tensDigit = b;
+					unitsDigit = a;
 				}
 			}
-		});		
+		} else {
+			if (b > 9) {
+				tensDigit = b;
+				unitsDigit = a;
+			} else {
+				if (this.partDiff[pos1 -1] < 0 || this.partDiff[pos2] < 0) {
+					tensDigit = b;
+					unitsDigit = a;
+				} else {
+					tensDigit = a;
+					unitsDigit = b;
+				}
+			}
+		}
+		return parseInt( `${tensDigit}${unitsDigit}`, 10);
 	}
-	/*	
-	protected getResult(): {
-		// const res = super.getResult();
-		const startHoleNo = this.sg.extraInfo.startHoleNo as number | 1;
+	private orderValueIndex(order:number[], orderValue:number) {
+		return order.findIndex((odr) => odr === orderValue);
 	}
-	*/
 }

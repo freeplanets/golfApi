@@ -1,7 +1,7 @@
 import { scoreLine } from "../../function/func.interface";
 import { playerGameData, sideGame } from "../../database/db.interface";
 import { holesPlayerScore, iScoreLine } from "../class.if";
-import { sideGameFormat } from "../../models/enum";
+import { sideGameFormat, sideGames } from "../../models/enum";
 import recordLine from "../common/recordLine";
 import stringScore from "../common/stringScore";
 
@@ -40,7 +40,13 @@ export default abstract class ASideGameScore {
 			const group:string[]=[];
 			const isplayed:boolean[] =[];
 			this.sg.playerGameData.forEach((pg) => {
-				gameDetail.push(this.rline.createGameDetail(pg.playerName));
+				let tmp:scoreLine;
+				if (this.sg.sideGameName === sideGames.NASSAU || this.sg.sideGameName === sideGames.SIXES) {
+					tmp = this.rline.newline(pg.playerName);
+				} else {
+					tmp = this.rline.createGameDetail(pg.playerName);
+				}
+				gameDetail.push(tmp);
 				group.push(pg.betterballGroup);
 				isplayed.push(pg.selected);
 			});
@@ -98,7 +104,7 @@ export default abstract class ASideGameScore {
 			total[`f${idx+1}`] = gameDetail[idx][`f19`]; 
 		});
 		this.sg.extraInfo.total = total;
-		this.sg.extraInfo.gameDetail = gameDetail;		
+		this.sg.extraInfo.gameDetail = gameDetail;
 	}
 	protected ByIndividual(score:number[], isplayed:boolean[]) {
 		// const isplayed = this.sg.extraInfo.isplayed as boolean[];

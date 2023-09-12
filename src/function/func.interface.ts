@@ -56,7 +56,7 @@ export interface queryReq {
 }
 
 export interface scoreLine {
-	f0:string;
+	f0?:string;
 	f1?:string;
 	f2?:string;
 	f3?:string;
