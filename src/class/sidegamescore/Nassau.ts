@@ -1,4 +1,4 @@
-import { sideGameFormat } from "src/models/enum";
+import { sideGameFormat, sideGames } from "../../models/enum";
 import { scoreLine } from "../../function/func.interface";
 import { holesPlayerScore, iScoreLine } from "../class.if";
 import ASideGameScore from "./ASideGameScore";
@@ -26,7 +26,7 @@ interface playerScoreLine {
 	f18?:number;
 	f19?:number;
 }
-interface playerScore {
+export interface tmpScore {
 	playerName:string;
 	subTotal:iScoreLine;
 	scoreLine: playerScoreLine;
@@ -51,16 +51,19 @@ export default class Nassau extends StrokePlay {
 	}
 	protected updateResult(holeNo: number, scores: number[]): void {
 		if (scores.length < 4) return;
-		const subTotal = this.sg.extraInfo.subTotal as playerScore[];
 		let fIdx = 0;
 		if (holeNo <= 9) {
 			fIdx = 1;
 		} else {
 			fIdx = 2;
 		}
-		let subF = [0, 0, 0, 0]; //前九	
-		let subB = [0, 0, 0, 0]; //後九
-		let subT = [0, 0, 0, 0]; //前後合
+		this.updateResultCal(fIdx, holeNo, scores);
+	}
+	protected updateResultCal(fIdx:number, holeNo: number, scores: number[]) {
+		const subTotal = this.sg.extraInfo.subTotal as tmpScore[];
+		let subF = [0, 0, 0, 0]; //前九	,sixs 前6
+		let subB = [0, 0, 0, 0]; //後九	,sixs 中6
+		let subT = [0, 0, 0, 0]; //前後合 ,sixs 後6 
 		const isplayed = this.sg.extraInfo.isplayed as boolean[];
 		subTotal.forEach((st, idx) => {
 			if (st.subTotal[`f${holeNo}`] === undefined) st.subTotal[`f${holeNo}`] = 0;
@@ -68,6 +71,7 @@ export default class Nassau extends StrokePlay {
 			st.subTotal[`f${holeNo}`] = scores[idx];
 			if (st.subTotal[`f${fIdx}`] === undefined) st.subTotal[`f${fIdx}`] = 0;
 			st.subTotal[`f${fIdx}`] += diff;
+			if (this.sg.sideGameName === sideGames.NASSAU) st.subTotal.f3 += diff;
 			subF[idx] = st.scoreLine.f1;
 			subB[idx] = st.scoreLine.f2;
 			subT[idx] = st.scoreLine.f3;
@@ -93,6 +97,6 @@ export default class Nassau extends StrokePlay {
 			}
 		})
 		this.sg.extraInfo.total = total;
-		this.sg.extraInfo.gameDetail = gameDetail;		
+		this.sg.extraInfo.gameDetail = gameDetail;
 	}
 }

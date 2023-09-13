@@ -1,4 +1,5 @@
 import { Schema } from "dynamoose";
+import mapAssetObjectSchema from "./common/mapAssetObject.schema";
 
 const ZonesSchema = new Schema({
   zoneid: {
@@ -131,70 +132,7 @@ const ZonesSchema = new Schema({
               },
               assets: {
                 type: Array,
-                schema: [
-                  {
-                    type: Object,
-                    schema: {
-                      name: {
-                        type: String
-                      },
-                      type: {
-                        type: String
-                      },
-                      show: {
-                        type: Boolean
-                      },
-                      x: {
-                        type: Number
-                      },
-                      y: {
-                        type: Number
-                      },
-                      width: {
-                        type: Number
-                      },
-                      height: {
-                        type: Number
-                      },
-                      icon: {
-                        type: String
-                      },
-                      color: {
-                        type: String
-                      },
-                      bgColor: {
-                        type: String
-                      },
-                      borderColor: {
-                        type: String
-                      },
-                      font: {
-                        type: String
-                      },
-                      image: {
-                        type: String
-                      },
-                      label: {
-                        type: String
-                      },
-                      circleRadius: {
-                        type: Number
-                      },
-                      circleColor: {
-                        type: String
-                      },
-                      circleDashline: {
-                        type: Boolean
-                      },
-                      circleGap: {
-                        type: Number
-                      },
-                      circleMax: {
-                        type: Number
-                      }
-                    }
-                  }
-                ]
+                schema: [mapAssetObjectSchema],
               },
               width: {
                 type: Number
@@ -236,70 +174,7 @@ const ZonesSchema = new Schema({
                   },
                   assets: {
                     type: Array,
-                    schema: [
-                      {
-                        type: Object,
-                        schema: {
-                          name: {
-                            type: String,
-                          },
-                          type: {
-                            type: String,
-                          },
-                          show: {
-                            type: Boolean,
-                          },
-                          x: {
-                            type: Number,
-                          },
-                          y: {
-                            type: Number,
-                          },
-                          width: {
-                            type: Number,
-                          },
-                          height: {
-                            type: Number,
-                          },
-                          icon: {
-                            type: String,
-                          },
-                          color: {
-                            type: String,
-                          },
-                          bgColor: {
-                            type: String,
-                          },
-                          borderColor: {
-                            type: String,
-                          },
-                          font: {
-                            type: String,
-                          },
-                          image: {
-                            type: String,
-                          },
-                          label: {
-                            type: String,
-                          },
-                          circleRadius: {
-                            type: Number,
-                          },
-                          circleColor: {
-                            type: String,
-                          },
-                          circleDashline: {
-                            type: Boolean,
-                          },
-                          circleGap: {
-                            type: Number,
-                          },
-                          circleMax: {
-                            type: Number,
-                          }
-                        }
-                      }
-                    ]
+                    schema: [mapAssetObjectSchema],
                   },
                   width: {
                     type: Number

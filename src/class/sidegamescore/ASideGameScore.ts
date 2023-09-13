@@ -47,7 +47,7 @@ export default abstract class ASideGameScore {
 					tmp = this.rline.createGameDetail(pg.playerName);
 				}
 				gameDetail.push(tmp);
-				group.push(pg.betterballGroup);
+				if (pg.betterballGroup)	group.push(pg.betterballGroup);
 				isplayed.push(pg.selected);
 			});
 			this.sg.extraInfo.gameDetail = gameDetail;

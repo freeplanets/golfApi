@@ -34,11 +34,16 @@ export default class SideGameRegister {
 			const qG = await this.dbService.query(key, ['stepInZone', 'stepInFairway', 'players', 'playerDefaults', 'sideGames']);
 			if (qG.count> 0) {
 				const game = qG[0];
-				let curSG:sideGame;
+				let curSG:sideGame | false;
 				if (this.sidegame.sidegameid) {
 					const fIdx = game.sideGames.findIndex((sg) => sg.sidegameid === this.sidegame.sidegameid);
 					if (fIdx !== -1) {
-						game.sideGames[fIdx] = new SideGameCreator(this.sidegame, game).create();
+						curSG = new SideGameCreator(this.sidegame, game).create();
+						if (curSG) game.sideGames[fIdx] = curSG;
+						else {
+							console.log('chk0', curSG);
+							return false;
+						}
 					} else {
 						console.log('chk1', curSG);
 						return false;
@@ -46,7 +51,12 @@ export default class SideGameRegister {
 				} else {
 					if (!game.sideGames) game.sideGames = [];
 					curSG = new SideGameCreator(this.sidegame, game).create();
-					game.sideGames.push(curSG);
+					if (curSG) {
+						game.sideGames.push(curSG);
+					} else {
+						console.log('chk2', curSG);
+						return false;
+					}
 				}
 				this.reCalc(game.stepInZone, game.stepInFairway, game.sideGames, game.players);
 				await this.dbService.update(key, {sideGames:game.sideGames});

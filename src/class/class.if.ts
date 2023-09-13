@@ -1,4 +1,3 @@
-import { scoreLine } from "../function/func.interface";
 import { playerGameData, sideGame } from "../database/db.interface";
 
 export interface createPlayerGameData {
@@ -6,7 +5,7 @@ export interface createPlayerGameData {
 }
 
 export interface sideGameCreate {
-	create(): sideGame;
+	create(): sideGame | false;
 }
 
 export interface playerScore {

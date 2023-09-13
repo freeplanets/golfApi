@@ -1,5 +1,7 @@
-import { scoreLine } from "src/function/func.interface";
-import StrokePlay from "./StrokePlay";
+import { scoreLine } from "../../function/func.interface";
+import Nassau, { tmpScore } from "./Nassau";
+import { sideGameFormat } from "../../models/enum";
+import { sideGame } from "../../database/db.interface";
 
 /**
  * 六局比桿賽 Sixes
@@ -7,30 +9,33 @@ import StrokePlay from "./StrokePlay";
 可以根據球員差點之間的差異，依讓分規則計算。
 選分組或BetterGame:系統自動分組，前6洞(1&2, 3&4),中6洞(1&3, 2&4)，後6洞(1&4, 2&3)
  */
-export default class Sixes extends StrokePlay {
-	getResult(): { title: scoreLine; total: scoreLine; gameDetail: scoreLine[]; } {
-		const title:scoreLine = this.rline.newline('HOLE');
-		const total:scoreLine = this.rline.newline(this.sg.sideGameName);
-		const gameDetail:scoreLine[] = [];
-		const scoreLines:scoreLine[] = [];
-		const first6 = { f1:0, f2:0, f3:0, f4:0 };
-		const mid6 = { f1:0, f2:0, f3:0, f4:0 };
-		const last6 = { f1:0, f2:0, f3:0, f4:0 };
-		this.sg.playerGameData.forEach((player, idx) => {
-			title[`f${idx}`] = player.playerName;
-			player.holes.forEach((score) => {
-				scoreLines[score.holeNo-1][`f${idx}`]=`${score.gross}`;
-				if (score.holeNo < 7) {
-					first6[`f${idx}`] +=  score.gross;
-				} else {
-					if (score.holeNo < 13) {
-						mid6[`f${idx}`] +=  score.gross;
-					} else {
-						last6[`f${idx}`] +=  score.gross;
-					}
-				}
-			});
-		});		
-		return { title, total, gameDetail }		
+export default class Sixes extends Nassau {
+	constructor(sg:sideGame){
+		super(sg);
+		if (this.sg.extraInfo.group.length < 4) {
+			this.sg.extraInfo.autoGroup = true;
+		}
 	}
+	protected updateResult(holeNo: number, scores: number[]): void {
+		if (scores.length < 4) return;
+		const autoGroup = !!this.sg.extraInfo.autoGroup;
+		let fIdx = 0;
+		if (holeNo <= 6) {
+			fIdx = 1;
+			if (autoGroup) {
+				this.sg.extraInfo.group = ['A', 'B', 'A', 'B'];
+			}
+		} else if (holeNo <= 12) {
+			fIdx = 2;
+			if (autoGroup) {
+				this.sg.extraInfo.group = ['A', 'A', 'B', 'B'];
+			}
+		} else {
+			fIdx = 3;
+			if (autoGroup) {
+				this.sg.extraInfo.group = ['A', 'B', 'B', 'A'];
+			}			
+		}
+		this.updateResultCal(fIdx, holeNo, scores);
+	}	
 }

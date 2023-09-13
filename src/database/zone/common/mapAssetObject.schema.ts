@@ -72,6 +72,22 @@ const mapAssetObjectSchema = new Schema({
 	circleMax: {
 		type: Number,
 		required: false,
-	}, // circle最多幾個	FALSE																					
+	}, // circle最多幾個	FALSE
+	startAngle: {
+		type: Number,
+		required: false,
+	}, // circle起始角度
+	stopAngle: {
+		type: Number,
+		required: false,
+	}, // circle結束角度
+	textAngle: {
+		type: Number,
+		required: false,
+	}, // circle弧上標籤角度
+	rotate: {
+		type: Number,
+		required: false,
+	}, // 標籤/圖片/方塊旋轉角度
 });
 export default mapAssetObjectSchema;

@@ -23,11 +23,6 @@ const greenObject = new Schema({
 	image: {
 		type:String,
 	},
-	assets: {
-		type: Array,
-		schema: mapAssetObject,
-		required: false,
-	},
 	width: {
 		type: Number,
 		required: false,
@@ -40,6 +35,11 @@ const greenObject = new Schema({
 		type: Number,
 		required: false,
 	}, // 寬度的距離長度(米)
+	assets: {
+		type: Array,
+		schema: [mapAssetObject],
+		required: false,
+	},	
 	enable: {
 		type: Boolean,
 		required: false,

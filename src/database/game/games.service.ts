@@ -16,6 +16,7 @@ export default class GamesService extends defaultService<games, gameKey> {
 	){
 		super(gamesModel);
 	}
+	/*
 	async registerSideGame(gameid:string, data:sideGame){
 		const key:gameKey = {
 			gameid,
@@ -59,6 +60,7 @@ export default class GamesService extends defaultService<games, gameKey> {
 		}
 		return res;
 	}
+	*/
 
 	async updateGamesPoint(gameid:string, data:Partial<games>){
 		const key:gameKey = {
