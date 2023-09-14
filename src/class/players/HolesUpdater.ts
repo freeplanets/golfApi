@@ -17,6 +17,7 @@ export default class HolesUpdater {
 		this.scoreObj = this.oldHoles.map((score) => new ScoreUpdater(score));
 	}
 	update(newHoles:Partial<score>[]){
+		console.log('HolesUpdater update', newHoles);
 		newHoles.forEach((itm) => {
 			const f = this.scoreObj.find((so)=>so.holeNo === itm.holeNo);
 			if (f) {
@@ -44,6 +45,7 @@ export default class HolesUpdater {
 		return this.pDiff;
 	}
 	get updatedHoles():number[] {
+		// console.log('updatedHoles', this.updated);
 		return this.updated;
 	}
 }

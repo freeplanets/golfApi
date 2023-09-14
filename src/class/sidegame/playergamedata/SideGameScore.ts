@@ -4,7 +4,7 @@ import HcpAssign from "../handicap/HcpAssign";
 import { hashKey } from "../../../function/Commands";
 
 export default class SideGameScore implements createPlayerGameData {
-	constructor(private sideG:sideGame, private game:Partial<games>){}
+	constructor(private sideG:sideGame, private game:Partial<games>, private startHoleNo:number){}
 	create(): playerGameData[] {
 		const sideG = this.sideG;
 		if (!sideG.sidegameid) {
@@ -20,6 +20,6 @@ export default class SideGameScore implements createPlayerGameData {
 				}
 			});
 		}
-		return new HcpAssign(sideG, this.game).doit();
+		return new HcpAssign(sideG, this.game, this.startHoleNo).doit();
 	}
 }

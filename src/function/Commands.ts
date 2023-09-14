@@ -296,7 +296,7 @@ export function removeUnderLineData(dta:any) {
 	const a:AnyObject = {};
 	Object.keys(dta).forEach((key) => {
 		// console.log('key:', key);
-		if (key.indexOf('_') === -1 && dta[key]) {
+		if (key.indexOf('_') === -1 && isAllowedData(dta[key])) {
 			if (typeof dta[key] === 'object') {
 				if (Array.isArray(dta[key]) ) {
 					a[key] = dta[key].map((itm:any) => removeUnderLineData(itm))
@@ -320,8 +320,6 @@ export function playerDefaultHcpCal(data:playerDefault[]){
 		return pd;
 	})
 }
-
-
 
 export function createScoreData(gameid:string, players:player[]) {
 	const data:scoresData = {
@@ -371,4 +369,10 @@ function convString(n:number, withSign = false) {
 	if (n === 0) return '';
 	if (n > 0 && withSign) return `+${n}`;
 	return String(n);
+}
+function isAllowedData(data:any) {
+	if (data === null) return false;
+	if (data === undefined) return false;
+	if (typeof(data) === 'number' &&  isNaN(data)) return false;
+	return true;
 }

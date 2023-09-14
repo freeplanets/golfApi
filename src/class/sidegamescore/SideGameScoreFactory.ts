@@ -61,7 +61,7 @@ export default class SideGameScoreFactory {
 	}
 	addScore(score:holesPlayerScore){
 		this.sideG.forEach((sg) => {
-			console.log(sg.name, new Date().toLocaleString());
+			console.log('add store', sg.name, score.holeNo, new Date().toLocaleString());
 			sg.calc(score);
 			// if (sg.name === sideGames.STABLEFORD) sg.calc(score);
 		});

@@ -5,15 +5,17 @@ import SideGameScore from "./playergamedata/SideGameScore";
 import { createPlayerGameData, sideGameCreate } from "../class.if";
 import { sideGameFormat, sideGames } from "../../models/enum";
 
+/*
 interface gObj {
 	[key:string]:number;
 }
-
+*/
 export default class SideGameCreator implements sideGameCreate {
 	private gameScores:createPlayerGameData;
 	// constructor(private sideG:sideGame, private playerDfs:playerDefault[], private players:player[]){
-	constructor(private sideG:sideGame, private game:Partial<games>) {
-		this.gameScores = new SideGameScore(this.sideG, this.game);
+	constructor(private sideG:sideGame, private game:Partial<games>, startHoleNo:number) {
+		this.gameScores = new SideGameScore(this.sideG, this.game, startHoleNo);
+		this.sideG.extraInfo = { startHoleNo }; // init value and assign startHoleNo;
 		/*
 		switch(this.sideG.sideGameName) {
 			case sideGames.NASSAU:
@@ -26,15 +28,15 @@ export default class SideGameCreator implements sideGameCreate {
 		*/
 	}
 	create(): sideGame | false {
-		const chkPlayerInGame = this.checkData();
-		if (!chkPlayerInGame) return false;
+		//const chkPlayerInGame = this.checkData();
+		//if (!chkPlayerInGame) return false;
 		this.sideG.playerGameData = this.gameScores.create();
 		this.sideG.playerGameData.forEach((itm) => {
 			console.log(itm.playerName, itm.hcp, itm.extraInfo); 
 		});
-		this.sideG.extraInfo = {};	
 		return this.sideG;
 	}
+	/*
 	private checkData():boolean {
 		switch(this.sideG.sideGameName) {
 			case sideGames.HESSEIN:
@@ -78,4 +80,5 @@ export default class SideGameCreator implements sideGameCreate {
 		});
 		return g.A === g.B;
 	}
+	*/
 }

@@ -16,7 +16,9 @@ export interface playerScore {
 }
 export interface holesPlayerScore {
 	holeNo:number;
-	scores:playerScore[],
+	scores:playerScore[];
+	forAffectTheNextGame?:boolean;
+	changedHoleNo?:number;	// 給會影響下洞計算小遊戲檢查是否往下重算
 }
 export interface iScoreLine {
 	f0:number;

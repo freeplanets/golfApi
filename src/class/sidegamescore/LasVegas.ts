@@ -1,3 +1,4 @@
+import { sideGame } from "src/database/db.interface";
 import { holesPlayerScore } from "../class.if";
 import Hessein from "./Hessein";
 
@@ -13,6 +14,10 @@ import Hessein from "./Hessein";
  */
 export default class LasVegas extends Hessein {
 	private partDiff:number[] = [];
+	constructor(sg:sideGame) {
+		super(sg);
+		this.forAffectTheNextGame = true;
+	}
 	calc(holeScore: holesPlayerScore): void {
 		this.partDiff = holeScore.scores.map((score) => score.parDiff);
 		super.calc(holeScore);
@@ -31,7 +36,7 @@ export default class LasVegas extends Hessein {
 		const odrIdx3 = this.orderValueIndex(curOrder, 3);
 		const odrIdx4 = this.orderValueIndex(curOrder, 4);
 		const diff = (this.combineNumber(score, odrIdx1, odrIdx4) - this.combineNumber(score, odrIdx2, odrIdx3)) * this.sg.wager;
-		this.assignSecondPlace(score, isplayed);
+		this.assignSecondPlace(score, isplayed, curOrder);
 		const tmp = [0,0,0,0];
 		tmp[odrIdx1] = diff;
 		tmp[odrIdx4] = diff;

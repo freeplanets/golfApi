@@ -3,7 +3,7 @@ import { sideGame, playerGameData, games } from "../../../database/db.interface"
 import HcpAssign from "../handicap/HcpAssign";
 
 export default class NassauOrSixesScore implements createPlayerGameData {
-	constructor(private sideG:sideGame, private game:Partial<games>){
+	constructor(private sideG:sideGame, private game:Partial<games>, private startHoleNo:number){
 	}
 	create(): playerGameData[] {
 		this.sideG.playerGameData.map((player) => {
@@ -20,6 +20,6 @@ export default class NassauOrSixesScore implements createPlayerGameData {
 			});
 			return player
 		});
-		return new HcpAssign(this.sideG, this.game).doit();
+		return new HcpAssign(this.sideG, this.game, this.startHoleNo).doit();
 	}
 }

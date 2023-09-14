@@ -1,4 +1,4 @@
-import { sideGameFormat } from "../../models/enum";
+import { sideGameFormat, sideGames } from "../../models/enum";
 import { gameKey, player, sideGame } from "../../database/db.interface";
 import { AnyObject } from "../../models/if";
 import GamesService from "../../database/game/games.service";
@@ -11,6 +11,10 @@ import { holesPlayerScore } from "../class.if";
 import SideGameScoreFactory from "../sidegamescore/SideGameScoreFactory";
 import stringScore from "../common/stringScore";
 
+interface gObj {
+	[key:string]:number;
+}
+
 export default class SideGameRegister {
 	private rline = new recordLine();
 	private sc = new stringScore();
@@ -22,7 +26,7 @@ export default class SideGameRegister {
 		this.sidegame = sidegame;
 	}
 	async checkIn() {
-		if(this.checkPlayer()) {
+		if(this.checkData()) {
 			const key:gameKey = {
 				gameid: this.gameid,
 			}
@@ -34,11 +38,12 @@ export default class SideGameRegister {
 			const qG = await this.dbService.query(key, ['stepInZone', 'stepInFairway', 'players', 'playerDefaults', 'sideGames']);
 			if (qG.count> 0) {
 				const game = qG[0];
+				const startHoleNo = this.getStartHoleNo(game.stepInZone, game.stepInFairway, game.players[0]);
 				let curSG:sideGame | false;
 				if (this.sidegame.sidegameid) {
 					const fIdx = game.sideGames.findIndex((sg) => sg.sidegameid === this.sidegame.sidegameid);
 					if (fIdx !== -1) {
-						curSG = new SideGameCreator(this.sidegame, game).create();
+						curSG = new SideGameCreator(this.sidegame, game, startHoleNo).create();
 						if (curSG) game.sideGames[fIdx] = curSG;
 						else {
 							console.log('chk0', curSG);
@@ -50,7 +55,7 @@ export default class SideGameRegister {
 					}
 				} else {
 					if (!game.sideGames) game.sideGames = [];
-					curSG = new SideGameCreator(this.sidegame, game).create();
+					curSG = new SideGameCreator(this.sidegame, game, startHoleNo).create();
 					if (curSG) {
 						game.sideGames.push(curSG);
 					} else {
@@ -108,12 +113,12 @@ export default class SideGameRegister {
 	reCalc(zoneid:string, fairwayno:number,sideGs:sideGame[], player:player[]){
 		const sUpdater = new ScoresUpdater(player);
 		const sgsf = new SideGameScoreFactory(sideGs);
-		let holeNo = sUpdater.getStartHoleNo(zoneid, fairwayno);
+		let holeNo = this.getStartHoleNo(zoneid, fairwayno, player[0]);
 		if (holeNo) {
 			let hasScore = false;
 			do {
 				const holeScore = sUpdater.getScores(holeNo);
-				hasScore = this.scoreCheckIfAllHasScore(holeScore);
+				hasScore = sUpdater.scoreCheckIfAllHasScore(holeScore);
 				if (hasScore) {
 					sgsf.addScore(holeScore);
 				}
@@ -121,7 +126,52 @@ export default class SideGameRegister {
 			} while(hasScore);
 		}
 	}
-	scoreCheckIfAllHasScore(score:holesPlayerScore){
-		return score.scores.every((score) => score.gross > 0);
+
+	private checkData():boolean {
+		switch(this.sidegame.sideGameName) {
+			case sideGames.HESSEIN:
+				// 至少三人參加
+				return this.numberOfPlayersCheck(3);
+			case sideGames.LAS_VEGAS:
+			case sideGames.SIXES:
+				// 四人全部參加
+				return this.numberOfPlayersCheck(4);
+			case sideGames.BIRDIES:
+			case sideGames.EAGLES:
+			case sideGames.PARS:
+				this.sidegame.format = sideGameFormat.individual;
+			default:
+				return this.checkAll();
+		}
+	}
+	private checkAll() {
+		let ans = false;
+		if (this.sidegame.format === sideGameFormat.individual) {
+			ans = this.numberOfPlayersCheck(2);
+		} else {
+			ans = this.groupCheck();
+		}
+		return ans;
+	}	
+	private numberOfPlayersCheck(count:number):boolean {
+		let cnt = 0;
+		this.sidegame.playerGameData.forEach((player) => {
+			if (player.selected) cnt++;
+		});
+		return cnt >= count;
+	}
+	private groupCheck(){
+		const chk = this.numberOfPlayersCheck(4);
+		if (!chk) return false;
+		const g:gObj = {}
+		this.sidegame.playerGameData.forEach((player) => {
+			if (!g[`${player.betterballGroup}`]) g[`${player.betterballGroup}`] = 1;
+			else g[`${player.betterballGroup}`]+=1;
+		});
+		return g.A === g.B;
+	}
+	getStartHoleNo(zoneid:string, fairwayno:number, anyPlayer:player) {
+		// return this.oldPlayers[0].holes.find((h) => h.zoneid === zoneid && h.fairwayno === fairwayno).holeNo;
+		return anyPlayer.holes.find((h) => h.zoneid === zoneid && h.fairwayno === fairwayno).holeNo;
 	}
 }

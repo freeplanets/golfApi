@@ -9,10 +9,12 @@ export default class PlayerUpdater {
 	}
 	update(scores:Partial<score>[]){
 		this.holes.update(scores);
-		this.oldPlayer.gross += this.holes.grossGap;
-		this.oldPlayer.backGross += this.holes.backGrossGap;
-		this.oldPlayer.frontGross += this.holes.frontGrossGap;
-		this.oldPlayer.parDiff += this.holes.parDiffGap;
+		if (this.holes.updatedHoles.length > 0) {
+			this.oldPlayer.gross += this.holes.grossGap;
+			this.oldPlayer.backGross += this.holes.backGrossGap;
+			this.oldPlayer.frontGross += this.holes.frontGrossGap;
+			this.oldPlayer.parDiff += this.holes.parDiffGap;
+		}
 	}
 	get playerName() {
 		return this.oldPlayer.playerName;

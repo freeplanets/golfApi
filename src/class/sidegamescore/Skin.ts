@@ -1,8 +1,5 @@
-import { scoreLine } from "src/function/func.interface";
 import { sideGame } from "../../database/db.interface";
-import { holesPlayerScore } from "../class.if";
 import StrokePlay from "./StrokePlay";
-import { iGroup } from "./ASideGameScore";
 
 /**
  * 逐洞賽 (Skin)
@@ -13,12 +10,14 @@ import { iGroup } from "./ASideGameScore";
  */
 export default class Skin extends StrokePlay {  //ASideGameScore {
 	protected carry:boolean;
+	private curHoleNo = 0;
 	constructor(sg:sideGame){
 		super(sg);
 		this.carry = true;
-		if (this.carry) {
-			this.sg.extraInfo.carry = 0;
-		}
+	}
+	protected updateResult(holeNo: number, scores: number[]): void {
+		this.curHoleNo = holeNo;
+		super.updateResult(holeNo, scores);
 	}
 	protected ByIndividual(score: number[], isplayed: boolean[]): number[] {
 		const newScore = score.map((v,idx) => isplayed[idx] ? v : 0);
@@ -28,8 +27,7 @@ export default class Skin extends StrokePlay {  //ASideGameScore {
 		const min = Math.min(...newScore);
 		const cnt = score.filter((v)=> v == min);
 		if (cnt.length === 1) {
-			const base = 1 + this.sg.extraInfo.carry;
-			this.sg.extraInfo.carry = 0;
+			const base = this.sg.carryOver ? this.sg.extraInfo.carry[`C${this.curHoleNo}`] : 1;
 			score.forEach((v,idx) => {
 				if (v == min) {
 					newa[idx] = totalScore * base;
@@ -38,8 +36,8 @@ export default class Skin extends StrokePlay {  //ASideGameScore {
 				}
 			})
  		} else {
-			if (this.carry) {
-				this.sg.extraInfo.carry += 1;
+			if (this.sg.carryOver) {
+				this.sg.extraInfo.carry[`C${this.curHoleNo+1}`] += 1;
 			}
 		}
 		return newa;		
@@ -47,6 +45,7 @@ export default class Skin extends StrokePlay {  //ASideGameScore {
 	protected ByBetterGame(score: number[]): number[] {
 		const group:string[] = this.sg.extraInfo.group;
 		const groups = this.betterGroup(group, score);
+		const base = this.sg.carryOver ? this.sg.extraInfo.carry[`C${this.curHoleNo}`] : 1;
 		// 檢查分組最佳成績
 		group.forEach((g,idx) => {
 			let f = groups.find((itm) => itm.name === g);
@@ -63,8 +62,8 @@ export default class Skin extends StrokePlay {  //ASideGameScore {
 		const g1 = groups[0];
 		const g2 = groups[1];
 		if (g1.betterScore = g2.betterScore) {
-			if (this.carry) {
-				this.sg.extraInfo.carry += 1;
+			if (this.sg.carryOver) {
+				this.sg.extraInfo.carry[`C${this.curHoleNo+1}`] += 1;
 			}
 			return [0, 0, 0, 0];
 		} else {
@@ -74,50 +73,7 @@ export default class Skin extends StrokePlay {  //ASideGameScore {
 			} else {
 				winTeam = g1.name;
 			}
-			return group.map((g) => g === winTeam ? 1 : -1);
-		}
-		
-		// 比對各組成績及結果
-
-	}
-	/*
-	calc(holeScore: holesPlayerScore): void {
-		const tmp:holesPlayerScore = {
-			holeNo:holeScore.holeNo,
-			scores: [],
-		}
-		tmp.scores = holeScore.scores.map((player)=>{
-			const tmpScore = { ...player }
-			if (tmpScore.gross>0) {
-				const f = this.sg.playerGameData.find((itm) => itm.playerName === player.playerName);
-				if (f) {
-					const handicap = f.extraInfo.hcp[holeScore.holeNo-1] | 0;
-					tmpScore.parDiff = player.parDiff + handicap;
-				}
-			}
-			return tmpScore;
-		});
-		tmp.scores.sort((a, b)=> b.parDiff - a.parDiff);
-		if (tmp.scores[0].parDiff !== tmp.scores[0].parDiff) {
-			const f = this.sg.playerGameData.find((itm) => itm.playerName === tmp.scores[0].playerName);
-			if (f) {
-				let points = this.sg.wager | 1;
-				if (this.sg.extraInfo.carry) {
-					if (this.sg.extraInfo.carry.holeNo === holeScore.holeNo) {
-						points += this.sg.extraInfo.carry.points as number;
-						delete this.sg.extraInfo.carry;
-					}
-				}
-				this.update(f, holeScore.holeNo, points);
-			}
-		} else {
-			if(this.carry) {
-				this.sg.extraInfo.carry = {
-					holeNo: holeScore.holeNo + 1 > 18 ? 1 : holeScore.holeNo + 1,
-					points: this.sg.wager | 1, 
-				}
-			}
+			return group.map((g) => g === winTeam ? 1*base : -1*base);
 		}
 	}
-	*/
 }

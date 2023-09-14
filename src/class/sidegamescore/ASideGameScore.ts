@@ -4,6 +4,7 @@ import { holesPlayerScore, iScoreLine } from "../class.if";
 import { sideGameFormat, sideGames } from "../../models/enum";
 import recordLine from "../common/recordLine";
 import stringScore from "../common/stringScore";
+import { AnyObject } from "src/models/if";
 
 export interface iGroup {
 	name:string;
@@ -14,6 +15,7 @@ export interface iGroup {
 export default abstract class ASideGameScore {
 	protected rline = new recordLine();
 	protected sc = new stringScore();
+	protected forAffectTheNextGame = false;
 	constructor(protected sg:sideGame){
 		this.createResultData();
 	}
@@ -33,7 +35,7 @@ export default abstract class ASideGameScore {
 		}
 	}
 	protected createResultData(){
-		if (!this.sg.extraInfo) this.sg.extraInfo = {};
+		// if (!this.sg.extraInfo) this.sg.extraInfo = {};
 		if (!this.sg.extraInfo.total) {
 			this.sg.extraInfo.total = this.rline.newline(this.sg.sideGameName, '', '', '', '', this.sg.sidegameid);
 			const gameDetail:scoreLine[] = [];
@@ -53,6 +55,9 @@ export default abstract class ASideGameScore {
 			this.sg.extraInfo.gameDetail = gameDetail;
 			this.sg.extraInfo.group = group;
 			this.sg.extraInfo.isplayed = isplayed;
+			if (this.sg.carryOver) {
+				this.sg.extraInfo.carry = this.createCarryOverData();
+			}
 		}
 	}
 	protected getResult() {
@@ -296,5 +301,12 @@ export default abstract class ASideGameScore {
 		}
 		// console.log('scoreDiff', total);
 		return total;
+	}
+	private createCarryOverData() {
+		const tmp:AnyObject = {}
+		for(let i=1; i<19; i+=1 ) {
+			tmp[`C${i}`] = 1;
+		}
+		return tmp;
 	}
 }

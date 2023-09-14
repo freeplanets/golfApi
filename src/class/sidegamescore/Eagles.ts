@@ -9,6 +9,7 @@ import ASideGameScore from "./ASideGameScore";
  */
 export default class Eagles extends ASideGameScore {
 	calc(holeScore: holesPlayerScore): void {
+		if (holeScore.forAffectTheNextGame !== this.forAffectTheNextGame) return;
 		const scores:number[] = [];
 		holeScore.scores.forEach((player)=>{
 			if (player.gross>0) {

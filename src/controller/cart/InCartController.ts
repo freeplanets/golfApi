@@ -29,6 +29,7 @@ import { ConditionInitializer } from "dynamoose/dist/Condition";
 import ScoresUpdater from "../../class/players/ScoresUpdater";
 import SideGameScoreFactory from "../../class/sidegamescore/SideGameScoreFactory";
 import SideGameRegister from "../../class/sidegame/SideGameRegister";
+import { sideGames } from "../../models/enum";
 
 @ApiBearerAuth()
 @ApiTags('Cart')
@@ -557,7 +558,6 @@ export default class InCartController {
 					sideGameScore.sideGameTitle.push(stitle);
 					const objT = {f1:0, f2:0, f3:0, f4: 0};
 					g.sideGames.forEach((sg) => {
-						// console.log(sg.sideGameName, sg.extraInfo);
 						if (sg.extraInfo && sg.extraInfo.total) {
 							sideGameScore.sideGameScore.push(sg.extraInfo.total);
 							objT.f1 += parseInt(sg.extraInfo.total.f1,10)
@@ -610,13 +610,28 @@ export default class InCartController {
 					console.log('update', new Date().toLocaleString(), sUpdater.UpdatedHoles);
 					if (sUpdater.UpdatedHoles) {
 						if (sideGames && sideGames.length > 0) {
-							const score = sUpdater.getScores(sUpdater.UpdatedHoles);
+							let score = sUpdater.getScores(sUpdater.UpdatedHoles);
 							const sideGF:SideGameScoreFactory = new SideGameScoreFactory(sideGames);
-							sideGF.addScore(score);
-							console.log('after addScore', new Date().toLocaleString(), score);
+							console.log('getUpdteScore', sUpdater.UpdatedHoles, score);
+							if (sUpdater.scoreCheckIfAllHasScore(score)) {
+								sideGF.addScore(score);
+								console.log('after first time addScore');
+								if (this.hadAffectNextGame(sideGames)) {
+									let nextHoleScore = sUpdater.UpdatedHoles + 1;
+									score = sUpdater.getScores(nextHoleScore);
+									while(sUpdater.scoreCheckIfAllHasScore(score)) {
+										score.forAffectTheNextGame = true;
+										console.log('getUpdteScore in while', score);
+										sideGF.addScore(score);
+										nextHoleScore+=1;
+										score = sUpdater.getScores(nextHoleScore); 
+									}
+								}
+							}
+							console.log('after addScore', new Date().toLocaleString());
 						}
 					}
-					console.dir(sideGames, {depth: 8});
+					// console.dir(sideGames, {depth: 8});
 					await this.gamesService.update(key, {players:oldPlayers, sideGames:sideGames});
 					// await this.gamesService.update(key, {players:oldPlayers});
 					console.log('after save data', new Date().toLocaleString());
@@ -639,5 +654,12 @@ export default class InCartController {
 			}
 		}
 		return resp;	
+	}
+	private hadAffectNextGame(sgs:sideGame[]):boolean {
+		let f = sgs.find((sg) => sg.sideGameName === sideGames.HESSEIN);
+		if (!f) {
+			f = sgs.find((sg) => sg.sideGameName === sideGames.LAS_VEGAS);
+		}
+		return !!f;
 	}
 }	

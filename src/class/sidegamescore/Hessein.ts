@@ -11,24 +11,36 @@ import StrokePlay from "./StrokePlay";
 賽程中，海珊的人選並非固定的，每一洞結束後，當洞擊球桿數排名第二（如桿數相同，則以開球順序為準）的球友自動成為下一洞的海珊。
 假使在某洞平手且打球順序不變時，當「海珊」的球友延續擔任，但在下一洞的輸贏點數加倍；若再相同時，在下下一洞再加倍，餘依此類推。
  */
+
+interface holeOrders {
+	[key:string]: number[], // => H?:number[]
+}
+
 export default class Hessein extends StrokePlay {
+	protected curHoleNo = 0;
 	constructor(sg:sideGame){
 		super(sg);
+		this.forAffectTheNextGame = true;
 		if (!this.sg.extraInfo.curHessein) {
-			const countBase=0;
+			let countBase=0;
 			const curOrder = [];
 			this.sg.extraInfo.playerPos = []; 
 			this.sg.playerGameData.forEach((pg) => {
-				let countBase = 0;
+				//let countBase = 0;
 				this.sg.extraInfo.playerPos.push(pg.playerName);
 				// if (pg.playOrder === 2) this.sg.extraInfo.curHessein = pg.playerName;
 				if (pg.selected) countBase++;
 				curOrder.push(pg.playOrder);
 			});
 			this.sg.extraInfo.countBase = countBase - 1;
-			this.sg.extraInfo.carry = 1;
-			this.sg.extraInfo.curOrder = curOrder;
+			this.sg.extraInfo.Orders = {} as holeOrders;
+			this.sg.extraInfo.Orders[`H${this.sg.extraInfo.startHoleNo}`] = curOrder;
 		}
+	}
+	protected updateResult(holeNo: number, scores: number[]): void {
+		console.log('updateResult check', holeNo);
+		this.curHoleNo = holeNo;
+		super.updateResult(holeNo, scores);
 	}
 	protected ByIndividual(score: number[], isplayed: boolean[]): number[] {
 		return this.hessienCal(score, isplayed);		
@@ -39,10 +51,11 @@ export default class Hessein extends StrokePlay {
 	}
 	private hessienCal(score: number[], isplayed: boolean[]) {
 		// let curHessein = this.sg.extraInfo.curHessein as string;
-		const carry = this.sg.extraInfo.carry as number;
+		const carry = this.sg.carryOver ? this.sg.extraInfo.carry[`C${this.curHoleNo}`] as number : 1;
 		const wager = this.sg.wager;
 		const countBase = this.sg.extraInfo.countBase as number;
-		const curOrder = this.sg.extraInfo.curOrder as number[];
+		const curOrder = this.sg.extraInfo.Orders[`H${this.curHoleNo}`] as number[];
+		// console.log('curOrder', cOrder, curOrder, this.curHoleNo, this.sg.extraInfo.Orders);
 		let hsScore = 0;
 		let others = 0;
 		let hsIdx = 0; // second place index;
@@ -54,20 +67,26 @@ export default class Hessein extends StrokePlay {
 				if (isplayed[idx]) others += v;
 			}
 		});
-		const diff = hsScore - others;
+		const diff = others - hsScore;
+		// console.log('hessien score check', diff, hsScore, others, countBase);
 		if (diff === 0) {
-			this.sg.extraInfo.carry = carry * 2;
+			if (this.sg.carryOver) {
+				this.sg.extraInfo.carry[`C${this.curHoleNo + 1}`] = carry * 2;
+			}
+			let holeNo = this.curHoleNo < 18 ? this.curHoleNo + 1 : 1; 
+			this.sg.extraInfo.Orders[`H${holeNo}`] = [...curOrder];
 			return [0, 0, 0, 0];
 		} else {
-			const otPoint = wager * diff * -1; 
+			const otPoint = wager * diff * -1;
+			// console.log('hessien check score', score);
 			const tmp = score.map((v, idx) => isplayed[idx] ? otPoint : 0);
+			// console.log('hessien check score 2', tmp, hsIdx);
 			tmp[hsIdx] = diff * wager * countBase;
-			this.assignSecondPlace(score, isplayed);
+			this.assignSecondPlace(score, isplayed, curOrder);
 			return tmp;
 		}
 	}
-	protected assignSecondPlace(score:number[], isplayed:boolean[]) {
-		const curOrder = this.sg.extraInfo.curOrder as number[];
+	protected assignSecondPlace(score:number[], isplayed:boolean[], curOrder:number[]) {
 		const tmp = score.map((v, idx) => {
 			return {
 				index:idx,
@@ -77,9 +96,14 @@ export default class Hessein extends StrokePlay {
 			}
 		});
 		tmp.sort((a, b) => a.score - b.score + ( !a.isplayed ? 99 : (a.score === b.score) && (a.playOrder > b.playOrder) ? 1 : 0));
+		// console.log('after sort', tmp);
+		const cOrder = [...curOrder];
 		tmp.forEach((a, idx) => {
-			curOrder[a.index] = idx + 1;
+			cOrder[a.index] = idx + 1;
 		});
-		this.sg.extraInfo.curOrder = curOrder;
+		// console.log('assignSecondPlace', tmp, curOrder);
+		let holeNo = this.curHoleNo < 18 ? this.curHoleNo + 1 : 1; 
+		this.sg.extraInfo.Orders[`H${holeNo}`] = cOrder;
+		// console.log('assignSecondPlace end', this.sg.extraInfo.Orders);	
 	}
 }
