@@ -144,14 +144,9 @@ export default class InCartController {
 				if (body.zoneid && body.fairwayno){
 					cart.zoneid = body.zoneid;
 					cart.fairwayno = body.fairwayno;
-					const token = Headers('WWW-AUTH');
-					const user = tokenCheck(String(token));
-					if (user) {
-						cond = new Condition({
-							siteid: user.siteid, 
-							zoneid: body.zoneid,
-							fairwayno: body.fairwayno});						
-					}
+					cond = new Condition({
+						zoneid: body.zoneid,
+						fairwayno: body.fairwayno});
 					if (body.distance) cart.distance = body.distance;
 				}
 				ans = await this.cartService.update(key, cart);

@@ -35,7 +35,9 @@ export default class SideGameRegister {
 				sideGameScore:[],
 				sideGameTotal: [this.rline.newline('total')],
 			}
+			console.log('check1', new Date().toLocaleString());
 			const qG = await this.dbService.query(key, ['stepInZone', 'stepInFairway', 'players', 'playerDefaults', 'sideGames']);
+			console.log('check2', new Date().toLocaleString());
 			if (qG.count> 0) {
 				const game = qG[0];
 				const startHoleNo = this.getStartHoleNo(game.stepInZone, game.stepInFairway, game.players[0]);
@@ -55,7 +57,9 @@ export default class SideGameRegister {
 					}
 				} else {
 					if (!game.sideGames) game.sideGames = [];
+					console.log('check3', new Date().toLocaleString());
 					curSG = new SideGameCreator(this.sidegame, game, startHoleNo).create();
+					console.log('check4', new Date().toLocaleString());
 					if (curSG) {
 						game.sideGames.push(curSG);
 					} else {
@@ -63,8 +67,11 @@ export default class SideGameRegister {
 						return false;
 					}
 				}
+				console.log('check5', new Date().toLocaleString());
 				this.reCalc(game.stepInZone, game.stepInFairway, game.sideGames, game.players);
+				console.log('check6', new Date().toLocaleString(), key);
 				await this.dbService.update(key, {sideGames:game.sideGames});
+				console.log('check7', new Date().toLocaleString());
 				const stitle:scoreLine= this.rline.newline('name');
 				game.playerDefaults.forEach((player, idx) => {
 					stitle[`f${idx+1}`] = player.playerName;
@@ -77,6 +84,7 @@ export default class SideGameRegister {
 					res.sideGameTotal[0].f4 = this.sc.add(res.sideGameTotal[0].f4, sg.extraInfo.total.f4);
 					return sg.extraInfo.total
 				});
+				console.log('check8', new Date().toLocaleString());				
 				return res;
 			} else {
 				console.log('game not found', key);
