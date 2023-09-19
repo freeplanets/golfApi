@@ -1,4 +1,5 @@
 import { sideGame } from "../../database/db.interface";
+import { holesPlayerScore } from "../class.if";
 import StrokePlay from "./StrokePlay";
 
 /**
@@ -16,6 +17,7 @@ export default class Skin extends StrokePlay {  //ASideGameScore {
 		this.carry = true;
 	}
 	protected updateResult(holeNo: number, scores: number[]): void {
+		console.log('skin update Result', holeNo, scores);
 		this.curHoleNo = holeNo;
 		super.updateResult(holeNo, scores);
 	}
@@ -27,17 +29,19 @@ export default class Skin extends StrokePlay {  //ASideGameScore {
 		const min = Math.min(...newScore);
 		const cnt = score.filter((v)=> v == min);
 		if (cnt.length === 1) {
-			const base = this.sg.carryOver ? this.sg.extraInfo.carry[`C${this.curHoleNo}`] : 1;
+			const carry = this.sg.carryOver ? this.sg.extraInfo.carry[`C${this.curHoleNo}`] : 1;
 			score.forEach((v,idx) => {
 				if (v == min) {
-					newa[idx] = totalScore * base;
+					newa[idx] = totalScore + carry * totalScore;
 				} else {
-					newa[idx] = -1 * base;
+					newa[idx] = -1 - carry;
 				}
 			})
  		} else {
 			if (this.sg.carryOver) {
-				this.sg.extraInfo.carry[`C${this.curHoleNo+1}`] += 1;
+				const tmpCarry = this.sg.extraInfo.carry[`C${this.curHoleNo}`];
+				const curCarry = tmpCarry ? tmpCarry : 0;
+				this.sg.extraInfo.carry[`C${this.curHoleNo+1}`] += 1 + curCarry;
 			}
 		}
 		return newa;		
@@ -45,7 +49,7 @@ export default class Skin extends StrokePlay {  //ASideGameScore {
 	protected ByBetterGame(score: number[]): number[] {
 		const group:string[] = this.sg.extraInfo.group;
 		const groups = this.betterGroup(group, score);
-		const base = this.sg.carryOver ? this.sg.extraInfo.carry[`C${this.curHoleNo}`] : 1;
+		const carry = this.sg.carryOver ? this.sg.extraInfo.carry[`C${this.curHoleNo}`] : 1;
 		// 檢查分組最佳成績
 		group.forEach((g,idx) => {
 			let f = groups.find((itm) => itm.name === g);
@@ -63,7 +67,9 @@ export default class Skin extends StrokePlay {  //ASideGameScore {
 		const g2 = groups[1];
 		if (g1.betterScore = g2.betterScore) {
 			if (this.sg.carryOver) {
-				this.sg.extraInfo.carry[`C${this.curHoleNo+1}`] += 1;
+				const tmpCarry = this.sg.extraInfo.carry[`C${this.curHoleNo}`];
+				const curCarry = tmpCarry ? tmpCarry : 0;
+				this.sg.extraInfo.carry[`C${this.curHoleNo+1}`] += 1 + curCarry;
 			}
 			return [0, 0, 0, 0];
 		} else {
@@ -73,7 +79,7 @@ export default class Skin extends StrokePlay {  //ASideGameScore {
 			} else {
 				winTeam = g1.name;
 			}
-			return group.map((g) => g === winTeam ? 1*base : -1*base);
+			return group.map((g) => g === winTeam ? 1 + carry : -1 - carry);
 		}
 	}
 }

@@ -1,3 +1,4 @@
+import { sideGame } from "../../database/db.interface";
 import { holesPlayerScore } from "../class.if";
 import ASideGameScore from "./ASideGameScore";
 
@@ -8,6 +9,10 @@ import ASideGameScore from "./ASideGameScore";
 帕(Par):以這個球洞規定的桿數，完成這個球洞
  */
 export default class Pars extends ASideGameScore {
+	constructor(sg:sideGame){
+		super(sg);
+		this.highWin = true;
+	}
 	calc(holeScore: holesPlayerScore): void {
 		if (holeScore.forAffectTheNextGame !== this.forAffectTheNextGame) return;
 		const scores:number[] = [];
@@ -19,7 +24,6 @@ export default class Pars extends ASideGameScore {
 					if (f.selected) {
 						const handicap = f.extraInfo.hcp[holeScore.holeNo-1] | 0;
 						points = (player.parDiff + handicap) < 1 ? 1 : 0;
-						// f.points = (this.sg.wager | 1) * points;	
 					}
 					scores.push(points);
 					this.update(f, holeScore.holeNo, points)

@@ -4,7 +4,7 @@ import { Condition } from "dynamoose";
 import GamesService from "../../database/game/games.service";
 import CartsService from "../../database/cart/carts.service";
 import { createScoreData, playerDefaultHcpCal, removeUnderLineData, tokenCheck, updateTableData } from "../../function/Commands";
-import { cartKey, carts, devices, gameKey, games, mapLatLong, sideGame } from "../../database/db.interface";
+import { cartKey, carts, devices, gameKey, games, mapLatLong, sideGame, sideGameKey } from "../../database/db.interface";
 import { AnyObject, commonRes, commonResWithData, locReq, positonReq } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
@@ -30,6 +30,7 @@ import ScoresUpdater from "../../class/players/ScoresUpdater";
 import SideGameScoreFactory from "../../class/sidegamescore/SideGameScoreFactory";
 import SideGameRegister from "../../class/sidegame/SideGameRegister";
 import { sideGames } from "../../models/enum";
+import SideGamesService from "../../database/sidegame/sidegames.service";
 
 @ApiBearerAuth()
 @ApiTags('Cart')
@@ -40,7 +41,8 @@ export default class InCartController {
 		private readonly cartService:CartsService,
 		private readonly zonesService:ZonesService,
 		private readonly devicesService:DevicesService,
-		private readonly coursesService:CoursesService
+		private readonly coursesService:CoursesService,
+		private readonly sidegamesService:SideGamesService
 	){}
 	@Get('getSideInfo/:siteid')
 	@ApiOperation({summary:'取得整資料 / get golf club complete information', description: '取得球場完整資料 / get golf club complete information'})
@@ -79,7 +81,12 @@ export default class InCartController {
 	@ApiParam({name:'gameid', description: '來賓分組代號'})
 	@ApiResponse({status:200, type:commonResponse})
 	async getSideGameScore(@Param('gameid') gameid:string,@Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await this.querySideGameScore(String(token), gameid);
+		const sgr = new SideGameRegister(this.gamesService, this.sidegamesService, gameid);
+		// const resp = await this.querySideGameScore(String(token), gameid);
+		const resp:commonResWithData<any> = {
+			errcode: '0',
+		}
+		resp.data = await sgr.getSideGameScore()
 		return resp;
 	}
 
@@ -99,7 +106,12 @@ export default class InCartController {
 	@ApiParam({name:'sidegameid', description: '小遊戲代號'})
 	@ApiResponse({status:200, type:commonResponse})
 	async getSideGameData(@Param('gameid') gameid:string, @Param('sidegameid') sidegameid:string,@Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await this.querySideGameData(String(token), gameid, sidegameid);
+		const resp:commonResWithData<sideGame> = {
+			errcode: '0',
+		}
+		const sgs = new SideGameRegister(this.gamesService, this.sidegamesService, gameid);
+		resp.data = await sgs.getSideGameData(sidegameid);
+		// const resp1 = await this.querySideGameData(String(token), gameid, sidegameid);
 		return resp;
 	}
 
@@ -109,7 +121,7 @@ export default class InCartController {
 	@ApiParam({name:'sidegameid', description: '小遊戲代號'})
 	@ApiResponse({status:200, type:commonResponse})
 	async deleteSideGameData(@Param('gameid') gameid:string, @Param('sidegameid') sidegameid:string,@Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await this.delSideGameData(String(token), gameid, sidegameid);
+		const resp = await this.delSideGameData(String(token), sidegameid);
 		return resp;
 	}		
 
@@ -132,6 +144,7 @@ export default class InCartController {
 		}
 		try {
 			let ans:any =	await this.devicesService.update({deviceid}, data);
+			// console.log('location', ans);
 			if (ans.cartid) {
 				const key:cartKey = {
 					cartid: ans.cartid,
@@ -141,10 +154,12 @@ export default class InCartController {
 				}
 				// let zoneSearch:Partial<carts>;
 				let cond:ConditionInitializer;
-				if (body.zoneid && body.fairwayno){
+				if (body.siteid && body.zoneid && body.fairwayno){
+					// cart.siteid = body.siteid;
 					cart.zoneid = body.zoneid;
 					cart.fairwayno = body.fairwayno;
 					cond = new Condition({
+						siteid: body.siteid,
 						zoneid: body.zoneid,
 						fairwayno: body.fairwayno});
 					if (body.distance) cart.distance = body.distance;
@@ -214,8 +229,8 @@ export default class InCartController {
 		if (tokenCheck(String(token))) {
 			// try {
 				//  = await this.gamesService.registerSideGame(gameid, body);
-				const sgR = new SideGameRegister(this.gamesService, gameid, body);
-				const sgr = await sgR.checkIn();
+				const sgR = new SideGameRegister(this.gamesService, this.sidegamesService, gameid);
+				const sgr = await sgR.checkIn(body);
 				if (sgr) {
 					resp.data = sgr;
 				} else {
@@ -458,34 +473,19 @@ export default class InCartController {
 		}
 		return resp;
 	}
-	async delSideGameData(token:string, gameid:string, sidegameid:string) {
+	async delSideGameData(token:string, sidegameid:string) {
 		const resp:commonRes = {
 			errcode: ErrCode.OK,
 		}
 		const user = tokenCheck(token);
 		if (user) {
-			const ans = await this.gamesService.query({gameid}, ['sideGames']);
-			if (ans.count>0) {
-				const g = ans[0];
-				if (g.sideGames && g.sideGames.length > 0) {
-					const fIdx = g.sideGames.findIndex((sg) => sg.sidegameid === sidegameid);
-					if (fIdx > -1) {
-						g.sideGames.splice(fIdx, 1);
-						try {
-							await this.gamesService.update({gameid}, {sideGames: g.sideGames});
-						} catch(error) {
-							resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
-							resp.error = {
-								message: errorMsg('DATABASE_ACCESS_ERROR'),
-								extra: error,
-							}
-						}
-					}					
-				}
-			} else {
-				resp.errcode = ErrCode.ITEM_NOT_FOUND;
+			try {
+				await this.sidegamesService.delete({sidegameid});
+			} catch(error) {
+				resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
 				resp.error = {
-					message: errorMsg('ITEM_NOT_FOUND'),
+					message: errorMsg('DATABASE_ACCESS_ERROR'),
+					extra: error,
 				}
 			}
 		} else {
@@ -502,26 +502,9 @@ export default class InCartController {
 		}
 		const user = tokenCheck(token);
 		if (user) {
-			const sideGameDetail:AnyObject = {}
-			const ans = await this.gamesService.query({gameid}, ['sideGames']);
-			if (ans.count>0) {
-				const g = ans[0];
-				if (g.sideGames && g.sideGames.length > 0) {
-					const f = g.sideGames.find((sg) => sg.sidegameid === sidegameid);
-					sideGameDetail.sideGameName = f.sideGameName;
-					if (f && f.extraInfo && f.extraInfo.gameDetail) {
-						sideGameDetail.detail = f.extraInfo.gameDetail; 
-					} else {
-						sideGameDetail.detail = [];
-					}
-				}
-				resp.data = sideGameDetail;
-			} else {
-				resp.errcode = ErrCode.ITEM_NOT_FOUND;
-				resp.error = {
-					message: errorMsg('ITEM_NOT_FOUND'),
-				}
-			}
+				const sgr = new SideGameRegister(this.gamesService, this.sidegamesService, gameid);
+				resp.data = await sgr.getSideGameDetail(sidegameid);
+				console.log(gameid, sidegameid, 'querySideGameDetail', resp.data);
 		} else {
 			resp.errcode = ErrCode.TOKEN_ERROR;
 			resp.error = {
@@ -595,11 +578,12 @@ export default class InCartController {
 			const key:gameKey = {
 				gameid: data.gameid,
 			};
-			const f = await this.gamesService.query(key, ['players','sideGames']);
+			const f = await this.gamesService.query(key, ['players']);
 			console.log('get data:', new Date().toLocaleString(), f.count);
 			if (f.count > 0) {
 					const oldPlayers = f[0].players;
-					const sideGames = f[0].sideGames ?  f[0].sideGames : [];
+					// const sideGames = f[0].sideGames ?  f[0].sideGames : [];
+					const sideGames = await this.sidegamesService.query({gameid:data.gameid});
 					const sUpdater = new ScoresUpdater(oldPlayers);
 					sUpdater.update(data)
 					console.log('update', new Date().toLocaleString(), sUpdater.UpdatedHoles);
@@ -627,7 +611,19 @@ export default class InCartController {
 						}
 					}
 					// console.dir(sideGames, {depth: 8});
-					await this.gamesService.update(key, {players:oldPlayers, sideGames:sideGames});
+					await this.gamesService.update(key, {players:oldPlayers});
+					sideGames.forEach(async (sg) => {
+						const sgKey:sideGameKey = {
+							sidegameid: sg.sidegameid,
+						}
+						delete sg.sidegameid;
+						try {
+							// console.log(sgKey.sidegameid, sg.extraInfo);
+							await this.sidegamesService.update(sgKey,sg)
+						} catch(e) {
+							console.log('err', e);
+						}
+					})
 					// await this.gamesService.update(key, {players:oldPlayers});
 					console.log('after save data', new Date().toLocaleString());
 					resp.data = createScoreData(data.gameid, oldPlayers);	
@@ -651,9 +647,12 @@ export default class InCartController {
 		return resp;	
 	}
 	private hadAffectNextGame(sgs:sideGame[]):boolean {
-		let f = sgs.find((sg) => sg.sideGameName === sideGames.HESSEIN);
+		let f = sgs.find((sg) => sg.sideGameName === sideGames.SKIN);
 		if (!f) {
 			f = sgs.find((sg) => sg.sideGameName === sideGames.LAS_VEGAS);
+		} 
+		if (!f) {
+			f = sgs.find((sg) => sg.sideGameName === sideGames.HESSEIN);	
 		}
 		return !!f;
 	}

@@ -1,3 +1,4 @@
+import { sideGame } from "../../database/db.interface";
 import { holesPlayerScore, iScoreLine } from "../class.if";
 import ASideGameScore from "./ASideGameScore";
 
@@ -8,6 +9,10 @@ import ASideGameScore from "./ASideGameScore";
 小鳥球(Birdie)是打出低於標準桿(Par)1桿．
  */
 export default class Birdies extends ASideGameScore {
+	constructor(sg:sideGame){
+		super(sg);
+		this.highWin = true;
+	}
 	calc(holeScore: holesPlayerScore): void {
 		if (holeScore.forAffectTheNextGame !== this.forAffectTheNextGame) return;
 		const scores:number[] = [];
@@ -19,7 +24,6 @@ export default class Birdies extends ASideGameScore {
 					if (f.selected) {
 						const handicap = f.extraInfo.hcp[holeScore.holeNo-1] | 0;
 						points = (player.parDiff + handicap) < 0 ? 1 : 0;
-						// f.points = (this.sg.wager | 1) * points;
 					}
 					scores.push(points);
 					this.update(f, holeScore.holeNo, points)

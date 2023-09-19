@@ -16,6 +16,7 @@ export default abstract class ASideGameScore {
 	protected rline = new recordLine();
 	protected sc = new stringScore();
 	protected forAffectTheNextGame = false;
+	protected highWin = false; // true 得分高者 Win, false 桿數低者 Win  
 	constructor(protected sg:sideGame){
 		this.createResultData();
 	}
@@ -60,6 +61,7 @@ export default abstract class ASideGameScore {
 			}
 		}
 	}
+	/*
 	protected getResult() {
 		// const title:scoreLine = this.newline('HOLE');
 		const gameDetail:scoreLine[] = [];
@@ -88,15 +90,21 @@ export default abstract class ASideGameScore {
 			this.resultByBetterGame(group, iScoreLines, gameDetail);
 		}
 	}
+	*/
 	protected updateResult(holeNo:number, scores:number[]){
 		if (scores.length < 4) return;
 		let newa:number[];
 		const isplayed = this.sg.extraInfo.isplayed as boolean[];
+		const wager = this.sg.wager ? this.sg.wager : 1;
+		console.log('updateResult', this.sg.sideGameName, wager, this.sg.wager, scores);
 		if (this.sg.format === sideGameFormat.individual) {
 			newa = this.ByIndividual(scores, isplayed);
 		} else {
 			newa = this.ByBetterGame(scores);
 		}
+		console.log('updateResult 1', this.sg.sideGameName, newa);
+		newa = newa.map((v) => v * wager); // 乘上每點分數
+		console.log('updateResult 2', this.sg.sideGameName,newa);
 		const gameDetail = this.sg.extraInfo.gameDetail as scoreLine[];
 		const olda = gameDetail.map((v) =>  v[`f${holeNo}`] ? parseInt(v[`f${holeNo}`], 10) : 0);
 		const tt = gameDetail.map((v) =>  v.f19 ? parseInt(v.f19, 10) : 0);
@@ -108,10 +116,13 @@ export default abstract class ASideGameScore {
 			gameDetail[idx][`f19`] = isplayed[idx] ? String(tt[idx]) : '';
 			total[`f${idx+1}`] = gameDetail[idx][`f19`]; 
 		});
+		console.log('updateResult', this.sg.sideGameName, JSON.stringify(total));
+		console.log('updateResult', this.sg.sideGameName, JSON.stringify(gameDetail));
 		this.sg.extraInfo.total = total;
 		this.sg.extraInfo.gameDetail = gameDetail;
 	}
 	protected ByIndividual(score:number[], isplayed:boolean[]) {
+		console.log('ByIndividual', this.sg.sideGameName, score, isplayed);
 		// const isplayed = this.sg.extraInfo.isplayed as boolean[];
 		const newa = [
 			this.plDiff(score, 1, isplayed),
@@ -122,7 +133,7 @@ export default abstract class ASideGameScore {
 		return newa;
 	}
 	protected betterGroup(group:string[], score:number[]) {
-		console.log('group:', group);
+		console.log('group:', this.sg.sideGameName, group);
 		const g1:iGroup = {
 			name: '',
 			betterScore:999,
@@ -154,10 +165,10 @@ export default abstract class ASideGameScore {
 		const groups = this.betterGroup(group, score);
 		// 比對各組成績及結果
 		if (groups[0].betterScore < groups[1].betterScore) {
-			groups[0].points = (groups[1].betterScore - groups[0].betterScore) * this.sg.wager;
+			groups[0].points = (groups[1].betterScore - groups[0].betterScore);
 			groups[1].points = groups[0].points * -1;  
 		} else {
-			groups[0].points = (groups[0].betterScore - groups[1].betterScore) * this.sg.wager;
+			groups[0].points = (groups[0].betterScore - groups[1].betterScore);
 			groups[1].points = groups[0].points * -1;				
 		}
 		// 結果寫回各人成績
@@ -183,7 +194,8 @@ export default abstract class ASideGameScore {
 		this.sg.extraInfo.total = total;
 		this.sg.extraInfo.gameDetail = gameDetail;
 		*/
-	}		
+	}
+	/*		
 	protected ResultByIndividual(scores:iScoreLine[], gameDetail:scoreLine[], isplayed:boolean[]) {	
 		let a1=0, a2=0, a3=0, a4=0;
 		let iT1=0, iT2=0, iT3=0, iT4=0;
@@ -212,6 +224,8 @@ export default abstract class ASideGameScore {
 		this.sg.extraInfo.total = total;
 		this.sg.extraInfo.gameDetail = gameDetail;
 	}
+	*/
+	/*
 	protected resultByBetterGame(group:string[], scores:iScoreLine[], gameDetail:scoreLine[]) {
 		const g1:iGroup = {
 			name: '',
@@ -265,6 +279,7 @@ export default abstract class ASideGameScore {
 		this.sg.extraInfo.total = total;
 		this.sg.extraInfo.gameDetail = gameDetail;
 	}
+	*/
 	protected plDiff(score:number[], pos:number, isplayed:boolean[]) {
 		const iAt = pos - 1;
 		if(isplayed[pos-1]) {
@@ -297,7 +312,11 @@ export default abstract class ASideGameScore {
 		if (count<2) return 0;
 		let total = 0;
 		for(let i = count-1; i>0; i--) {
-			total += s[i] - s[0];
+			if (this.highWin) {
+				total += s[0] - s[i];	
+			} else {
+				total += s[i] - s[0];
+			}
 		}
 		// console.log('scoreDiff', total);
 		return total;

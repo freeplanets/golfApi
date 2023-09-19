@@ -1,3 +1,4 @@
+import { sideGame } from "../../database/db.interface";
 import { holesPlayerScore } from "../class.if";
 import ASideGameScore from "./ASideGameScore";
 
@@ -12,6 +13,10 @@ import ASideGameScore from "./ASideGameScore";
 -3分—超過兩桿或更多
  */
 export default class ModifiedStableford extends ASideGameScore {
+	constructor(sg:sideGame){
+		super(sg);
+		this.highWin = true;
+	}
 	calc(holeScore: holesPlayerScore): void {
 		const scores:number[] = [];
 		holeScore.scores.forEach((player)=>{
@@ -21,7 +26,7 @@ export default class ModifiedStableford extends ASideGameScore {
 					let points = 0;
 					if (f.selected) {
 						const handicap = f.extraInfo.hcp[holeScore.holeNo-1] | 0;
-						const parDiff = player.parDiff - handicap;
+						const parDiff = player.parDiff + handicap;
 						if (parDiff <= -3) points = 8;
 						 //else if (parDiff > 1) f.points = -3;
 						else {
@@ -42,8 +47,6 @@ export default class ModifiedStableford extends ASideGameScore {
 									points = -3;
 							}
 						}
-						// f.points = (this.sg.wager | 1) * points;
-						points *= (this.sg.wager | 1);	
 					}
 					scores.push(points);
 					this.update(f, holeScore.holeNo, points);

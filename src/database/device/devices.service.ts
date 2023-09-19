@@ -27,8 +27,10 @@ export default class DevicesService extends defaultService<devices, deviceKey> {
 				ts: new Date().getTime(),
 			}
 			// console.log('his:', his);
-			await this.historyService.create(his);
+			const ans  = await this.historyService.create(his);
+			// console.log('check', ans);
 		}
+		// console.log(data);
 		return super.update(key, data, cond);
 	}
 	getHistory(key:deviceKey|ConditionInitializer){

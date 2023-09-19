@@ -46,4 +46,5 @@ export interface locReq extends mapLatLong {
   zoneid?:string;
   fairwayno?:number;
   distance?:number;
+  siteid?:string;
 }

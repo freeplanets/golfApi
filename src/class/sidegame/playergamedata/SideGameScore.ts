@@ -9,6 +9,7 @@ export default class SideGameScore implements createPlayerGameData {
 		const sideG = this.sideG;
 		if (!sideG.sidegameid) {
 			sideG.sidegameid = hashKey();
+			if (!sideG.wager || sideG.wager < 1) sideG.wager = 1;
 			this.game.players.forEach((player) => {
 				const f = sideG.playerGameData.find((itm) => itm.playerName === player.playerName);
 				if (f) {

@@ -1,5 +1,5 @@
 import { sideGameFormat, sideGames } from "../../models/enum";
-import { gameKey, player, sideGame } from "../../database/db.interface";
+import { gameKey, player, playerDefault, sideGame, sideGameKey } from "../../database/db.interface";
 import { AnyObject } from "../../models/if";
 import GamesService from "../../database/game/games.service";
 import { removeUnderLineData } from "../../function/Commands";
@@ -10,21 +10,136 @@ import ScoresUpdater from "../players/ScoresUpdater";
 import { holesPlayerScore } from "../class.if";
 import SideGameScoreFactory from "../sidegamescore/SideGameScoreFactory";
 import stringScore from "../common/stringScore";
+import SideGamesService from "../../database/sidegame/sidegames.service";
 
 interface gObj {
 	[key:string]:number;
 }
-
+enum actionValue {
+	NEW = "new",
+	EDIT = 'edit',
+}
 export default class SideGameRegister {
 	private rline = new recordLine();
 	private sc = new stringScore();
-	private sidegame:sideGame;
-	constructor(private dbService:GamesService, private gameid:string, sidegame:sideGame){
+	// private sidegame:sideGame;
+	private action = "";
+	constructor(private dbService:GamesService,private sgService:SideGamesService, private gameid:string){
+
+	}
+	async delSideGame(sidegameid: string) {
+		return this.sgService.delete({sidegameid});
+	}
+	async updateWhenPlayerDefaultsChange(){}
+	async getSideGameScore(playerDefaults?:playerDefault[]) {
+		const res:sideGameRes = {
+			sideGameTitle: [],
+			sideGameScore:[],
+			sideGameTotal: [this.rline.newline('total')],
+		}
+		if (!playerDefaults) {
+			const ga = await this.dbService.query({gameid:this.gameid}, ['playerDefaults']);
+			// console.log(this.gameid, 'check playerDefaults', ga);
+			playerDefaults = ga[0].playerDefaults;
+		}
+		const stitle:scoreLine= this.rline.newline('name');
+		playerDefaults.forEach((player, idx) => {
+			stitle[`f${idx+1}`] = player.playerName;
+		});
+		const sgs = await this.sgService.query({gameid: this.gameid}, ['extraInfo']);
+		console.log('getSideGameScore after query', new Date().toLocaleString());
+		res.sideGameTitle.push(stitle);
+		if (sgs.count > 0) {
+			res.sideGameScore = sgs.map((sg) => {
+				res.sideGameTotal[0].f1 = this.sc.add(res.sideGameTotal[0].f1, sg.extraInfo.total.f1);
+				res.sideGameTotal[0].f2 = this.sc.add(res.sideGameTotal[0].f2, sg.extraInfo.total.f2);
+				res.sideGameTotal[0].f3 = this.sc.add(res.sideGameTotal[0].f3, sg.extraInfo.total.f3);
+				res.sideGameTotal[0].f4 = this.sc.add(res.sideGameTotal[0].f4, sg.extraInfo.total.f4);
+				return sg.extraInfo.total
+			});
+		}
+		console.log('getSideGameScore end', new Date().toLocaleString());
+		return res;
+	}
+	async getSideGameData(sidegameid:string) {
+		return this.sgService.findOne({sidegameid});
+	}
+	async getSideGameDetail(sidegameid:string){
+		const sideGameDetail:AnyObject = {}
+		const sgs = await this.sgService.query({sidegameid}, ['sideGameName', 'extraInfo']);
+		if (sgs.count>0) {
+			const f = sgs[0];
+			sideGameDetail.sideGameName = f.sideGameName;
+			if (f && f.extraInfo && f.extraInfo.gameDetail) {
+				sideGameDetail.detail = f.extraInfo.gameDetail; 
+			} else {
+				sideGameDetail.detail = [];
+			}
+		}
+		return sideGameDetail;	
+	}
+	async checkIn(sidegame:sideGame) {
+		this.action = (sidegame as any)._action;
 		sidegame = removeUnderLineData(sidegame);
 		if ((sidegame as any).gameid !== undefined) delete (sidegame as any).gameid;
 		if ((sidegame as any).f0 !== undefined) delete (sidegame as any).f0;
-		this.sidegame = sidegame;
+		// this.sidegame = sidegame;		
+		if(this.checkData(sidegame)) {
+			const key:gameKey = {
+				gameid: this.gameid,
+			}
+			console.log('check1', new Date().toLocaleString());
+			const qG = await this.dbService.query(key, ['stepInZone', 'stepInFairway', 'players', 'playerDefaults']); //, 'sideGames']);
+			console.log('check2', new Date().toLocaleString());
+			if (qG.count> 0) {
+				const game = qG[0];
+				const startHoleNo = this.getStartHoleNo(game.stepInZone, game.stepInFairway, game.players[0]);
+				let curSG:sideGame;
+				if (!sidegame.sidegameid) {
+					console.log('check3', new Date().toLocaleString());
+					const chkCreate = new SideGameCreator(sidegame, game, startHoleNo).create();
+					if (chkCreate) {
+						curSG = chkCreate;
+					} else {
+						return false;
+					}
+					console.log('check4', new Date().toLocaleString());
+				} else {
+					curSG = sidegame;
+				}
+				console.log('check5', new Date().toLocaleString());
+				if (!curSG) return false;
+				this.reCalc(game.stepInZone, game.stepInFairway, [ curSG ], game.players);
+				console.log('check6', new Date().toLocaleString(), key);
+				// console.log('sidegameData:', JSON.stringify(game.sideGames));
+				if (!curSG.gameid) curSG.gameid = this.gameid;
+				switch(this.action) {
+					case actionValue.NEW:
+						await this.sgService.create(curSG);
+						break;
+					case actionValue.EDIT:
+						const sgKey:sideGameKey = {
+							sidegameid: curSG.sidegameid,
+						};
+						delete curSG.sidegameid;
+						await this.sgService.update(sgKey, curSG)
+						break;
+					default:
+						console.log('sidegame action not found!', this.action);
+						return false;
+				}
+				// await this.dbService.update(key, {sideGames:game.sideGames});
+				console.log('check7', new Date().toLocaleString());
+				return  await this.getSideGameScore(game.playerDefaults);
+			} else {
+				console.log('game not found', key);
+				return false;
+			}			
+		}
+		console.log('check player error');
+		return false;
 	}
+	/*
 	async checkIn() {
 		if(this.checkData()) {
 			const key:gameKey = {
@@ -70,6 +185,7 @@ export default class SideGameRegister {
 				console.log('check5', new Date().toLocaleString());
 				this.reCalc(game.stepInZone, game.stepInFairway, game.sideGames, game.players);
 				console.log('check6', new Date().toLocaleString(), key);
+				console.log('sidegameData:', JSON.stringify(game.sideGames));
 				await this.dbService.update(key, {sideGames:game.sideGames});
 				console.log('check7', new Date().toLocaleString());
 				const stitle:scoreLine= this.rline.newline('name');
@@ -94,20 +210,21 @@ export default class SideGameRegister {
 		console.log('check player error');
 		return false;
 	}
-	checkPlayer():boolean {
+	*/
+	checkPlayer(sidegame:sideGame):boolean {
 		let ans:boolean = false;
 		let noGamePlayers = 4;
 		const group:AnyObject = {}
-		if (this.sidegame.format === sideGameFormat.individual) {
+		if (sidegame.format === sideGameFormat.individual) {
 			noGamePlayers = 2;
-			this.sidegame.playerGameData.forEach((player) => {
+			sidegame.playerGameData.forEach((player) => {
 				if (player.selected) noGamePlayers--;
 			});
 			
 			ans = noGamePlayers < 1;
 			console.log('checkPlayer1' , noGamePlayers, ans);
 		} else {
-			this.sidegame.playerGameData.forEach((player) => {
+			sidegame.playerGameData.forEach((player) => {
 				if (player.selected) noGamePlayers--;
 				if (!group[player.betterballGroup]) group[player.betterballGroup] = 0;
 				group[player.betterballGroup]++;	
@@ -135,44 +252,44 @@ export default class SideGameRegister {
 		}
 	}
 
-	private checkData():boolean {
-		switch(this.sidegame.sideGameName) {
+	private checkData(sidegame:sideGame):boolean {
+		switch(sidegame.sideGameName) {
 			case sideGames.HESSEIN:
 				// 至少三人參加
-				return this.numberOfPlayersCheck(3);
+				return this.numberOfPlayersCheck(sidegame, 3);
 			case sideGames.LAS_VEGAS:
 			case sideGames.SIXES:
 				// 四人全部參加
-				return this.numberOfPlayersCheck(4);
+				return this.numberOfPlayersCheck(sidegame, 4);
 			case sideGames.BIRDIES:
 			case sideGames.EAGLES:
 			case sideGames.PARS:
-				this.sidegame.format = sideGameFormat.individual;
+				sidegame.format = sideGameFormat.individual;
 			default:
-				return this.checkAll();
+				return this.checkAll(sidegame);
 		}
 	}
-	private checkAll() {
+	private checkAll(sidegame:sideGame) {
 		let ans = false;
-		if (this.sidegame.format === sideGameFormat.individual) {
-			ans = this.numberOfPlayersCheck(2);
+		if (sidegame.format === sideGameFormat.individual) {
+			ans = this.numberOfPlayersCheck(sidegame, 2);
 		} else {
-			ans = this.groupCheck();
+			ans = this.groupCheck(sidegame);
 		}
 		return ans;
 	}	
-	private numberOfPlayersCheck(count:number):boolean {
+	private numberOfPlayersCheck(sidegame:sideGame, count:number):boolean {
 		let cnt = 0;
-		this.sidegame.playerGameData.forEach((player) => {
+		sidegame.playerGameData.forEach((player) => {
 			if (player.selected) cnt++;
 		});
 		return cnt >= count;
 	}
-	private groupCheck(){
-		const chk = this.numberOfPlayersCheck(4);
+	private groupCheck(sidegame:sideGame){
+		const chk = this.numberOfPlayersCheck(sidegame, 4);
 		if (!chk) return false;
 		const g:gObj = {}
-		this.sidegame.playerGameData.forEach((player) => {
+		sidegame.playerGameData.forEach((player) => {
 			if (!g[`${player.betterballGroup}`]) g[`${player.betterballGroup}`] = 1;
 			else g[`${player.betterballGroup}`]+=1;
 		});

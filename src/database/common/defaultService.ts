@@ -9,11 +9,20 @@ export default class defaultService<T extends K, K extends defaultKey> implement
 		return this.model.create(data);
 	}
 	update(key: K, data: Partial<T>, cond?: Partial<T>): Promise<T> {
+		// console.log('serviceUpdate-start', new Date().toLocaleString());
 		if (cond) {
 			const condition = new Condition(cond).eq(true);
 			return this.model.update(key, data, { return: 'item', condition: condition});
 		}
 		return this.model.update(key, data);
+		/*
+		.then((res) => {
+			console.log('serviceUpdate-end', new Date().toLocaleString());
+			return res;
+		}).catch(err => {
+			return err;
+		});
+		*/
 	}
 	/*
 	update(key: K, data: Partial<T>): Promise<T> {

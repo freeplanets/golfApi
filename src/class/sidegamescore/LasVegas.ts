@@ -35,7 +35,7 @@ export default class LasVegas extends Hessein {
 		const odrIdx2 = this.orderValueIndex(curOrder, 2);
 		const odrIdx3 = this.orderValueIndex(curOrder, 3);
 		const odrIdx4 = this.orderValueIndex(curOrder, 4);
-		const diff = (this.combineNumber(score, odrIdx1, odrIdx4) - this.combineNumber(score, odrIdx2, odrIdx3)) * this.sg.wager;
+		const diff = (this.combineNumber(score, odrIdx1, odrIdx4) - this.combineNumber(score, odrIdx2, odrIdx3));
 		this.assignSecondPlace(score, isplayed, curOrder);
 		const tmp = [0,0,0,0];
 		tmp[odrIdx1] = diff;

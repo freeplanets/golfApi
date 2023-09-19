@@ -94,6 +94,7 @@ const player4: playerGameData = {
 }
 const sideGameO:sideGame = {
   sidegameid: '',
+  gameid: '',
   sideGameName:sideGames.STABLEFORD,
   format: sideGameFormat.individual,
   wager: 1,

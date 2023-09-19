@@ -19,6 +19,7 @@ export default class SideGameScoreFactory {
 	private sideG:ASideGameScore[]=[];
 	constructor(private sideGs:sideGame[]){
 		this.sideGs.forEach((sideGame) => {
+			console.log('SideGameScoreFactory', sideGame.sideGameName);
 			switch(sideGame.sideGameName){
 				case sideGames.STABLEFORD:
 					this.sideG.push(new Stableford(sideGame));
@@ -61,7 +62,7 @@ export default class SideGameScoreFactory {
 	}
 	addScore(score:holesPlayerScore){
 		this.sideG.forEach((sg) => {
-			console.log('add store', sg.name, score.holeNo, new Date().toLocaleString());
+			console.log('add score', sg.name, score.holeNo, new Date().toLocaleString());
 			sg.calc(score);
 			// if (sg.name === sideGames.STABLEFORD) sg.calc(score);
 		});

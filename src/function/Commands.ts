@@ -7,9 +7,6 @@ import { JwtService } from "@nestjs/jwt";
 import { ConditionComparisonComparatorName, queryReq, scoreLine, scoresData } from "./func.interface";
 import { Condition } from "dynamoose";
 import _scoreObject from "../models/game/_scoreObject";
-import ScoresUpdater from "../class/players/ScoresUpdater";
-import SideGameScoreFactory from "../class/sidegamescore/SideGameScoreFactory";
-import GamesService from "../database/game/games.service";
 
 const jwt = new JwtService();
 const pfSite = 'union';
@@ -159,7 +156,7 @@ export async function updateTableData<D extends K, K extends defaultKey>(token:s
 	const user = tokenCheck(token);
 	if (user) {
 		console.log('updateTableData:')
-		console.dir(data, {	depth: 8 });
+		// console.dir(data, {	depth: 8 });
 		data.modifyid = user.uid;
 		const service = (dbservice as defaultMethod<D, K>);
 		try {
@@ -169,7 +166,7 @@ export async function updateTableData<D extends K, K extends defaultKey>(token:s
 				// 更改資料時檢查是否為同球場
 				if (isMyClub(user, f.siteid)) {
 					data = removeUnderLineData(data);
-					console.log('removeUnderLineData:', JSON.stringify(data));
+					// console.log('removeUnderLineData:', JSON.stringify(data));
 					// console.log('service:', service);
 					resp.data = await service.update(keys, data, filter);
 				} else { 

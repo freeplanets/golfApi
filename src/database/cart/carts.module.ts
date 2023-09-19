@@ -4,6 +4,8 @@ import CartsSchema from "./carts.schema";
 import CartController from "../../controller/manage/CartController";
 import CartsService from "./carts.service";
 import DevicesModule from "../device/devices.module";
+import SideGamesSchema from "../sidegame/sidegames.schema";
+import SideGamesService from "../sidegame/sidegames.service";
 
 @Module({
 	imports: [
@@ -15,11 +17,18 @@ import DevicesModule from "../device/devices.module";
 				options: {
 					throughput: 'ON_DEMAND',
 				}
-			},						
+			},
+			{
+				name: 'SideGames',
+				schema: SideGamesSchema,
+				options: {
+					throughput: 'ON_DEMAND',
+				}
+			}
 		])
 	],
 	controllers: [CartController],
-	providers: [CartsService],
-	exports: [CartsService]
+	providers: [CartsService, SideGamesService],
+	exports: [CartsService, SideGamesService]
 })
 export default class CartsModule {}

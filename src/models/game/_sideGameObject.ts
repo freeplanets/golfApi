@@ -10,6 +10,11 @@ export default class _sideGameObject implements sideGame {
 	sidegameid: string;
 
 	@ApiProperty({
+		description: '擊球分組代號',
+	})	
+	gameid: string;
+	
+	@ApiProperty({
 		description: '小遊戲名稱',
 		enumName: '小遊戲各項目名稱',
 		enum: sideGames,

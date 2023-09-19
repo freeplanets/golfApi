@@ -52,7 +52,6 @@ export default class Hessein extends StrokePlay {
 	private hessienCal(score: number[], isplayed: boolean[]) {
 		// let curHessein = this.sg.extraInfo.curHessein as string;
 		const carry = this.sg.carryOver ? this.sg.extraInfo.carry[`C${this.curHoleNo}`] as number : 1;
-		const wager = this.sg.wager;
 		const countBase = this.sg.extraInfo.countBase as number;
 		const curOrder = this.sg.extraInfo.Orders[`H${this.curHoleNo}`] as number[];
 		// console.log('curOrder', cOrder, curOrder, this.curHoleNo, this.sg.extraInfo.Orders);
@@ -77,11 +76,11 @@ export default class Hessein extends StrokePlay {
 			this.sg.extraInfo.Orders[`H${holeNo}`] = [...curOrder];
 			return [0, 0, 0, 0];
 		} else {
-			const otPoint = wager * diff * -1;
+			const otPoint = diff * -1;
 			// console.log('hessien check score', score);
 			const tmp = score.map((v, idx) => isplayed[idx] ? otPoint : 0);
 			// console.log('hessien check score 2', tmp, hsIdx);
-			tmp[hsIdx] = diff * wager * countBase;
+			tmp[hsIdx] = diff * countBase;
 			this.assignSecondPlace(score, isplayed, curOrder);
 			return tmp;
 		}

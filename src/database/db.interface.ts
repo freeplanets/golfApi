@@ -180,10 +180,13 @@ export interface playerGameData {
   playOrder:number;
   holes:score[];
   extraInfo?:AnyObject;
+  index?:number;  //對應playerDefaults index
 }
-
-export interface sideGame {
+export interface sideGameKey extends defaultKey {
   sidegameid:string;
+}
+export interface sideGame extends sideGameKey { 
+  gameid:string;
   sideGameName:sideGames;
   format:sideGameFormat | null;
   wager:number;
@@ -191,7 +194,7 @@ export interface sideGame {
   carryOver?:boolean;
   hcpType: HcpType;
   playerGameData:playerGameData[];
-  extraInfo?:AnyObject; 
+  extraInfo?:AnyObject;
 }
 
 export interface player {
