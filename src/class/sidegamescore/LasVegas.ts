@@ -48,8 +48,9 @@ export default class LasVegas extends Hessein {
 	}
 	private combineNumber(score:number[], pos1:number, pos2:number) {
 		let unitsDigit = 0, tensDigit = 0;
-		const a = score[pos1-1];
-		const b = score[pos2-1];
+		const a = score[pos1];
+		const b = score[pos2];
+		console.log(a, b, pos1, pos2);
 		if (a > b) {
 			if (a > 9) {
 				tensDigit = a;
@@ -77,6 +78,7 @@ export default class LasVegas extends Hessein {
 				}
 			}
 		}
+		console.log('combineNumber', parseInt( `${tensDigit}${unitsDigit}`, 10), tensDigit, unitsDigit);
 		return parseInt( `${tensDigit}${unitsDigit}`, 10);
 	}
 	private resignPlace(score:number[], curOrder:number[]) {
@@ -86,8 +88,8 @@ export default class LasVegas extends Hessein {
 		tmps.sort((a, b) => { 
 			let aNum = a.score;
 			let bNum = b.score;
-			if (a.order > b.order) aNum += 1;
-			else bNum += 1;
+			//if (a.order > b.order) aNum += 1;
+			//else bNum += 1;
 			return aNum - bNum;
 		});
 		const tmpOrder:number[] = [];
@@ -95,6 +97,7 @@ export default class LasVegas extends Hessein {
 			tmpOrder[itm.index] = idx+1;
 		});
 		console.log('resignPlace', score, curOrder, tmpOrder);
+		console.dir(tmps);
 		this.sg.extraInfo.Orders[`H${this.curHoleNo + 1}`] =  tmpOrder;
 	}
 	private orderValueIndex(order:number[], orderValue:number) {
