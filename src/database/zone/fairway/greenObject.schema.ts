@@ -1,7 +1,8 @@
 import { Schema } from "dynamoose";
-import mapAssetObject from "../common/mapAssetObject.schema";
+import mapAssetObjectSchema from "../common/mapAssetObject.schema";
 
-const greenObject = new Schema({
+
+const greenObjectSchema = new Schema({
 	sno: {
 		type: String,
 	}, // 果嶺代號
@@ -37,7 +38,7 @@ const greenObject = new Schema({
 	}, // 寬度的距離長度(米)
 	assets: {
 		type: Array,
-		schema: [mapAssetObject],
+		schema: [mapAssetObjectSchema],
 		required: false,
 	},	
 	enable: {
@@ -51,5 +52,11 @@ const greenObject = new Schema({
 	memo: {
 		type: String,
 	},	// 備註
+	greenHeight: {
+		type: Number,
+	},
+	greenWidth: {
+		type: Number,
+	},
 });
-export default greenObject;
+export default greenObjectSchema;

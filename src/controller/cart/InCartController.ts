@@ -158,10 +158,17 @@ export default class InCartController {
 					// cart.siteid = body.siteid;
 					cart.zoneid = body.zoneid;
 					cart.fairwayno = body.fairwayno;
+					cart.loctm = new Date().getTime();
+					let searchZone = body.zoneid;
+					let searchFairwayno = body.fairwayno;
+					if (body.requestZoneid && body.fairwayno) {
+						searchZone = body.requestZoneid;
+						searchFairwayno = body.requestFairwayno;
+					}
 					cond = new Condition({
 						siteid: body.siteid,
-						zoneid: body.zoneid,
-						fairwayno: body.fairwayno});
+						zoneid: searchZone,
+						fairwayno: searchFairwayno});
 					if (body.distance) cart.distance = body.distance;
 				}
 				ans = await this.cartService.update(key, cart);
@@ -219,7 +226,7 @@ export default class InCartController {
 	}
 
 	@Post('sidegameRegister/:gameid')
-	@ApiOperation({summary:'小遊戲登錄 / sidegameRegister (working.....)', description:'小遊戲登錄 / sidegameRegister'})
+	@ApiOperation({summary:'小遊戲登錄 / sidegameRegister', description:'小遊戲登錄 / sidegameRegister'})
 	@ApiParam({name:'gameid', description: '來賓分組代號'})
 	@ApiBody({description:'', type: _sideGameObject, examples:sideGameReqEx})
 	async sidegameRegister(@Param('gameid') gameid:string, @Body() body:sideGame, @Headers('WWW-AUTH') token:Record<string, string>){

@@ -1,5 +1,6 @@
 import { Schema } from "dynamoose";
 import mapAssetObjectSchema from "./common/mapAssetObject.schema";
+import greenObjectSchema from "./fairway/greenObject.schema";
 
 const ZonesSchema = new Schema({
   zoneid: {
@@ -150,53 +151,7 @@ const ZonesSchema = new Schema({
           },
           greens: {
             type: Array,
-            schema: [
-              {
-                type: Object,
-                schema: {
-                  sno: {
-                    type: String,
-                  },
-                  topEdge: {
-                    type: Number,
-                  },
-                  leftEdge: {
-                    type: Number,
-                  },
-                  rightEdge: {
-                    type: Number,
-                  },
-                  bottomEdge: {
-                    type: Number,
-                  },
-                  image: {
-                    type: String,
-                  },
-                  assets: {
-                    type: Array,
-                    schema: [mapAssetObjectSchema],
-                  },
-                  width: {
-                    type: Number
-                  },
-                  height: {
-                    type: Number
-                  },
-                  widthDistance: {
-                    type: Number
-                  },
-                  enable: {
-                    type: Boolean,
-                  },
-                  speed: {
-                    type: Number,
-                  },
-                  memo: {
-                    type: String
-                  }
-                }
-              }
-            ]
+            schema: [greenObjectSchema],
           }
         }
       }

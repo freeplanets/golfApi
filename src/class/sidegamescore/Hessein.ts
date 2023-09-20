@@ -38,7 +38,7 @@ export default class Hessein extends StrokePlay {
 		}
 	}
 	protected updateResult(holeNo: number, scores: number[]): void {
-		console.log('updateResult check', holeNo);
+		console.log('updateResult check', holeNo, scores);
 		this.curHoleNo = holeNo;
 		super.updateResult(holeNo, scores);
 	}

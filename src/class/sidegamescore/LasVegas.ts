@@ -1,6 +1,7 @@
 import { sideGame } from "src/database/db.interface";
 import { holesPlayerScore } from "../class.if";
 import Hessein from "./Hessein";
+import { AnyObject } from "src/models/if";
 
 /**
  * 拉斯維加斯 (Las Vegas)
@@ -30,13 +31,14 @@ export default class LasVegas extends Hessein {
 		return this.lvCal(score, isplayed);
 	}
 	private lvCal(score:number[], isplayed:boolean[]) {
-		const curOrder = this.sg.extraInfo.curOrder as number[];
+		const curOrder = this.sg.extraInfo.Orders[`H${this.curHoleNo}`] as number[];
+		console.log('lvCal', curOrder);
 		const odrIdx1 = this.orderValueIndex(curOrder, 1);
 		const odrIdx2 = this.orderValueIndex(curOrder, 2);
 		const odrIdx3 = this.orderValueIndex(curOrder, 3);
 		const odrIdx4 = this.orderValueIndex(curOrder, 4);
 		const diff = (this.combineNumber(score, odrIdx1, odrIdx4) - this.combineNumber(score, odrIdx2, odrIdx3));
-		this.assignSecondPlace(score, isplayed, curOrder);
+		this.resignPlace(score, curOrder);
 		const tmp = [0,0,0,0];
 		tmp[odrIdx1] = diff;
 		tmp[odrIdx4] = diff;
@@ -76,6 +78,24 @@ export default class LasVegas extends Hessein {
 			}
 		}
 		return parseInt( `${tensDigit}${unitsDigit}`, 10);
+	}
+	private resignPlace(score:number[], curOrder:number[]) {
+		const tmps:AnyObject[] = score.map((v, idx) => {
+			return { score: v, index: idx, order: curOrder[idx] }
+		});
+		tmps.sort((a, b) => { 
+			let aNum = a.score;
+			let bNum = b.score;
+			if (a.order > b.order) aNum += 1;
+			else bNum += 1;
+			return aNum - bNum;
+		});
+		const tmpOrder:number[] = [];
+		tmps.forEach((itm, idx) => {
+			tmpOrder[itm.index] = idx+1;
+		});
+		console.log('resignPlace', score, curOrder, tmpOrder);
+		this.sg.extraInfo.Orders[`H${this.curHoleNo + 1}`] =  tmpOrder;
 	}
 	private orderValueIndex(order:number[], orderValue:number) {
 		return order.findIndex((odr) => odr === orderValue);

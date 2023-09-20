@@ -324,7 +324,7 @@ export default abstract class ASideGameScore {
 	private createCarryOverData() {
 		const tmp:AnyObject = {}
 		for(let i=1; i<19; i+=1 ) {
-			tmp[`C${i}`] = 1;
+			tmp[`C${i}`] = 0;
 		}
 		return tmp;
 	}

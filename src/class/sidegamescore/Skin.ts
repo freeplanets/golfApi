@@ -29,7 +29,7 @@ export default class Skin extends StrokePlay {  //ASideGameScore {
 		const min = Math.min(...newScore);
 		const cnt = score.filter((v)=> v == min);
 		if (cnt.length === 1) {
-			const carry = this.sg.carryOver ? this.sg.extraInfo.carry[`C${this.curHoleNo}`] : 1;
+			const carry = this.sg.carryOver ? this.sg.extraInfo.carry[`C${this.curHoleNo}`] : 0;
 			score.forEach((v,idx) => {
 				if (v == min) {
 					newa[idx] = totalScore + carry * totalScore;

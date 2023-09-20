@@ -24,7 +24,7 @@ export default class StrokePlay extends ASideGameScore {
 				}
 			}
 		});
-		// console.log('strokeplay calc end', holeScore.holeNo);
+		console.log('strokeplay calc end', holeScore);
 		this.updateResult(holeScore.holeNo, scores);	
 	}
 }

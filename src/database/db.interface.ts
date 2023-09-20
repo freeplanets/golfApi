@@ -87,6 +87,8 @@ export interface greenObject {
   enable:boolean;
   speed:number;
   memo?:string; //備註
+  greenHeight?:number;
+  greenWidth?:number;
 }
 
 export interface fairwayObject {
