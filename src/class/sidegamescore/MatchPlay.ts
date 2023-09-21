@@ -9,6 +9,5 @@ import Skin from "./Skin";
 export default class Matchplay extends Skin {
 	constructor(sg:sideGame) {
 		super(sg);
-		this.carry = false;
 	}
 }

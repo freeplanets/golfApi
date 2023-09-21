@@ -10,11 +10,9 @@ import StrokePlay from "./StrokePlay";
 可以根據球員差點之間的差異，依讓分規則計算。
  */
 export default class Skin extends StrokePlay {  //ASideGameScore {
-	protected carry:boolean;
 	private curHoleNo = 0;
 	constructor(sg:sideGame){
 		super(sg);
-		this.carry = true;
 	}
 	protected updateResult(holeNo: number, scores: number[]): void {
 		console.log('skin update Result', holeNo, scores);
@@ -28,8 +26,10 @@ export default class Skin extends StrokePlay {  //ASideGameScore {
 		const newa = [ 0, 0, 0, 0];
 		const min = Math.min(...newScore);
 		const cnt = score.filter((v)=> v == min);
+		console.log('ByIndividual min check', min, cnt, this.sg.carryOver);
 		if (cnt.length === 1) {
 			const carry = this.sg.carryOver ? this.sg.extraInfo.carry[`C${this.curHoleNo}`] : 0;
+			console.log('ByIndividual carry', this.sg.sideGameName, this.curHoleNo, carry);
 			score.forEach((v,idx) => {
 				if (v == min) {
 					newa[idx] = totalScore + carry * totalScore;
@@ -42,6 +42,7 @@ export default class Skin extends StrokePlay {  //ASideGameScore {
 				const tmpCarry = this.sg.extraInfo.carry[`C${this.curHoleNo}`];
 				const curCarry = tmpCarry ? tmpCarry : 0;
 				this.sg.extraInfo.carry[`C${this.curHoleNo+1}`] += 1 + curCarry;
+				console.log('ByIndividual add carry', this.sg.sideGameName, this.sg.extraInfo.carry[`C${this.curHoleNo+1}`]);
 			}
 		}
 		return newa;		

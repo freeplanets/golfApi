@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } 
 import { Condition } from "dynamoose";
 import GamesService from "../../database/game/games.service";
 import CartsService from "../../database/cart/carts.service";
-import { createScoreData, playerDefaultHcpCal, removeUnderLineData, tokenCheck, updateTableData } from "../../function/Commands";
+import { createScoreData, getResultByGameID, playerDefaultHcpCal, removeUnderLineData, tokenCheck, updateTableData } from "../../function/Commands";
 import { cartKey, carts, devices, gameKey, games, mapLatLong, sideGame, sideGameKey } from "../../database/db.interface";
 import { AnyObject, commonRes, commonResWithData, locReq, positonReq } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
@@ -300,10 +300,13 @@ export default class InCartController {
 	}
 
 	@Get('getResult/:gameid')
-	@ApiOperation({summary: '結果輸出/ getResult (建構中...)', description: '結果輸出/ getResult'})
+	@ApiOperation({summary: '結果輸出/ getResult', description: '結果輸出/ getResult'})
 	@ApiParam({name:'gameid', description: '來賓分組代號'})
 	@ApiResponse({})	
-	getResult(){}
+	async getResult(@Param('gameid') gameid:string, @Headers('WWW-AUTH') token:Record<string, string>){
+		const resp = await getResultByGameID(String(token), gameid, this.gamesService);
+		return resp;
+	}
 
 	async searchCheckInData(token:string, caddieid:string, deviceid:string):Promise<commonResWithData<any>> {
 		let resp:commonResWithData<any> = {
@@ -511,7 +514,7 @@ export default class InCartController {
 		if (user) {
 				const sgr = new SideGameRegister(this.gamesService, this.sidegamesService, gameid);
 				resp.data = await sgr.getSideGameDetail(sidegameid);
-				console.log(gameid, sidegameid, 'querySideGameDetail', resp.data);
+				// console.log(gameid, sidegameid, 'querySideGameDetail', resp.data);
 		} else {
 			resp.errcode = ErrCode.TOKEN_ERROR;
 			resp.error = {
@@ -606,7 +609,7 @@ export default class InCartController {
 									let nextHoleScore = sUpdater.UpdatedHoles + 1;
 									score = sUpdater.getScores(nextHoleScore);
 									while(sUpdater.scoreCheckIfAllHasScore(score)) {
-										score.forAffectTheNextGame = true;
+										// score.forAffectTheNextGame = true;
 										console.log('getUpdteScore in while', score);
 										sideGF.addScore(score);
 										nextHoleScore+=1;

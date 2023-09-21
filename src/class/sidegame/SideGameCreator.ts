@@ -27,10 +27,12 @@ export default class SideGameCreator implements sideGameCreate {
 		}
 		*/
 	}
-	create(): sideGame | false {
+	create(sidegameid?:string): sideGame | false {
 		//const chkPlayerInGame = this.checkData();
 		//if (!chkPlayerInGame) return false;
 		this.sideG.playerGameData = this.gameScores.create();
+		if (this.sideG.sideGameName === sideGames.SKIN) this.sideG.carryOver = true;
+		if (this.sideG.sideGameName === sideGames.MATCH_PLAY) this.sideG.carryOver = true;
 		this.sideG.playerGameData.forEach((itm) => {
 			console.log(itm.playerName, itm.hcp, itm.extraInfo); 
 		});

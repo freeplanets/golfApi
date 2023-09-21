@@ -7,7 +7,6 @@ import { scoreLine, sideGameRes } from "../../function/func.interface";
 import recordLine from "../common/recordLine";
 import SideGameCreator from "./SideGameCreator";
 import ScoresUpdater from "../players/ScoresUpdater";
-import { holesPlayerScore } from "../class.if";
 import SideGameScoreFactory from "../sidegamescore/SideGameScoreFactory";
 import stringScore from "../common/stringScore";
 import SideGamesService from "../../database/sidegame/sidegames.service";
@@ -62,7 +61,14 @@ export default class SideGameRegister {
 		return res;
 	}
 	async getSideGameData(sidegameid:string) {
-		return this.sgService.findOne({sidegameid});
+		const sgd = await this.sgService.findOne({sidegameid});
+		delete sgd.extraInfo;
+		sgd.playerGameData = sgd.playerGameData.map((pg) => {
+			delete pg.holes;
+			delete pg.extraInfo;
+			return pg;
+		});
+		return sgd;
 	}
 	async getSideGameDetail(sidegameid:string){
 		const sideGameDetail:AnyObject = {}
@@ -95,22 +101,17 @@ export default class SideGameRegister {
 				const game = qG[0];
 				const startHoleNo = this.getStartHoleNo(game.stepInZone, game.stepInFairway, game.players[0]);
 				let curSG:sideGame;
-				if (!sidegame.sidegameid) {
-					console.log('check3', new Date().toLocaleString());
-					const chkCreate = new SideGameCreator(sidegame, game, startHoleNo).create();
-					if (chkCreate) {
-						curSG = chkCreate;
-					} else {
-						return false;
-					}
-					console.log('check4', new Date().toLocaleString());
+				console.log('check3', new Date().toLocaleString());
+				const chkCreate = new SideGameCreator(sidegame, game, startHoleNo).create();
+				if (chkCreate) {
+					curSG = chkCreate;
 				} else {
-					curSG = sidegame;
+					return false;
 				}
-				console.log('check5', new Date().toLocaleString());
+				console.log('check4', new Date().toLocaleString());
 				if (!curSG) return false;
 				this.reCalc(game.stepInZone, game.stepInFairway, [ curSG ], game.players);
-				console.log('check6', new Date().toLocaleString(), key);
+				console.log('check5', new Date().toLocaleString(), key);
 				// console.log('sidegameData:', JSON.stringify(game.sideGames));
 				if (!curSG.gameid) curSG.gameid = this.gameid;
 				switch(this.action) {
@@ -121,6 +122,7 @@ export default class SideGameRegister {
 						const sgKey:sideGameKey = {
 							sidegameid: curSG.sidegameid,
 						};
+						console.log('check sidegameid:', sgKey);
 						delete curSG.sidegameid;
 						await this.sgService.update(sgKey, curSG)
 						break;
@@ -129,7 +131,7 @@ export default class SideGameRegister {
 						return false;
 				}
 				// await this.dbService.update(key, {sideGames:game.sideGames});
-				console.log('check7', new Date().toLocaleString());
+				console.log('check6', new Date().toLocaleString());
 				return  await this.getSideGameScore(game.playerDefaults);
 			} else {
 				console.log('game not found', key);

@@ -1,9 +1,8 @@
 import { sideGameFormat, sideGames } from "../../models/enum";
 import { scoreLine } from "../../function/func.interface";
-import { holesPlayerScore, iScoreLine } from "../class.if";
-import ASideGameScore from "./ASideGameScore";
+import { iScoreLine } from "../class.if";
 import StrokePlay from "./StrokePlay";
-import { score, sideGame } from "src/database/db.interface";
+import { sideGame } from "../../database/db.interface";
 
 interface playerScoreLine {
 	f1?:number;
@@ -61,21 +60,24 @@ export default class Nassau extends StrokePlay {
 	}
 	protected updateResultCal(fIdx:number, holeNo: number, scores: number[]) {
 		const subTotal = this.sg.extraInfo.subTotal as tmpScore[];
+		console.log('updateResultCal', fIdx, scores);
 		let subF = [0, 0, 0, 0]; //前九	,sixs 前6
 		let subB = [0, 0, 0, 0]; //後九	,sixs 中6
 		let subT = [0, 0, 0, 0]; //前後合 ,sixs 後6 
 		const isplayed = this.sg.extraInfo.isplayed as boolean[];
 		subTotal.forEach((st, idx) => {
-			if (st.subTotal[`f${holeNo}`] === undefined) st.subTotal[`f${holeNo}`] = 0;
-			const diff = scores[idx] - st.subTotal[`f${holeNo}`];
-			st.subTotal[`f${holeNo}`] = scores[idx];
-			if (st.subTotal[`f${fIdx}`] === undefined) st.subTotal[`f${fIdx}`] = 0;
+			if (!st.scoreLine[`f${holeNo}`]) st.scoreLine[`f${holeNo}`] = 0;
+			const diff = scores[idx] - st.scoreLine[`f${holeNo}`];
+			console.log('subTotal check', idx, ' > ', diff, scores[idx], st.scoreLine[`f${holeNo}`]);
+			st.scoreLine[`f${holeNo}`] = scores[idx];
+			if (!st.subTotal[`f${fIdx}`]) st.subTotal[`f${fIdx}`] = 0;
 			st.subTotal[`f${fIdx}`] += diff;
 			if (this.sg.sideGameName === sideGames.NASSAU) st.subTotal.f3 += diff;
-			subF[idx] = st.scoreLine.f1;
-			subB[idx] = st.scoreLine.f2;
-			subT[idx] = st.scoreLine.f3;
+			subF[idx] = st.subTotal.f1;
+			subB[idx] = st.subTotal.f2;
+			subT[idx] = st.subTotal.f3;
 		})
+		console.log(subF, subB, subT);
 		if (this.sg.format === sideGameFormat.individual) {
 			subF = this.ByIndividual(subF, isplayed);
 			subB = this.ByIndividual(subB, isplayed);
@@ -98,5 +100,6 @@ export default class Nassau extends StrokePlay {
 		})
 		this.sg.extraInfo.total = total;
 		this.sg.extraInfo.gameDetail = gameDetail;
+		console.log(total, gameDetail)
 	}
 }

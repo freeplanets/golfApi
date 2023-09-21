@@ -16,7 +16,8 @@ export default abstract class ASideGameScore {
 	protected rline = new recordLine();
 	protected sc = new stringScore();
 	protected forAffectTheNextGame = false;
-	protected highWin = false; // true 得分高者 Win, false 桿數低者 Win  
+	// protected CalcCounter = 0;
+	protected highWin = false; // true 得分高者 Win, false 桿數低者 Win
 	constructor(protected sg:sideGame){
 		this.createResultData();
 	}
@@ -36,7 +37,7 @@ export default abstract class ASideGameScore {
 		}
 	}
 	protected createResultData(){
-		// if (!this.sg.extraInfo) this.sg.extraInfo = {};
+		if (!this.sg.extraInfo) this.sg.extraInfo = {};
 		if (!this.sg.extraInfo.total) {
 			this.sg.extraInfo.total = this.rline.newline(this.sg.sideGameName, '', '', '', '', this.sg.sidegameid);
 			const gameDetail:scoreLine[] = [];
@@ -116,8 +117,8 @@ export default abstract class ASideGameScore {
 			gameDetail[idx][`f19`] = isplayed[idx] ? String(tt[idx]) : '';
 			total[`f${idx+1}`] = gameDetail[idx][`f19`]; 
 		});
-		console.log('updateResult', this.sg.sideGameName, JSON.stringify(total));
-		console.log('updateResult', this.sg.sideGameName, JSON.stringify(gameDetail));
+		// console.log('updateResult', this.sg.sideGameName, JSON.stringify(total));
+		// console.log('updateResult', this.sg.sideGameName, JSON.stringify(gameDetail));
 		this.sg.extraInfo.total = total;
 		this.sg.extraInfo.gameDetail = gameDetail;
 	}

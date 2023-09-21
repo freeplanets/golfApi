@@ -7,8 +7,8 @@ import ASideGameScore from "./ASideGameScore";
  */
 export default class StrokePlay extends ASideGameScore {
 	calc(holeScore: holesPlayerScore): void {
-		console.log('strokeplay calc start', holeScore.holeNo, this.forAffectTheNextGame);	
-		// if (holeScore.forAffectTheNextGame !== this.forAffectTheNextGame) return;
+		// if ( this.CalcCounter === 1  && !this.forAffectTheNextGame) return;
+		// this.CalcCounter += 1;		
 		const scores:number[] = [];
 		holeScore.scores.forEach((player)=>{
 			if (player.gross>0) {

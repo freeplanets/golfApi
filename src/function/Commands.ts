@@ -7,6 +7,7 @@ import { JwtService } from "@nestjs/jwt";
 import { ConditionComparisonComparatorName, queryReq, scoreLine, scoresData } from "./func.interface";
 import { Condition } from "dynamoose";
 import _scoreObject from "../models/game/_scoreObject";
+import GamesService from "../database/game/games.service";
 
 const jwt = new JwtService();
 const pfSite = 'union';
@@ -317,7 +318,28 @@ export function playerDefaultHcpCal(data:playerDefault[]){
 		return pd;
 	})
 }
-
+export async function getResultByGameID(token:string, gameid:string, dbservice:GamesService) {
+	const resp:commonResWithData<scoresData> = {
+		errcode: ErrCode.OK,
+	} 
+	if (tokenCheck(token)) {
+		const f = await dbservice.query({gameid}, ['players']);
+		if (f.count > 0) {
+			resp.data = createScoreData(gameid, f[0].players);
+		} else {
+			resp.errcode = ErrCode.ITEM_NOT_FOUND;
+			resp.error = {
+				message: errorMsg('ITEM_NOT_FOUND'),
+			}
+		}
+	} else {
+		resp.errcode = ErrCode.TOKEN_ERROR;
+		resp.error = {
+			message: errorMsg('TOKEN_ERROR'),
+		}
+	}
+	return resp;
+}
 export function createScoreData(gameid:string, players:player[]) {
 	const data:scoresData = {
 		gameid,

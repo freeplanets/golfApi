@@ -14,7 +14,8 @@ export default class Eagles extends ASideGameScore {
 		this.highWin = true;
 	}
 	calc(holeScore: holesPlayerScore): void {
-		if (holeScore.forAffectTheNextGame !== this.forAffectTheNextGame) return;
+		//if ( this.CalcCounter === 1  && !this.forAffectTheNextGame) return;
+		//this.CalcCounter += 1;		
 		const scores:number[] = [];
 		holeScore.scores.forEach((player)=>{
 			if (player.gross>0) {
