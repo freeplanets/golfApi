@@ -37,6 +37,7 @@ export default abstract class ASideGameScore {
 		}
 	}
 	protected createResultData(){
+		console.log('createResultData', this.sg.sideGameName);
 		if (!this.sg.extraInfo) this.sg.extraInfo = {};
 		if (!this.sg.extraInfo.total) {
 			this.sg.extraInfo.total = this.rline.newline(this.sg.sideGameName, '', '', '', '', this.sg.sidegameid);

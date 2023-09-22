@@ -19,7 +19,7 @@ export enum sideGames {
 	EAGLES = 'Eagles',
 	PARS = 'Pars',
 	SIXES = 'Sixes',
-	LAS_VEGAS = 'LasVages',
+	LAS_VEGAS = 'LasVegas',
 	HESSEIN = 'Hessein',
 }
 export enum sideGamesTW {

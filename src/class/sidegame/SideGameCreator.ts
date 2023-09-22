@@ -27,7 +27,7 @@ export default class SideGameCreator implements sideGameCreate {
 		}
 		*/
 	}
-	create(sidegameid?:string): sideGame | false {
+	create(): sideGame | false {
 		//const chkPlayerInGame = this.checkData();
 		//if (!chkPlayerInGame) return false;
 		this.sideG.playerGameData = this.gameScores.create();

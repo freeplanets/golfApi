@@ -45,11 +45,12 @@ export default class SideGameRegister {
 		playerDefaults.forEach((player, idx) => {
 			stitle[`f${idx+1}`] = player.playerName;
 		});
-		const sgs = await this.sgService.query({gameid: this.gameid}, ['extraInfo']);
+		const sgs = await this.sgService.query({gameid: this.gameid}, ['sideGameName','sidegameid','extraInfo']);
 		console.log('getSideGameScore after query', new Date().toLocaleString());
 		res.sideGameTitle.push(stitle);
 		if (sgs.count > 0) {
 			res.sideGameScore = sgs.map((sg) => {
+				console.log(sg.sideGameName, sg.sidegameid, sg.extraInfo);
 				res.sideGameTotal[0].f1 = this.sc.add(res.sideGameTotal[0].f1, sg.extraInfo.total.f1);
 				res.sideGameTotal[0].f2 = this.sc.add(res.sideGameTotal[0].f2, sg.extraInfo.total.f2);
 				res.sideGameTotal[0].f3 = this.sc.add(res.sideGameTotal[0].f3, sg.extraInfo.total.f3);
@@ -62,7 +63,7 @@ export default class SideGameRegister {
 	}
 	async getSideGameData(sidegameid:string) {
 		const sgd = await this.sgService.findOne({sidegameid});
-		delete sgd.extraInfo;
+		// delete sgd.extraInfo;
 		sgd.playerGameData = sgd.playerGameData.map((pg) => {
 			delete pg.holes;
 			delete pg.extraInfo;

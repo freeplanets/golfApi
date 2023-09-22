@@ -3,6 +3,8 @@ import { scoreLine } from "../../function/func.interface";
 import { iScoreLine } from "../class.if";
 import StrokePlay from "./StrokePlay";
 import { sideGame } from "../../database/db.interface";
+import winnerGetPoint from "../common/winnerGetPoint";
+import teamWinnerGetPoint from "../common/teamWinnerGetPoint";
 
 interface playerScoreLine {
 	f1?:number;
@@ -79,14 +81,21 @@ export default class Nassau extends StrokePlay {
 		})
 		console.log(subF, subB, subT);
 		if (this.sg.format === sideGameFormat.individual) {
-			subF = this.ByIndividual(subF, isplayed);
-			subB = this.ByIndividual(subB, isplayed);
-			subT = this.ByIndividual(subT, isplayed);
+			const winner = new winnerGetPoint();
+			subF = winner.calc(subF, isplayed);
+			subB = winner.calc(subB, isplayed);
+			subT = winner.calc(subT, isplayed);
 		} else {
-			subF = this.ByBetterGame(subF);
-			subB = this.ByBetterGame(subB);
-			subT = this.ByBetterGame(subT);
+			const group:string[] = this.sg.extraInfo.group;
+			const teamWinner = new teamWinnerGetPoint();
+			subF = teamWinner.calc(subF, group);
+			subB = teamWinner.calc(subB, group);
+			subT = teamWinner.calc(subT, group);
 		}
+		const wager = this.sg.wager; 
+		subF = subF.map((v) => v * wager);
+		subB = subB.map((v) => v * wager);
+		subT = subT.map((v) => v * wager);
 		const gameDetail = this.sg.extraInfo.gameDetail as scoreLine[];
 		const total = this.sg.extraInfo.total as scoreLine;
 		gameDetail.forEach((gd,idx) => {
@@ -100,6 +109,6 @@ export default class Nassau extends StrokePlay {
 		})
 		this.sg.extraInfo.total = total;
 		this.sg.extraInfo.gameDetail = gameDetail;
-		console.log(total, gameDetail)
+		// console.log(total, gameDetail)
 	}
 }

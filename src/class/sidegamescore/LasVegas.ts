@@ -2,6 +2,7 @@ import { sideGame } from "src/database/db.interface";
 import { holesPlayerScore } from "../class.if";
 import Hessein from "./Hessein";
 import { AnyObject } from "src/models/if";
+import LasVegasScoreCombine from "../common/LasVegasScoreCombine";
 
 /**
  * 拉斯維加斯 (Las Vegas)
@@ -20,18 +21,24 @@ export default class LasVegas extends Hessein {
 		this.forAffectTheNextGame = true;
 	}
 	calc(holeScore: holesPlayerScore): void {
+		console.log('LasVegas calc', holeScore);
 		this.partDiff = holeScore.scores.map((score) => score.parDiff);
 		super.calc(holeScore);
 	}
 	protected ByBetterGame(score: number[]): number[] {
-		const isplayed = this.sg.extraInfo.isplayed as boolean[]
-		return this.lvCal(score, isplayed);
+		//const isplayed = this.sg.extraInfo.isplayed as boolean[]
+		return this.lvCal(score);
 	}
-	protected ByIndividual(score: number[], isplayed: boolean[]): number[] {
-		return this.lvCal(score, isplayed);
+	protected ByIndividual(score: number[], isplayed?: boolean[]): number[] {
+		return this.lvCal(score);
 	}
-	private lvCal(score:number[], isplayed:boolean[]) {
+	private lvCal(score:number[]) {
 		const curOrder = this.sg.extraInfo.Orders[`H${this.curHoleNo}`] as number[];
+		const lvsc = new LasVegasScoreCombine(score, this.partDiff, curOrder);
+		const newa = lvsc.calc();
+		this.sg.extraInfo.Orders[`H${this.curHoleNo + 1}`] = lvsc.newOrders();
+		return newa;
+		/*
 		console.log('lvCal', curOrder);
 		const odrIdx1 = this.orderValueIndex(curOrder, 1);
 		const odrIdx2 = this.orderValueIndex(curOrder, 2);
@@ -45,6 +52,7 @@ export default class LasVegas extends Hessein {
 		tmp[odrIdx2] = diff * -1;
 		tmp[odrIdx3] = diff * -1;
 		return tmp;
+		*/
 	}
 	private combineNumber(score:number[], pos1:number, pos2:number) {
 		let unitsDigit = 0, tensDigit = 0;
@@ -56,7 +64,7 @@ export default class LasVegas extends Hessein {
 				tensDigit = a;
 				unitsDigit = b;
 			} else {
-				if (this.partDiff[pos1 -1] < 0 || this.partDiff[pos2] < 0) {
+				if (this.partDiff[pos1] < 0 || this.partDiff[pos2] < 0) {
 					tensDigit = a;
 					unitsDigit = b;					
 				} else {
@@ -69,7 +77,7 @@ export default class LasVegas extends Hessein {
 				tensDigit = b;
 				unitsDigit = a;
 			} else {
-				if (this.partDiff[pos1 -1] < 0 || this.partDiff[pos2] < 0) {
+				if (this.partDiff[pos1] < 0 || this.partDiff[pos2] < 0) {
 					tensDigit = b;
 					unitsDigit = a;
 				} else {
