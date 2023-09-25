@@ -4,7 +4,7 @@ import { Condition } from "dynamoose";
 import GamesService from "../../database/game/games.service";
 import gameData from "../../models/game/gameData";
 import { assignCartEx, gamePartialReqEx, gameReqEx, getGamesReqEx } from "../../models/examples/game/gameDataEx";
-import { carts, gameKey, games } from "../../database/db.interface";
+import { carts, gameKey, games, player, score, teeObject } from "../../database/db.interface";
 import { createTableData, deleteTableData, getTableData, hashKey, tokenCheck, updateTableData } from "../../function/Commands";
 import gamePartialData from "../../models/game/gamePartialData";
 import gameResponse from "../../models/game/gameResponse";
@@ -16,6 +16,8 @@ import { errorMsg } from "../../function/Errors";
 import assignCartRequest from "../../models/game/assignCartRequest";
 import CartsService from "../../database/cart/carts.service";
 import { CartStatus } from "../../function/func.interface";
+import ZonesService from "../../database/zone/zones.service";
+import CoursesService from "../../database/course/courses.service";
 
 @ApiBearerAuth()
 @ApiTags('Manage')
@@ -24,6 +26,8 @@ export default class GameController {
 	constructor(
 		private readonly gamesService:GamesService,
 		private readonly cartsService:CartsService,
+		private readonly zonesService:ZonesService,
+		private readonly coursesService:CoursesService,
 	){}
 
 	@Put('game')
@@ -31,7 +35,8 @@ export default class GameController {
 	@ApiBody({description:'編組資料', type: gameData, examples: gameReqEx})
 	@ApiResponse({status: 200})
 	async add(@Body() body:games, @Headers('WWW-AUTH') token:Record<string, string>) {
-		body.gameid = hashKey();
+		// body.gameid = hashKey();
+		body = await this.gameDataCheck(body);
 		const resp = await createTableData(String(token), this.gamesService, body);
 		return resp;
 	}
@@ -129,5 +134,67 @@ export default class GameController {
 			}		
 		}
 		return resp;
+	}
+	async gameDataCheck(game:games):Promise<games> {
+		if (!game.gameid) game.gameid = hashKey();
+		if (!game.playerDefaults) {
+			let isHolesHasData = true;
+			game.playerDefaults = game.players.map((player) => {
+				if (isHolesHasData) {
+					if (!player.holes || player.holes.length === 0) isHolesHasData = false
+				}
+				return {
+					playerName: player.playerName,
+					fullHcp: '0',
+					allowance: '100',
+					hcp: '0',
+					hcpRound: true,
+				}
+			});
+			if (!isHolesHasData) {
+				const course = await this.coursesService.findOne({courseid: game.courseid});
+				const outZone = await this.zonesService.findOne({zoneid: game.outZone});
+				const inZone = await this.zonesService.findOne({zoneid: game.inZone});
+				const zones = [outZone, inZone];
+				game.players = game.players.map((itm, idx) => {
+					let holes:score[] = [];
+					let no = 0;
+					zones.forEach((z) => {
+						z.fairways.forEach((f) => {
+							no+=1;
+							const sco:score = {
+								zoneid: z.zoneid,
+								fairwayno: f.fairwayno,
+								handicap: f.handicap,
+								par: f.par,
+								holeNo: no,
+								gross: 0,
+								parDiff: 0,
+							};
+							holes.push(sco);
+						})
+					});
+					let ctee:teeObject = itm.tee;			
+					if (!itm.tee) {
+						ctee = course.tees.find((t) => t.teeColor === 'White');
+					}
+					const tmp:player = {
+						playerName: itm.playerName,
+						tee: ctee,
+						hcp: '0',
+						playerOrder: idx,
+						gross: 0,
+						holes,
+						frontGross: 0,
+						backGross: 0,
+						parDiff: 0,
+						stablefordPoint: 0,
+						extra: itm.extra,
+					};
+					return tmp;
+				});
+			}
+		}
+		return game;
 	}
 }

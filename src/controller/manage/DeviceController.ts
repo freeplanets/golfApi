@@ -2,14 +2,14 @@ import { Body, Controller, Headers, Post, Get, Param, Delete, Put, Patch } from 
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { deviceKey, devices, mapLatLong } from "../../database/db.interface";
 import commonResponse from "../../models/common/commonResponse";
-import { createTableData, deleteTableData, getTableData, hashKey, queryTable, updateTableData } from "../../function/Commands";
+import { createTableData, deleteTableData, getTableData, hashKey, queryTable, removeUnderLineData, tokenCheck, updateTableData } from "../../function/Commands";
 import DevicesService from "../../database/device/devices.service";
 import deviceData from "../../models/device/deviceData";
 import { deviceEx, deviceResEx, locationEx, queryDeviceRequestEx } from "../../models/examples/device/deviceEx";
 import deviceReponse from "../../models/device/deviceResponse";
 import queryDevicesRequest from "../../models/device/queryDevicesRequest";
 import _mapLatLong from "../../models/common/_mapLatLong";
-import { commonRes } from "../../models/if";
+import { commonRes, commonResWithData } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
 
@@ -26,7 +26,8 @@ export default class DeviceController {
 	async add(@Body() body:devices,@Headers('WWW-AUTH') token: Record<string, string>){
 		// console.log('device Put', body, token);
 		if(!body.deviceid) body.deviceid = hashKey();
-		const resp = await createTableData<devices, deviceKey>(String(token), this.devicesService, body);
+		// const resp = await createTableData<devices, deviceKey>(String(token), this.devicesService, body);
+		const resp = await this.addDevice(String(token), body);
 		return resp;
 	}
 
@@ -70,5 +71,45 @@ export default class DeviceController {
 		const resp = await queryTable(String(token), this.devicesService, body);
 		return resp;
 	}
-
+	async addDevice(token:string, device:devices){
+		const resp:commonResWithData<devices> = {
+			errcode: ErrCode.OK,
+		}
+		const user = tokenCheck(token);
+		if (user) {
+			if (device.siteid){
+				device = removeUnderLineData(device);
+				const devKey:deviceKey = {
+					deviceid: device.deviceid,
+				}
+				device.modifyid = user.uid;
+				try {
+					const f = this.devicesService.findOne(devKey);
+					if (f) {
+						delete device.deviceid;
+						resp.data = await this.devicesService.update(devKey, device);
+					} else {
+						resp.data = await this.devicesService.create(device);
+					}
+				} catch(error) {
+					resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
+					resp.error = {
+						message: errorMsg('DATABASE_ACCESS_ERROR'),
+						extra: error,
+					}
+				}				
+			} else { 
+				resp.errcode = ErrCode.ERROR_PARAMETER;
+				resp.error = {
+					message: errorMsg('ERROR_PARAMETER', 'siteid'),
+				}
+			}
+		} else {
+			resp.errcode = ErrCode.TOKEN_ERROR;
+			resp.error = {
+				message: errorMsg('TOKEN_ERROR'),
+			}
+		}
+		return resp;
+	}
 }

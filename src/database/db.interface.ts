@@ -159,6 +159,7 @@ export interface devices extends deviceKey {
   siteid: string;
   cartid?: string;
   location?: mapLatLong;
+  modifyid?:string;
 }
 
 

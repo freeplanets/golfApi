@@ -22,7 +22,7 @@ export default class CourseController {
 	@ApiBody({description: '球道組合資料新增', type: courseData, examples: courseEx})
 	@ApiResponse({status: 200, description: '回傳物件', type:courseResponse})
 	async add(@Body() body:courses,@Headers('WWW-AUTH') token: Record<string, string>){
-		body.courseid = hashKey();
+		if (!body.courseid) body.courseid = hashKey();
 		const resp = await createTableData<courses, courseKey>(String(token), this.courseService, body);
 		return resp;
 	}
