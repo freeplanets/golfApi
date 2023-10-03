@@ -79,6 +79,7 @@ export interface scoreLine {
 }
 export interface scoresData {
 	gameid:string;
+	playerChangeOrder?:boolean;
 	front?: scoreLine[];
 	back?: scoreLine[];
 	total?: scoreLine[];

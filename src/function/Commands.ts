@@ -323,9 +323,9 @@ export async function getResultByGameID(token:string, gameid:string, dbservice:G
 		errcode: ErrCode.OK,
 	} 
 	if (tokenCheck(token)) {
-		const f = await dbservice.query({gameid}, ['players']);
+		const f = await dbservice.query({gameid}, ['players', 'playerDefaults']);
 		if (f.count > 0) {
-			resp.data = createScoreData(gameid, f[0].players);
+			resp.data = createScoreData(gameid, f[0].players, f[0].playerDefaults);
 		} else {
 			resp.errcode = ErrCode.ITEM_NOT_FOUND;
 			resp.error = {
@@ -340,26 +340,30 @@ export async function getResultByGameID(token:string, gameid:string, dbservice:G
 	}
 	return resp;
 }
-export function createScoreData(gameid:string, players:player[]) {
+export function createScoreData(gameid:string, players:player[], playerDefaults:playerDefault[]) {
 	const data:scoresData = {
 		gameid,
 		front:[],
 		back:[],
 		total:[],
 	}
-	players.forEach((player) => {
-		data.total.push(createLineData([player.playerName, convString(player.frontGross), convString(player.backGross), convString(player.gross), convString(player.parDiff, true)]));
-		player.holes.forEach((hole) => {
-			if (hole.holeNo < 10) {
-				assignLineData(data.front, 'PAR', hole.fairwayno, hole.par);
-				assignLineData(data.front, 'HDCP', hole.fairwayno, hole.handicap);
-				assignLineData(data.front, player.playerName, hole.fairwayno, hole.gross);
-			} else {
-				assignLineData(data.back, 'PAR', hole.fairwayno, hole.par);
-				assignLineData(data.back, 'HDCP', hole.fairwayno, hole.handicap);
-				assignLineData(data.back, player.playerName, hole.fairwayno, hole.gross);				
-			}
-		})
+	// players.forEach((player) => {
+	playerDefaults.forEach((pd) => {
+		const player = players.find((p) => p.playerName === pd.playerName);
+		if (player) {
+			data.total.push(createLineData([player.playerName, convString(player.frontGross), convString(player.backGross), convString(player.gross), convString(player.parDiff, true)]));
+			player.holes.forEach((hole) => {
+				if (hole.holeNo < 10) {
+					assignLineData(data.front, 'PAR', hole.fairwayno, hole.par);
+					assignLineData(data.front, 'HDCP', hole.fairwayno, hole.handicap);
+					assignLineData(data.front, player.playerName, hole.fairwayno, hole.gross);
+				} else {
+					assignLineData(data.back, 'PAR', hole.fairwayno, hole.par);
+					assignLineData(data.back, 'HDCP', hole.fairwayno, hole.handicap);
+					assignLineData(data.back, player.playerName, hole.fairwayno, hole.gross);				
+				}
+			})
+		}
 	})
 	return data;
 }

@@ -9,6 +9,7 @@ import GameController from "../../controller/manage/GameController";
 import CartsModule from "../cart/carts.module";
 import InCartController from "../../controller/cart/InCartController";
 import DevicesModule from "../device/devices.module";
+import ScoresSchema from "./scores.schema";
 
 @Module({
 	imports: [
@@ -20,6 +21,13 @@ import DevicesModule from "../device/devices.module";
 			{
 				name: 'Games',
 				schema: GamesSchema,
+				options: {
+					throughput: 'ON_DEMAND',
+				}
+			},
+			{
+				name: 'Scores',
+				schema: ScoresSchema,
 				options: {
 					throughput: 'ON_DEMAND',
 				}

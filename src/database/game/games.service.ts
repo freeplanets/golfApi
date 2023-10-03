@@ -12,7 +12,7 @@ import { createScoreData, removeUnderLineData } from "../../function/Commands";
 export default class GamesService extends defaultService<games, gameKey> {
 	constructor(
 		@InjectModel('Games')
-		private gamesModel:Model<games, gameKey>,
+		gamesModel:Model<games, gameKey>,
 	){
 		super(gamesModel);
 	}

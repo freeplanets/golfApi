@@ -38,8 +38,8 @@ export interface ksGameReq {
 
 export interface ksLang {
   _default:string;  //預設語言
-  zhTW:string;  // 䌓中
-  jaJP:string;  // 日文
+  zhTW?:string;  // 䌓中
+  jaJP?:string;  // 日文
   koKR?:string; // 韓文
   zhCN?:string; // 簡中
 }
@@ -55,8 +55,8 @@ export interface ksHole {
   name:ksLang; // 名稱
   handicap:number; // HCP
   par:number; //標準桿
-  standardTime:number; // 標準擊球時間
-  _type:string; // simple_hole	球道難易類型																					  
+  standardTime?:number; // 標準擊球時間
+  _type?:string; // simple_hole	球道難易類型																					  
 }
 
 export interface ksScore {

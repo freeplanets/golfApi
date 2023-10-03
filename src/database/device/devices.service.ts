@@ -11,9 +11,9 @@ export default class DevicesService extends defaultService<devices, deviceKey> {
 	private historyService:DeviceHistoryService;
 	constructor(
 		@InjectModel('Devices')
-		private devicesModel:Model<devices, deviceKey>,
+		devicesModel:Model<devices, deviceKey>,
 		@InjectModel('DeviceHistory')
-		private devicesHistoryModel:Model<deviceHistory, deviceKey>,
+		devicesHistoryModel:Model<deviceHistory, deviceKey>,
 	){
 		super(devicesModel);
 		this.historyService = new DeviceHistoryService(devicesHistoryModel);

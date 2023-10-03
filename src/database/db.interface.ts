@@ -273,6 +273,25 @@ export interface courses extends courseKey {
   openDate?:string;
 }
 
+export interface scorekey extends defaultKey {
+  scoreid:string;
+}
+
+export interface scores extends scorekey {
+  gameid:string;
+  gameTitle:string;
+  courseid:string;
+  courseName:string;
+  playerName:string;
+  memberId:string;
+  checkInId:string;
+  gross:number;
+  hcp:number;
+  scores:number[];
+  esttimatedStartTime:number;
+}
+
+
 export interface platformUser extends AnyObject {
   // lastip: '1.34.195.217',
   siteid: string; // 'linkougolf',

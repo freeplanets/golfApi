@@ -15,7 +15,6 @@ import gameData from "../../models/game/gameData";
 import { hashKey } from "../../function/Commands";
 import _playerObject from "../../models/game/_playerObject";
 import { commonRes } from "../../models/if";
-import { HcpType } from "../../models/enum";
 import EncDecString from "../../function/EncDecString";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";

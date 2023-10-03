@@ -7,7 +7,7 @@ import { InjectModel, Model } from "nestjs-dynamoose";
 export default class CoursesService extends defaultService<courses, courseKey> {
 	constructor(
 		@InjectModel('Courses')
-		private coursesModel:Model<courses, courseKey>,
+		coursesModel:Model<courses, courseKey>,
 	){
 		super(coursesModel);
 	}

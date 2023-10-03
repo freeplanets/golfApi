@@ -7,7 +7,7 @@ import { deviceHistory, deviceKey } from "../db.interface";
 export default class DeviceHistoryService extends defaultService<deviceHistory, deviceKey> {
 	constructor(
 		@InjectModel('DeviceHistory')
-		private deviceHistoryModel:Model<deviceHistory, deviceKey>,
+		deviceHistoryModel:Model<deviceHistory, deviceKey>,
 	) {
 		super(deviceHistoryModel);
 	}

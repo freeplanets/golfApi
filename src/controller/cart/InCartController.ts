@@ -4,7 +4,7 @@ import { Condition } from "dynamoose";
 import GamesService from "../../database/game/games.service";
 import CartsService from "../../database/cart/carts.service";
 import { createScoreData, getResultByGameID, playerDefaultHcpCal, removeUnderLineData, tokenCheck, updateTableData } from "../../function/Commands";
-import { cartKey, carts, devices, gameKey, games, mapLatLong, sideGame, sideGameKey } from "../../database/db.interface";
+import { cartKey, carts, devices, gameKey, games, mapLatLong, playerDefault, sideGame, sideGameKey } from "../../database/db.interface";
 import { AnyObject, commonRes, commonResWithData, locReq, positonReq } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
@@ -287,7 +287,7 @@ export default class InCartController {
 	}
 
 	@Get('gameEnd/:gameid/:endTime')
-	@ApiOperation({summary:'開始擊球/ game start',description:'開始擊球/ game start'})
+	@ApiOperation({summary:'結束擊球/ game ended',description:'結束擊球/ game ended'})
 	@ApiParam({name: 'gameid', description: '編組代號'})
 	@ApiParam({name:'endTime', description:'結束擊球時間(timestamp)'})
 	@ApiResponse({status: 200, type: commonResponse})
@@ -358,7 +358,7 @@ export default class InCartController {
 				//for page show
 
 				console.log('for page show');
-				resp.data.score = createScoreData(g.gameid, g.players);
+				resp.data.score = createScoreData(g.gameid, g.players, g.playerDefaults);
 				chk.scoreData = new Date().toLocaleString();
 				console.log('after query zones');
 				/*
@@ -588,10 +588,23 @@ export default class InCartController {
 			const key:gameKey = {
 				gameid: data.gameid,
 			};
-			const f = await this.gamesService.query(key, ['players']);
+			const f = await this.gamesService.query(key, ['players', 'playerDefaults']);
 			console.log('get data:', new Date().toLocaleString(), f.count);
 			if (f.count > 0) {
 					const oldPlayers = f[0].players;
+					let playerDefaults = f[0].playerDefaults;
+					if (data.playerChangeOrder) {
+						const newPlayerDefaults:playerDefault[] = [];
+						const playerS = data.front ? data.front : data.back;
+						playerS.forEach((itm) => {
+							if (itm.f0 === 'PAR' || itm.f0 === 'HDCP') return;
+							const f = playerDefaults.find((p) => p.playerName === itm.f0);
+							if (f) {
+								newPlayerDefaults.push(f);
+							}
+						})
+						if (newPlayerDefaults.length === playerDefaults.length) playerDefaults = newPlayerDefaults;
+					}
 					// const sideGames = f[0].sideGames ?  f[0].sideGames : [];
 					const sideGames = await this.sidegamesService.query({gameid:data.gameid});
 					const sUpdater = new ScoresUpdater(oldPlayers);
@@ -621,7 +634,7 @@ export default class InCartController {
 						}
 					}
 					// console.dir(sideGames, {depth: 8});
-					await this.gamesService.update(key, {players:oldPlayers});
+					await this.gamesService.update(key, {players:oldPlayers, playerDefaults});
 					sideGames.forEach(async (sg) => {
 						const sgKey:sideGameKey = {
 							sidegameid: sg.sidegameid,
@@ -636,7 +649,7 @@ export default class InCartController {
 					})
 					// await this.gamesService.update(key, {players:oldPlayers});
 					console.log('after save data', new Date().toLocaleString());
-					resp.data = createScoreData(data.gameid, oldPlayers);	
+					resp.data = createScoreData(data.gameid, oldPlayers, playerDefaults);	
 					// console.log('createScoreData:', resp.data);
 					/*
 				} catch(error) {

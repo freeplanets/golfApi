@@ -12,7 +12,7 @@ export default class CartsService extends defaultService<carts, cartKey> {
 	
 	constructor(
 		@InjectModel('Carts')
-		private cartsModel:Model<carts, cartKey>,
+		cartsModel:Model<carts, cartKey>,
 		private deviceService:DevicesService,
 	){
 		super(cartsModel);
