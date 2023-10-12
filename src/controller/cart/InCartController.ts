@@ -71,7 +71,6 @@ export default class InCartController {
 	@ApiParam({name: 'deviceid', description:'設備代號'})
 	@ApiResponse({status: 200, description: '編組、分區、球車等資料', type: checkInResponse})
 	async getCheckInData(@Param('caddieid') caddieid:string, @Param('deviceid') deviceid:string, @Headers('WWW-AUTH') token:Record<string, string>){
-		console.log(new Date().toLocaleString());
 		const resp = await this.searchCheckInData(String(token), caddieid, deviceid);
 		return resp;
 	}
@@ -132,6 +131,16 @@ export default class InCartController {
 	@ApiResponse({status: 200, type: positionResponse})
 	async deviceLocation(@Param('deviceid') deviceid:string, @Body() body:locReq){
 		console.log('deviceLocation', deviceid, body);
+		const resp:commonResWithData<carts[]> = {
+			errcode: ErrCode.OK,
+		}		
+		if (!body.latitude || !body.longitude ) {
+			resp.errcode = ErrCode.MISS_PARAMETER;
+			resp.error = {
+				message: errorMsg('MISS_PARAMETER', 'latitude/longitude'),
+			};
+			return resp;
+		}
 		const loc: mapLatLong = {
 			latitude: body.latitude,
 			longitude: body.longitude,
@@ -139,9 +148,6 @@ export default class InCartController {
 		const data:Partial<devices> = {
 			location: loc,
 		};
-		const resp:commonResWithData<carts[]> = {
-			errcode: ErrCode.OK,
-		}
 		try {
 			let ans:any =	await this.devicesService.update({deviceid}, data);
 			// console.log('location', ans);
@@ -314,18 +320,21 @@ export default class InCartController {
 			data: {}		
 		}
 		const chk:AnyObject = {
-			start: new Date().toLocaleString(),
+			caddie: caddieid,
+			device: deviceid, 
 		}
 		const user = tokenCheck(token);
-		chk.tokenCheck = new Date().toLocaleString(); 
 		if (user) {
+			chk.siteid = user.siteid;
 			const ts = this.todayStartTs();
 			let cond = new Condition({siteid: user.siteid}).where('esttimatedStartTime').gt(ts).and().where('endTime').eq(0);
 			const game = await this.gamesService.query(cond, [], 'siteidesttimatedstarttimeGlobalIndex');
-			chk.queryGame = new Date().toLocaleString();
+			chk.gameCount = game.count;
+			chk.caddies = [];
 			if (game.count > 0) {
 				game.forEach((g,idx) => {
-					const fIdx = g.caddies.findIndex((itm) => itm.caddieid === caddieid)
+					console.log('game:', g.gameid, g.carts);
+					const fIdx = g.caddies.findIndex((itm) => itm.caddieid === caddieid);
 					if (fIdx > -1){
 						console.log('fIdx', fIdx, idx, caddieid, g.caddies);
 						game[idx].playerDefaults = game[idx].playerDefaults.map((p) => {
@@ -338,7 +347,6 @@ export default class InCartController {
 					}
 				})
 			}
-			chk.findGame = new Date().toLocaleString();
 			if (!resp.data.game) {
 				resp.errcode = ErrCode.ITEM_NOT_FOUND;
 				resp.error = {
@@ -357,10 +365,7 @@ export default class InCartController {
 				*/
 				//for page show
 
-				console.log('for page show');
 				resp.data.score = createScoreData(g.gameid, g.players, g.playerDefaults);
-				chk.scoreData = new Date().toLocaleString();
-				console.log('after query zones');
 				/*
 				const searchKey:Partial<carts> = {
 					// siteid: user.siteid,
@@ -372,6 +377,7 @@ export default class InCartController {
 				if (device && device.cartid) {
 					const cartid = device.cartid;
 					const cart = await this.cartService.findOne({ cartid });
+					delete (cart as any).updatedAt;
 					console.log('cart:', cart);
 					resp.data.cart = cart;
 					if (!g.carts) {
@@ -390,10 +396,12 @@ export default class InCartController {
 				message: errorMsg('TOKEN_ERROR'),
 			}		
 		}
+		/*
 		resp.error = {
 			message: 'time check',
 			extra: chk,
 		}
+		*/
 		return resp;
 	}
 
@@ -605,36 +613,44 @@ export default class InCartController {
 						})
 						if (newPlayerDefaults.length === playerDefaults.length) playerDefaults = newPlayerDefaults;
 					}
-					// const sideGames = f[0].sideGames ?  f[0].sideGames : [];
+					// sideGame
 					const sideGames = await this.sidegamesService.query({gameid:data.gameid});
 					const sUpdater = new ScoresUpdater(oldPlayers);
-					sUpdater.update(data)
-					console.log('update', new Date().toLocaleString(), sUpdater.UpdatedHoles);
-					if (sUpdater.UpdatedHoles) {
-						if (sideGames && sideGames.length > 0) {
-							let score = sUpdater.getScores(sUpdater.UpdatedHoles);
-							const sideGF:SideGameScoreFactory = new SideGameScoreFactory(sideGames);
-							console.log('getUpdteScore', sUpdater.UpdatedHoles, score);
-							if (sUpdater.scoreCheckIfAllHasScore(score)) {
-								sideGF.addScore(score);
-								console.log('after first time addScore');
-								if (this.hadAffectNextGame(sideGames)) {
-									let nextHoleScore = sUpdater.UpdatedHoles + 1;
-									score = sUpdater.getScores(nextHoleScore);
-									while(sUpdater.scoreCheckIfAllHasScore(score)) {
-										// score.forAffectTheNextGame = true;
-										console.log('getUpdteScore in while', score);
-										sideGF.addScore(score);
-										nextHoleScore+=1;
-										score = sUpdater.getScores(nextHoleScore); 
+					try {
+						sUpdater.update(data)
+						console.log('update', new Date().toLocaleString(), sUpdater.UpdatedHoles);
+						if (sUpdater.UpdatedHoles) {
+							if (sideGames && sideGames.length > 0) {
+								let score = sUpdater.getScores(sUpdater.UpdatedHoles);
+								const sideGF:SideGameScoreFactory = new SideGameScoreFactory(sideGames);
+								console.log('getUpdteScore', sUpdater.UpdatedHoles, score);
+								if (sUpdater.scoreCheckIfAllHasScore(score)) {
+									sideGF.addScore(score);
+									console.log('after first time addScore');
+									if (this.hadAffectNextGame(sideGames)) {
+										let nextHoleScore = sUpdater.UpdatedHoles + 1;
+										score = sUpdater.getScores(nextHoleScore);
+										while(sUpdater.scoreCheckIfAllHasScore(score)) {
+											// score.forAffectTheNextGame = true;
+											console.log('getUpdteScore in while', score);
+											sideGF.addScore(score);
+											nextHoleScore+=1;
+											score = sUpdater.getScores(nextHoleScore); 
+										}
 									}
 								}
+								console.log('after addScore', new Date().toLocaleString());
 							}
-							console.log('after addScore', new Date().toLocaleString());
 						}
+					} catch (err) {
+						console.log('sidegames error:', err);
 					}
-					// console.dir(sideGames, {depth: 8});
+					// update score
 					await this.gamesService.update(key, {players:oldPlayers, playerDefaults});
+					console.log('after save data', new Date().toLocaleString());
+					resp.data = createScoreData(data.gameid, oldPlayers, playerDefaults);	
+
+					// console.dir(sideGames, {depth: 8});
 					sideGames.forEach(async (sg) => {
 						const sgKey:sideGameKey = {
 							sidegameid: sg.sidegameid,
@@ -648,8 +664,6 @@ export default class InCartController {
 						}
 					})
 					// await this.gamesService.update(key, {players:oldPlayers});
-					console.log('after save data', new Date().toLocaleString());
-					resp.data = createScoreData(data.gameid, oldPlayers, playerDefaults);	
 					// console.log('createScoreData:', resp.data);
 					/*
 				} catch(error) {

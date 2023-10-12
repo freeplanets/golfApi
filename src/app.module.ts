@@ -6,10 +6,10 @@ import { AppController } from './app.controller';
 import GamesModule from './database/game/games.module';
 import { ConfigModule } from '@nestjs/config';
 let options:DynamooseModuleOptions = awsOptions;
-if(process.env.IS_OFFLINE) {
+// console.log('env:', process.env);
+if(process.env.IS_OFFLINE || process.env.NODE_ENV === 'test') {
   options = { local:true };
 } 
-
 @Module({
   imports: [
     ConfigModule.forRoot(),

@@ -78,10 +78,11 @@ export default class GamesService extends defaultService<games, gameKey> {
 		const key:gameKey = {
 			gameid: data.gameid,
 		};
-		const f = await super.query(key, ['players','sideGames']);
+		const f = await super.query(key, ['players','sideGames', 'playerDefaults']);
 		if (f) {
 			const sideGames = f[0].sideGames;
 			const oldPlayers = f[0].players;
+			const playerDefaults = f[0].playerDefaults;
 			let zone = '';
 			let score:scoreLine[];
 			if (data.front) {
@@ -128,7 +129,7 @@ export default class GamesService extends defaultService<games, gameKey> {
 				}
 			});
 			await this.update(key, {players:oldPlayers});
-			return createScoreData(data.gameid, oldPlayers);
+			return createScoreData(data.gameid, oldPlayers, playerDefaults);
 		}	
 	}
 	async updateGamePoint(gameid:string, data:_partialPlayerObject){

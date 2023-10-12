@@ -12,6 +12,7 @@ import { sideGame } from "../../database/db.interface";
 export default class Sixes extends Nassau {
 	constructor(sg:sideGame){
 		super(sg);
+		this.sg.format = sideGameFormat.team;
 		if (this.sg.extraInfo.group.length < 4) {
 			this.sg.extraInfo.autoGroup = true;
 		}

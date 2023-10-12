@@ -3,22 +3,25 @@ import { holesPlayerScore } from "../class.if";
 import Hessein from "./Hessein";
 import { AnyObject } from "src/models/if";
 import LasVegasScoreCombine from "../common/LasVegasScoreCombine";
+import { sideGameFormat } from "../../models/enum";
 
 /**
  * 拉斯維加斯 (Las Vegas)
-這是4人遊戲。第1洞開球出去後，依遠近分出1,2,3,4名，弟1洞的組合就是1和4同組，2和3同組。
-有別於計算個人桿數，得分以同組兩人桿數的組合，桿數少的排前面(十位)，桿數多的排後面(個位)，來計算分數。
-例如是PAR4的洞，1(A先生)打5桿，2(B)打6桿，3(C)打4桿，4(D)打4桿。1,4那組得分45，2,3那組得分46。得分少的為贏。
-表示1,4那組各贏1點，2,3那組各輸1點。下1洞的組合，將會因本洞的桿數有所變動，以成績好的往後排。
-桿數相同時，依上1洞的優先序。所以第2洞的組合排序C.D.A.B，變成C和B同一組，D和A同一組。
-當有桿數10桿或以上時，桿數多的排前面，例如1個打11桿，1個打4桿，得分為114。
-另，當有小鳥或更好成績出現時，對方要翻牌，即，桿數多的排前面。
+基本上會是同組的四個人一起玩，第一洞開球出去後，依照遠近分別出1.2.3.4名，這時第一洞的組合就是1和4是同一組，2和3是同一組。
+如果是PAR4的洞，1（A先生）打5桿，2（B）打6桿，3（C）打4桿，4（D）打4桿，1.4那組就是45（桿數少的擺前面），2.3那組就是46。
+45-46=1，1.4那組就是各贏1點，2.3那組就是各輸1點。
+到下一洞時組合將會因為上一洞桿數有所變動。
+由成績最好的往後排，所以第二洞的組合便是第一洞的C.D.A.B，所以變成C和B是同組，D跟A是同組，然後以同樣的方式計算點數的輸贏。
+這樣一直打完18洞後把每洞每個人的輸贏點數加減出來就是輸贏了。
+當有一組有人打出低於標準桿時，還規定要翻牌。
+意思就是輸的那方要反過來把成績較差的擺在前面，也就是本來是46要變成64，這時點數就有可能會有幾十點的差別。
  */
 export default class LasVegas extends Hessein {
 	private partDiff:number[] = [];
 	constructor(sg:sideGame) {
 		super(sg);
 		this.forAffectTheNextGame = true;
+		this.sg.format = sideGameFormat.team;
 	}
 	calc(holeScore: holesPlayerScore): void {
 		console.log('LasVegas calc', holeScore);
@@ -34,6 +37,7 @@ export default class LasVegas extends Hessein {
 	}
 	private lvCal(score:number[]) {
 		const curOrder = this.sg.extraInfo.Orders[`H${this.curHoleNo}`] as number[];
+		console.log('LasVegas curOrder', this.curHoleNo, curOrder, this.sg.extraInfo.Orders);
 		const lvsc = new LasVegasScoreCombine(score, this.partDiff, curOrder);
 		const newa = lvsc.calc();
 		this.sg.extraInfo.Orders[`H${this.curHoleNo + 1}`] = lvsc.newOrders();
@@ -98,7 +102,7 @@ export default class LasVegas extends Hessein {
 			let bNum = b.score;
 			//if (a.order > b.order) aNum += 1;
 			//else bNum += 1;
-			return aNum - bNum;
+			return bNum - aNum;
 		});
 		const tmpOrder:number[] = [];
 		tmps.forEach((itm, idx) => {

@@ -35,7 +35,7 @@ export default class GameController {
 	@ApiBody({description:'編組資料', type: gameData, examples: gameReqEx})
 	@ApiResponse({status: 200})
 	async add(@Body() body:games, @Headers('WWW-AUTH') token:Record<string, string>) {
-		// body.gameid = hashKey();
+		body.gameid = hashKey();
 		body = await this.gameDataCheck(body);
 		const resp = await createTableData(String(token), this.gamesService, body);
 		return resp;
@@ -45,12 +45,13 @@ export default class GameController {
 	@ApiOperation({summary:'修改編組資料/ update game', description:'修改編組資料/ update game'})
 	@ApiParam({name:'gameid', description:'編組代號'})
 	@ApiBody({description:'編組資料不含gameid', type: gamePartialData, examples:gamePartialReqEx})
-	async update(@Param('gameid') gameid:string, @Body() body:Partial<games>, @Headers('WWW-AUTH') token:Record<string, string>){
+	async update(@Param('gameid') gameid:string, @Body() body:games, @Headers('WWW-AUTH') token:Record<string, string>){
 		const keys:gameKey = {
 			gameid,
 		};
+		body = await this.gameDataCheck(body);
 		if (body.gameid) delete body.gameid;
-		const resp = await updateTableData(String(token), this.gamesService, body, keys);
+		const resp = await updateTableData<games, gameKey>(String(token), this.gamesService, body, keys);
 		return resp;
 	}
 
@@ -62,7 +63,7 @@ export default class GameController {
 		const keys:gameKey = {
 			gameid,
 		};
-		const resp = await getTableData(String(token), this.gamesService, keys);
+		const resp = await getTableData<games, gameKey>(String(token), this.gamesService, keys);
 		return resp;
 	}
 
@@ -136,21 +137,25 @@ export default class GameController {
 		return resp;
 	}
 	async gameDataCheck(game:games):Promise<games> {
-		if (!game.gameid) game.gameid = hashKey();
-		if (!game.playerDefaults) {
-			let isHolesHasData = true;
-			game.playerDefaults = game.players.map((player) => {
-				if (isHolesHasData) {
-					if (!player.holes || player.holes.length === 0) isHolesHasData = false
-				}
-				return {
-					playerName: player.playerName,
-					fullHcp: '0',
-					allowance: '100',
-					hcp: '0',
-					hcpRound: true,
-				}
-			});
+		// if (!game.gameid) game.gameid = hashKey();
+		let isHolesHasData = false;
+		if ((!game.playerDefaults || game.playerDefaults.length === 0) && game.players) {
+			// if (!game.players) game.players = [];
+			// if (game.players && game.players.length > 0) {
+				isHolesHasData = true;
+				game.playerDefaults = game.players.map((player) => {
+					if (isHolesHasData) {
+						if (!player.holes || player.holes.length === 0) isHolesHasData = false
+					}
+					return {
+						playerName: player.playerName,
+						fullHcp: '0',
+						allowance: '100',
+						hcp: '0',
+						hcpRound: true,
+					};
+				});
+			//}
 			if (!isHolesHasData) {
 				const course = await this.coursesService.findOne({courseid: game.courseid});
 				const outZone = await this.zonesService.findOne({zoneid: game.outZone});
