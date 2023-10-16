@@ -10,9 +10,10 @@ export default class SideGameScore implements createPlayerGameData {
 		if (!sideG.sidegameid) sideG.sidegameid = hashKey();
 		if (!sideG.wager || sideG.wager < 1) sideG.wager = 1;
 		this.game.players.forEach((player) => {
-			const f = sideG.playerGameData.find((itm) => itm.playerName === player.playerName);
-			if (f) {
-				if (!f.playOrder) f.playOrder = 0;
+			const fIdx = sideG.playerGameData.findIndex((itm) => itm.playerName === player.playerName);
+			if (fIdx > -1) {
+				const f = sideG.playerGameData[fIdx]; 
+				if (!f.playOrder) f.playOrder = fIdx + 1;
 				if (typeof f.playOrder === 'string') f.playOrder = parseInt(f.playOrder, 10);
 				f.holes = player.holes.map((hole) => {
 					return { ...hole };

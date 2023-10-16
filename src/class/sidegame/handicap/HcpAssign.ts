@@ -125,6 +125,7 @@ export default class HcpAssign {
 					ihcp += 1;
 				}
 				no += 1;
+				if (no > 18) no = 1;
 			}
 		}
 		return hcps;

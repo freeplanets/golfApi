@@ -25,6 +25,7 @@ export interface commonResWithData<D> extends commonRes {
 export default interface siteDateReq {
   siteid: string,
   queryDate: string,
+  status?: number,
 }
 
 export interface positonReq {
@@ -49,4 +50,11 @@ export interface locReq extends mapLatLong {
   siteid?:string;
   requestZoneid?:string;
   requestFairwayno?:number;
+}
+
+export interface gamesInfo {
+  waitForCart: number;
+  onGame: number;
+  ended: number;
+  total: number;  
 }

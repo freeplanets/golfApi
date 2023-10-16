@@ -29,7 +29,7 @@ import { ConditionInitializer } from "dynamoose/dist/Condition";
 import ScoresUpdater from "../../class/players/ScoresUpdater";
 import SideGameScoreFactory from "../../class/sidegamescore/SideGameScoreFactory";
 import SideGameRegister from "../../class/sidegame/SideGameRegister";
-import { sideGames } from "../../models/enum";
+import { gameStatus, sideGames } from "../../models/enum";
 import SideGamesService from "../../database/sidegame/sidegames.service";
 
 @ApiBearerAuth()
@@ -134,11 +134,7 @@ export default class InCartController {
 		const resp:commonResWithData<carts[]> = {
 			errcode: ErrCode.OK,
 		}		
-		if (!body.latitude || !body.longitude ) {
-			resp.errcode = ErrCode.MISS_PARAMETER;
-			resp.error = {
-				message: errorMsg('MISS_PARAMETER', 'latitude/longitude'),
-			};
+		if (!body.siteid || !body.latitude || !body.longitude) {
 			return resp;
 		}
 		const loc: mapLatLong = {
@@ -146,6 +142,7 @@ export default class InCartController {
 			longitude: body.longitude,
 		} 
 		const data:Partial<devices> = {
+			siteid: body.siteid,
 			location: loc,
 		};
 		try {
@@ -300,6 +297,7 @@ export default class InCartController {
 	async gameEnd(@Param('gameid') gameid:string, @Param('endTime') endTime:string, @Headers('WWW-AUTH') token:Record<string, string>){
 		const data:Partial<games> = {
 			endTime: parseInt(endTime, 10),
+			status: gameStatus.Ended,
 		}
 		const resp = await updateTableData(String(token), this.gamesService, data, {gameid});
 		return resp;
@@ -309,8 +307,8 @@ export default class InCartController {
 	@ApiOperation({summary: '結果輸出/ getResult', description: '結果輸出/ getResult'})
 	@ApiParam({name:'gameid', description: '來賓分組代號'})
 	@ApiResponse({})	
-	async getResult(@Param('gameid') gameid:string, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await getResultByGameID(String(token), gameid, this.gamesService);
+	async getResult(@Param('gameid') gameid:string){
+		const resp = await getResultByGameID(gameid, this.gamesService, this.zonesService);
 		return resp;
 	}
 

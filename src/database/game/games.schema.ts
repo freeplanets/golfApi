@@ -20,7 +20,13 @@ const GamesSchema = new Schema({
 				type: 'global',
         // global: true,
         rangeKey: 'esttimatedStartTime',
-      }
+      },
+      {
+        name: 'siteidstatusGlobalIndex',
+				type: 'global',
+        // global: true,
+        rangeKey: 'status',
+      }      
     ]
   },
   courseid: {
@@ -288,5 +294,8 @@ const GamesSchema = new Schema({
   gameTitle: {
     type: String,
   },
+  status: {
+    type: Number,
+  }
 }, { timestamps: true, saveUnknown: ["players.**","sideGames.**"] });
 export default GamesSchema;

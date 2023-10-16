@@ -251,6 +251,7 @@ export interface games extends gameKey {
   playerDefaults: playerDefault[];
   sideGames:sideGame[];
   gameTitle?:string;
+  status:number;
 }
 
 export interface courseKey extends defaultKey {

@@ -19,6 +19,7 @@ export default class Hessein extends StrokePlay {
 	protected curHoleNo = 0;
 	constructor(sg:sideGame){
 		super(sg);
+		this.sg.carryOver = true;
 		this.forAffectTheNextGame = true;
 		if (!this.sg.extraInfo.curHessein) {
 			let countBase=0;
@@ -32,8 +33,10 @@ export default class Hessein extends StrokePlay {
 				curOrder.push(pg.playOrder);
 			});
 			this.sg.extraInfo.countBase = countBase - 1;
-			this.sg.extraInfo.Orders = {} as holeOrders;
-			this.sg.extraInfo.Orders[`H${this.sg.extraInfo.startHoleNo}`] = curOrder;
+			if (!this.sg.extraInfo.Orders) {
+				this.sg.extraInfo.Orders = {} as holeOrders;
+				this.sg.extraInfo.Orders[`H${this.sg.extraInfo.startHoleNo}`] = curOrder;	
+			}
 		}
 	}
 	protected updateResult(holeNo: number, scores: number[]): void {
@@ -53,7 +56,7 @@ export default class Hessein extends StrokePlay {
 		const carry = this.sg.carryOver ? this.sg.extraInfo.carry[`C${this.curHoleNo}`] as number : 1;
 		const countBase = this.sg.extraInfo.countBase as number;
 		const curOrder = this.sg.extraInfo.Orders[`H${this.curHoleNo}`] as number[];
-		// console.log('curOrder', cOrder, curOrder, this.curHoleNo, this.sg.extraInfo.Orders);
+		console.log('hessienCal', carry, this.curHoleNo, this.sg.extraInfo.carry);
 		let hsScore = 0;
 		let others = 0;
 		let hsIdx = 0; // second place index;
@@ -75,11 +78,11 @@ export default class Hessein extends StrokePlay {
 			this.sg.extraInfo.Orders[`H${holeNo}`] = [...curOrder];
 			return [0, 0, 0, 0];
 		} else {
-			const otPoint = diff * -1;
+			const otPoint = diff * -1 * carry;
 			// console.log('hessien check score', score);
 			const tmp = score.map((v, idx) => isplayed[idx] ? otPoint : 0);
 			// console.log('hessien check score 2', tmp, hsIdx);
-			tmp[hsIdx] = diff * countBase;
+			tmp[hsIdx] = diff * countBase * carry;
 			this.assignSecondPlace(score, isplayed, curOrder);
 			return tmp;
 		}
@@ -93,13 +96,14 @@ export default class Hessein extends StrokePlay {
 				playOrder: curOrder[idx],
 			}
 		});
-		tmp.sort((a, b) => a.score - b.score  + ( !a.isplayed ? 99 : (a.score === b.score) && (a.playOrder > b.playOrder) ? 1 : 0));
-		// console.log('after sort', tmp);
+		// tmp.sort((a, b) => a.score - b.score  + ( !a.isplayed ? 99 : (a.score === b.score) && (a.playOrder > b.playOrder) ? 1 : 0));
+		tmp.sort((a, b) => a.score - b.score);
+		// console.log('assignSecondPlace', tmp);
 		const cOrder = [...curOrder];
 		tmp.forEach((a, idx) => {
 			cOrder[a.index] = idx + 1;
 		});
-		// console.log('assignSecondPlace', tmp, curOrder);
+		console.log('assignSecondPlace', tmp, curOrder, cOrder);
 		let holeNo = this.curHoleNo < 18 ? this.curHoleNo + 1 : 1; 
 		this.sg.extraInfo.Orders[`H${holeNo}`] = cOrder;
 		// console.log('assignSecondPlace end', this.sg.extraInfo.Orders);	

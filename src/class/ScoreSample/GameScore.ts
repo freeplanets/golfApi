@@ -1,7 +1,9 @@
 import { scoreLine, scoresData } from "../../function/func.interface";
+import { IScoreSample } from "../class.if";
 
-export default class GameScore {
+export default class GameScore implements IScoreSample {
 	private data:scoresData;
+	public gameForm:null;
 	private rgl = new RegExp('player[0-9]');
 	constructor(gameid = '' ) {
 		this.data = {
@@ -10,6 +12,12 @@ export default class GameScore {
 			back:[],
 			total:[],
 		}
+	}
+	getData() {
+		return this.data;
+	}
+	get hasData(): boolean {
+		return this.data.front[0].f1 !== '';
 	}
 	assignData(dta:string[]){
 		let title= dta[0];

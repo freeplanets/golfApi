@@ -4,7 +4,7 @@ import { AppModule } from './app.module';
 import supertest from 'supertest';
 //import * as request from 'supertest';
 import checkInDataJson from './test.data';
-import { DynamooseModule } from 'nestjs-dynamoose';
+
 describe('App e2e test', () => {
 	let app: INestApplication;
 	let games = { getData: () => checkInDataJson };

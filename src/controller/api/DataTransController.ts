@@ -18,6 +18,7 @@ import { commonRes } from "../../models/if";
 import EncDecString from "../../function/EncDecString";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
+import { gameStatus } from "../../models/enum";
 
 @ApiTags('Api')
 @Controller('ksapi')
@@ -143,6 +144,7 @@ export default class DataTransController {
 			if (data.event && data.event.name) {
 				game.gameTitle = data.event.name;
 			}
+			game.status = gameStatus.WaitForCart;
 			game.playerDefaults = [];
 			game.players = data.players.map((itm, idx) => {
 				let holes:score[] = [];

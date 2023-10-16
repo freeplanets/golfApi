@@ -18,7 +18,9 @@ export default class LasVegasScoreCombine {
 		const newa = [0, 0, 0, 0];
 		let points = 0;
 		if (this.numTwo !== this.numOne) {
-			points = this.numTwo > this.numOne ? 1 : -1;
+			//points = this.numTwo > this.numOne ? 1 : -1;
+			points = this.numTwo - this.numOne;
+			console.log('LasVegas', points, this.numTwo, this.numOne);
 		}
 		this.idxOne.forEach((idx) => {
 			newa[idx] = points;
@@ -57,6 +59,7 @@ export default class LasVegasScoreCombine {
 	}
 	private checkOne() {
 		if (this.idxOne.some((v) => this.parDiff[v] < 0)) { // 有好於birdie的成績，對手翻牌
+			console.log('checkOne', this.parDiff , this.idxOne);
 			this.numTwo = this.bigerFirst(this.teamTwo[0], this.teamTwo[1]);
 			this.stopTwo = true;
 		}
@@ -74,11 +77,13 @@ export default class LasVegasScoreCombine {
 	private bigerFirst(a:number, b:number) {
 		let tmp=`${a}${b}`;
 		if (a < b) tmp = `${b}${a}`;
+		console.log('bigerFirst', tmp, a, b);
 		return parseInt(tmp, 10);
 	}
 	private smallFirst(a:number, b:number) {
 		let tmp=`${a}${b}`;
 		if (a > b) tmp = `${b}${a}`;
+		console.log('smallFirst', tmp, a, b);
 		return parseInt(tmp, 10);
 	}
 }

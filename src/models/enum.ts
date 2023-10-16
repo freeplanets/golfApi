@@ -53,11 +53,17 @@ export enum sideGameGroup {
 }
 export enum sideGameFormat {
 	individual = 'individual',
-	betterball = 'better ball', 
+	betterball = 'betterball', 
 	team = 'team',
 }
 
 export enum scoreZone {
 	front = 'front',
 	back = 'back',
+}
+
+export enum gameStatus {
+	WaitForCart,
+	OnGame,
+	Ended,
 }

@@ -8,6 +8,8 @@ import { ConditionComparisonComparatorName, queryReq, scoreLine, scoresData } fr
 import { Condition } from "dynamoose";
 import _scoreObject from "../models/game/_scoreObject";
 import GamesService from "../database/game/games.service";
+import ZonesService from "src/database/zone/zones.service";
+import { ConditionInitializer } from "dynamoose/dist/Condition";
 
 const jwt = new JwtService();
 const pfSite = 'union';
@@ -318,24 +320,21 @@ export function playerDefaultHcpCal(data:playerDefault[]){
 		return pd;
 	})
 }
-export async function getResultByGameID(token:string, gameid:string, dbservice:GamesService) {
-	const resp:commonResWithData<scoresData> = {
+export async function getResultByGameID(gameid:string, dbservice:GamesService, zoneService:ZonesService) {
+	const resp:commonResWithData<any> = {
 		errcode: ErrCode.OK,
-	} 
-	if (tokenCheck(token)) {
-		const f = await dbservice.query({gameid}, ['players', 'playerDefaults']);
-		if (f.count > 0) {
-			resp.data = createScoreData(gameid, f[0].players, f[0].playerDefaults);
-		} else {
-			resp.errcode = ErrCode.ITEM_NOT_FOUND;
-			resp.error = {
-				message: errorMsg('ITEM_NOT_FOUND'),
-			}
-		}
+	}
+	const f = await dbservice.findOne({gameid});
+	if (f) {
+		const cond:ConditionInitializer = new Condition("zoneid").in([f.outZone, f.inZone]);
+		const zones = await zoneService.query(cond,['zoneid', 'name']);
+		resp.data.game = f;
+		resp.data.zones = zones;
+		resp.data = createScoreData(gameid, f.players, f.playerDefaults);
 	} else {
-		resp.errcode = ErrCode.TOKEN_ERROR;
+		resp.errcode = ErrCode.ITEM_NOT_FOUND;
 		resp.error = {
-			message: errorMsg('TOKEN_ERROR'),
+			message: errorMsg('ITEM_NOT_FOUND'),
 		}
 	}
 	return resp;

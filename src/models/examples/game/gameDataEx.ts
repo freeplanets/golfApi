@@ -140,6 +140,7 @@ const gameDataExVal: games = {
   caddies: caddies,
   playerDefaults: [playerD],
   sideGames: [sideGameO],
+  status: 0,
 }
 const partialPlayer:Partial<player> = {
   playerName: playerO.playerName,

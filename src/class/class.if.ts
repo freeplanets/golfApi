@@ -28,6 +28,12 @@ export interface iScoreLine {
 	f3?:number;
 	f4?:number;
 }
+export interface IScoreSample {
+	assignData(dta:string[]):void;
+	getData():any;
+	gameForm:any;
+	readonly hasData:boolean;
+}
 /*
 export interface ISideGameScore {
 	calc(holeScore:holesPlayerScore):void;

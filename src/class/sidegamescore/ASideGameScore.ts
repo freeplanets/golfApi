@@ -58,7 +58,7 @@ export default abstract class ASideGameScore {
 			this.sg.extraInfo.gameDetail = gameDetail;
 			this.sg.extraInfo.group = group;
 			this.sg.extraInfo.isplayed = isplayed;
-			if (this.sg.carryOver) {
+			if (this.sg.carryOver || this.sg.sideGameName === sideGames.HESSEIN) {
 				this.sg.extraInfo.carry = this.createCarryOverData();
 			}
 		}
@@ -326,7 +326,7 @@ export default abstract class ASideGameScore {
 	private createCarryOverData() {
 		const tmp:AnyObject = {}
 		for(let i=1; i<19; i+=1 ) {
-			tmp[`C${i}`] = 0;
+			tmp[`C${i}`] = 1;
 		}
 		return tmp;
 	}
