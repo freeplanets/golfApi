@@ -28,6 +28,8 @@ export default class teamWinnerGetPoint {
 	}
 	private makeGroups(groups:string[], scores:number[]) {
 		let teamMarkX = '';
+		this.teamX = [];
+		this.teamY = [];
 		groups.forEach((v, idx) => {
 			if (this.teamX.length === 0){
 				teamMarkX = v;

@@ -303,12 +303,13 @@ export default class InCartController {
 		return resp;
 	}
 
-	@Get('getResult/:gameid')
+	@Get('getResult/:siteid/:gameid')
 	@ApiOperation({summary: '結果輸出/ getResult', description: '結果輸出/ getResult'})
+	@ApiParam({name:'siteid', description: '球場代號'})	
 	@ApiParam({name:'gameid', description: '來賓分組代號'})
-	@ApiResponse({})	
-	async getResult(@Param('gameid') gameid:string){
-		const resp = await getResultByGameID(gameid, this.gamesService, this.zonesService);
+	@ApiResponse({status:200, type: checkInResponse})
+	async getResult(@Param('siteid') siteid:string, @Param('gameid') gameid:string){
+		const resp = await getResultByGameID(siteid, gameid, this.gamesService, this.zonesService);
 		return resp;
 	}
 

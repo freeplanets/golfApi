@@ -20,22 +20,34 @@ export default class Sixes extends Nassau {
 	protected updateResult(holeNo: number, scores: number[]): void {
 		if (scores.length < 4) return;
 		const autoGroup = !!this.sg.extraInfo.autoGroup;
+		this.sg.extraInfo.group = [
+			['A', 'A', 'B', 'B'],
+			['A', 'B', 'A', 'B'],
+			['A', 'B', 'B', 'A']
+		]; 
+
 		let fIdx = 0;
 		if (holeNo <= 6) {
 			fIdx = 1;
+			/*
+			if (autoGroup) {
+				this.sg.extraInfo.group = ['A', 'A', 'B', 'B']; 
+			}
+			*/
+		} else if (holeNo <= 12) {
+			fIdx = 2;
+			/*
 			if (autoGroup) {
 				this.sg.extraInfo.group = ['A', 'B', 'A', 'B'];
 			}
-		} else if (holeNo <= 12) {
-			fIdx = 2;
-			if (autoGroup) {
-				this.sg.extraInfo.group = ['A', 'A', 'B', 'B'];
-			}
+			*/
 		} else {
 			fIdx = 3;
+			/*
 			if (autoGroup) {
 				this.sg.extraInfo.group = ['A', 'B', 'B', 'A'];
-			}			
+			}
+			*/
 		}
 		this.updateResultCal(fIdx, holeNo, scores);
 	}	

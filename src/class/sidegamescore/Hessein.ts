@@ -96,9 +96,9 @@ export default class Hessein extends StrokePlay {
 				playOrder: curOrder[idx],
 			}
 		});
-		// tmp.sort((a, b) => a.score - b.score  + ( !a.isplayed ? 99 : (a.score === b.score) && (a.playOrder > b.playOrder) ? 1 : 0));
-		tmp.sort((a, b) => a.score - b.score);
-		// console.log('assignSecondPlace', tmp);
+		console.log('assignSecondPlace before', tmp);
+		tmp.sort((a, b) => a.score - b.score  - ( !b.isplayed ? 99 : (a.score === b.score) && (a.playOrder < b.playOrder) ? 1 : 0));
+		// tmp.sort((a, b) => a.score - b.score);
 		const cOrder = [...curOrder];
 		tmp.forEach((a, idx) => {
 			cOrder[a.index] = idx + 1;

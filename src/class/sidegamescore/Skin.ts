@@ -50,7 +50,8 @@ export default class Skin extends StrokePlay {  //ASideGameScore {
 	protected ByBetterGame(score: number[]): number[] {
 		const group:string[] = this.sg.extraInfo.group;
 		const groups = this.betterGroup(group, score);
-		const carry = this.sg.carryOver ? this.sg.extraInfo.carry[`C${this.curHoleNo}`] : 1;
+		console.log('byBetterGame group', group, groups);
+		const carry = this.sg.carryOver ? this.sg.extraInfo.carry[`C${this.curHoleNo}`] : 0;
 		// 檢查分組最佳成績
 		group.forEach((g,idx) => {
 			let f = groups.find((itm) => itm.name === g);
@@ -64,9 +65,11 @@ export default class Skin extends StrokePlay {  //ASideGameScore {
 			}
 			if (f.betterScore > score[idx]) f.betterScore = score[idx]; 
 		});
-		const g1 = groups[0];
-		const g2 = groups[1];
-		if (g1.betterScore = g2.betterScore) {
+		// console.log('byBetterGame groups', groups);
+		//const g1 = groups[0];
+		//const g2 = groups[1];
+		const [g1, g2] = groups;
+		if (g1.betterScore === g2.betterScore) {
 			if (this.sg.carryOver) {
 				const tmpCarry = this.sg.extraInfo.carry[`C${this.curHoleNo}`];
 				const curCarry = tmpCarry ? tmpCarry : 0;
@@ -80,7 +83,9 @@ export default class Skin extends StrokePlay {  //ASideGameScore {
 			} else {
 				winTeam = g1.name;
 			}
-			return group.map((g) => g === winTeam ? 1 + carry : -1 - carry);
+			const ans = group.map((g) => g === winTeam ? 1 + carry : -1 - carry);
+			// console.log(ans, group, winTeam);
+			return ans;
 		}
 	}
 }

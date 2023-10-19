@@ -1,4 +1,4 @@
-import { sideGameFormat, sideGames } from "../../models/enum";
+import { sideGameFormat, sideGameGroup, sideGames } from "../../models/enum";
 import { scoreLine } from "../../function/func.interface";
 import { iScoreLine } from "../class.if";
 import StrokePlay from "./StrokePlay";
@@ -86,11 +86,25 @@ export default class Nassau extends StrokePlay {
 			subB = winner.calc(subB, isplayed);
 			subT = winner.calc(subT, isplayed);
 		} else {
-			const group:string[] = this.sg.extraInfo.group;
+			let group:string[] | string[][];
+			group = this.sg.extraInfo.group;
+			let group1:string[];
+			let group2:string[];
+			let group3:string[];
+			if (this.sg.sideGameName === sideGames.SIXES) {
+				group1 = group[0] as string[];
+				group2 = group[1] as string[];
+				group3 = group[2] as string[];
+			} else {
+				group1 = group as string[];
+				group2 = group as string[];
+				group3 = group as string[];
+			}
 			const teamWinner = new teamWinnerGetPoint();
-			subF = teamWinner.calc(subF, group);
-			subB = teamWinner.calc(subB, group);
-			subT = teamWinner.calc(subT, group);
+			console.log('updateResultCal group', holeNo, group);
+			subF = teamWinner.calc(subF, group1);
+			subB = teamWinner.calc(subB, group2);
+			subT = teamWinner.calc(subT, group3);
 		}
 		const wager = this.sg.wager; 
 		subF = subF.map((v) => v * wager);

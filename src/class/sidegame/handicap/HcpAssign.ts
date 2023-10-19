@@ -40,7 +40,7 @@ export default class HcpAssign {
 						pg.extraInfo.hcp = this.assignFromOrders(pg.hcp, f.holes);	
 					}
 					pg.extraInfo.order = this.holesOrder;
-					// console.log('check hcp', pg.playerName, pg.hcp, pg.extraInfo.hcp);					
+					console.log('check hcp', pg.playerName, pg.hcp, pg.extraInfo.hcp);					
 				}
 			}
 			return pg;

@@ -320,17 +320,18 @@ export function playerDefaultHcpCal(data:playerDefault[]){
 		return pd;
 	})
 }
-export async function getResultByGameID(gameid:string, dbservice:GamesService, zoneService:ZonesService) {
+export async function getResultByGameID(siteid:string, gameid:string, dbservice:GamesService, zoneService:ZonesService) {
 	const resp:commonResWithData<any> = {
 		errcode: ErrCode.OK,
 	}
 	const f = await dbservice.findOne({gameid});
 	if (f) {
-		const cond:ConditionInitializer = new Condition("zoneid").in([f.outZone, f.inZone]);
+		const cond:ConditionInitializer = new Condition("siteid").eq(siteid);
 		const zones = await zoneService.query(cond,['zoneid', 'name']);
+		resp.data = {};
+		resp.data.score = createScoreData(gameid, f.players, f.playerDefaults);
 		resp.data.game = f;
 		resp.data.zones = zones;
-		resp.data = createScoreData(gameid, f.players, f.playerDefaults);
 	} else {
 		resp.errcode = ErrCode.ITEM_NOT_FOUND;
 		resp.error = {

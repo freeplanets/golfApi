@@ -58,7 +58,9 @@ export default abstract class ASideGameScore {
 			this.sg.extraInfo.gameDetail = gameDetail;
 			this.sg.extraInfo.group = group;
 			this.sg.extraInfo.isplayed = isplayed;
-			if (this.sg.carryOver || this.sg.sideGameName === sideGames.HESSEIN) {
+			if (this.sg.sideGameName === sideGames.HESSEIN) {
+				this.sg.extraInfo.carry = this.createCarryOverData(1);
+			} else if (this.sg.carryOver) {
 				this.sg.extraInfo.carry = this.createCarryOverData();
 			}
 		}
@@ -166,7 +168,7 @@ export default abstract class ASideGameScore {
 		const group:string[] = this.sg.extraInfo.group;
 		const groups = this.betterGroup(group, score);
 		// 比對各組成績及結果
-		if (groups[0].betterScore < groups[1].betterScore) {
+		if (groups[0].betterScore > groups[1].betterScore) {
 			groups[0].points = (groups[1].betterScore - groups[0].betterScore);
 			groups[1].points = groups[0].points * -1;  
 		} else {
@@ -323,10 +325,10 @@ export default abstract class ASideGameScore {
 		// console.log('scoreDiff', total);
 		return total;
 	}
-	private createCarryOverData() {
+	private createCarryOverData(val=0) {
 		const tmp:AnyObject = {}
 		for(let i=1; i<19; i+=1 ) {
-			tmp[`C${i}`] = 1;
+			tmp[`C${i}`] = val;
 		}
 		return tmp;
 	}
