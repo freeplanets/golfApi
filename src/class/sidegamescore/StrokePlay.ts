@@ -1,6 +1,7 @@
 import { holesPlayerScore } from "../class.if";
 import ASideGameScore from "./ASideGameScore";
 
+
 /**
  * 比桿賽 (Stroke play)
 以18洞的總桿數扣除球員的差點計算。
@@ -13,6 +14,7 @@ export default class StrokePlay extends ASideGameScore {
 		holeScore.scores.forEach((player)=>{
 			if (player.gross>0) {
 				const f = this.sg.playerGameData.find((itm) => itm.playerName === player.playerName);
+				console.log(f.playerName, f.extraInfo.hcp);
 				if (f) {
 					let points = 0;
 					if (f.selected) {
@@ -24,7 +26,7 @@ export default class StrokePlay extends ASideGameScore {
 				}
 			}
 		});
-		console.log('strokeplay calc end', holeScore);
+		console.log('strokeplay calc end', holeScore, scores);
 		this.updateResult(holeScore.holeNo, scores);	
 	}
 }

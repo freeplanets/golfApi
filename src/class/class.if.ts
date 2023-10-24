@@ -34,6 +34,15 @@ export interface IScoreSample {
 	gameForm:any;
 	readonly hasData:boolean;
 }
+export interface IKeyVal {
+	Key?: string;
+	Val?: string | number;
+	Cond?: string;
+	Key2?: string;
+	Val2?: string | number;
+	CondOr?: string;
+	[key: string]: any;
+}
 /*
 export interface ISideGameScore {
 	calc(holeScore:holesPlayerScore):void;

@@ -1,6 +1,7 @@
 import { sideGame } from "../../database/db.interface";
 import { holesPlayerScore } from "../class.if";
-import ASideGameScore from "./ASideGameScore";
+// import ASideGameScore from "./ASideGameScore";
+import Stableford from "./StableFord";
 
 /**
  * 改良史特伯福分數(Modified Stableford)
@@ -12,7 +13,7 @@ import ASideGameScore from "./ASideGameScore";
 -1分—超過一桿
 -3分—超過兩桿或更多
  */
-export default class ModifiedStableford extends ASideGameScore {
+export default class ModifiedStableford extends Stableford {
 	constructor(sg:sideGame){
 		super(sg);
 		this.highWin = true;
@@ -22,6 +23,7 @@ export default class ModifiedStableford extends ASideGameScore {
 		holeScore.scores.forEach((player)=>{
 			if (player.gross>0) {
 				const f = this.sg.playerGameData.find((itm) => itm.playerName === player.playerName);
+				console.log('info:', f.playerName, holeScore.holeNo, f.extraInfo);
 				if (f) {
 					let points = 0;
 					if (f.selected) {
@@ -53,6 +55,7 @@ export default class ModifiedStableford extends ASideGameScore {
 				}
 			}
 		});
+		console.log('ModifiedStableford before updateResult', holeScore.holeNo, scores);
 		this.updateResult(holeScore.holeNo, scores);
-	}	
+	}
 }

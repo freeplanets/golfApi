@@ -39,7 +39,7 @@ export default class LasVegas extends Hessein {
 		const curOrder = this.sg.extraInfo.Orders[`H${this.curHoleNo}`] as number[];
 		const lvsc = new LasVegasScoreCombine(score, this.partDiff, curOrder);
 		const newa = lvsc.calc();
-		this.sg.extraInfo.Orders[`H${this.curHoleNo + 1}`] = lvsc.newOrders();
+		this.sg.extraInfo.Orders[`H${this.curHoleNo + 1}`] = lvsc.newOrders(curOrder);
 		console.log('LasVegas curOrder', this.curHoleNo, curOrder, this.sg.extraInfo.Orders);
 		return newa;
 		/*

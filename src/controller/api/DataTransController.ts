@@ -39,16 +39,16 @@ export default class DataTransController {
 		const resp:commonRes = {
 			errcode: ErrCode.OK,
 		}
-		console.log('body', body);
+		// console.log('body', body);
 		//console.log('siteid:', siteid, process.env.API_KEY);
 		const eds:EncDecString = new EncDecString(process.env.API_KEY);
 		const { siteid } = JSON.parse(eds.Decrypted(apiKey));
-		console.log('siteid:', siteid, apiKey);
+		// console.log('siteid:', siteid, apiKey);
 		if (siteid) {
 			try {
-				console.log('createGames start:', new Date().getTime());
+				// console.log('createGames start:', new Date().getTime());
 				await this.createGames(siteid, body);
-				console.log('createGames end:', new Date().getTime());
+				// console.log('createGames end:', new Date().getTime());
 				return;
 			} catch (e) {
 				resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;

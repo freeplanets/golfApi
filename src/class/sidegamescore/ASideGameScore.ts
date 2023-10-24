@@ -167,13 +167,18 @@ export default abstract class ASideGameScore {
 	protected ByBetterGame(score:number[]) {
 		const group:string[] = this.sg.extraInfo.group;
 		const groups = this.betterGroup(group, score);
-		// 比對各組成績及結果
+		// 比對各組成績及結果 low is better and win points
+		const diff = Math.abs(groups[1].betterScore - groups[0].betterScore);
 		if (groups[0].betterScore > groups[1].betterScore) {
-			groups[0].points = (groups[1].betterScore - groups[0].betterScore);
-			groups[1].points = groups[0].points * -1;  
+				groups[0].points = diff * -1;
+				groups[1].points = diff;
+			// groups[0].points = (groups[1].betterScore - groups[0].betterScore);
+			// groups[1].points = groups[0].points * -1;  
 		} else {
-			groups[0].points = (groups[0].betterScore - groups[1].betterScore);
-			groups[1].points = groups[0].points * -1;				
+			groups[0].points = diff;
+			groups[1].points = diff * -1;			
+			// groups[0].points = (groups[0].betterScore - groups[1].betterScore);
+			// groups[1].points = groups[0].points * -1;				
 		}
 		// 結果寫回各人成績
 		console.log('groups:', groups);

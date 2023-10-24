@@ -31,6 +31,7 @@ import SideGameScoreFactory from "../../class/sidegamescore/SideGameScoreFactory
 import SideGameRegister from "../../class/sidegame/SideGameRegister";
 import { gameStatus, sideGames } from "../../models/enum";
 import SideGamesService from "../../database/sidegame/sidegames.service";
+import MyDate from "../../class/common/MyDate";
 
 @ApiBearerAuth()
 @ApiTags('Cart')
@@ -325,25 +326,29 @@ export default class InCartController {
 		const user = tokenCheck(token);
 		if (user) {
 			chk.siteid = user.siteid;
-			const ts = this.todayStartTs();
+			const ts = MyDate.getTime(new Date().toLocaleDateString());
 			let cond = new Condition({siteid: user.siteid}).where('esttimatedStartTime').gt(ts).and().where('endTime').eq(0);
 			const game = await this.gamesService.query(cond, [], 'siteidesttimatedstarttimeGlobalIndex');
 			chk.gameCount = game.count;
 			chk.caddies = [];
 			if (game.count > 0) {
-				game.forEach((g,idx) => {
+				game.every((g,idx) => {
 					console.log('game:', g.gameid, g.carts);
-					const fIdx = g.caddies.findIndex((itm) => itm.caddieid === caddieid);
-					if (fIdx > -1){
-						console.log('fIdx', fIdx, idx, caddieid, g.caddies);
-						game[idx].playerDefaults = game[idx].playerDefaults.map((p) => {
-							p.betterballGroup = '';
-							p.selected = true;
-							p.playOrder = '';
-							return p;
-						}) 
-						resp.data.game = game[idx];
+					if (g.caddies && g.caddies.length > 0) {
+						const fIdx = g.caddies.findIndex((itm) => itm.caddieid === caddieid);
+						if (fIdx > -1){
+							console.log('fIdx', fIdx, idx, caddieid, g.caddies);
+							game[idx].playerDefaults = game[idx].playerDefaults.map((p) => {
+								p.betterballGroup = '';
+								p.selected = true;
+								p.playOrder = '';
+								return p;
+							}) 
+							resp.data.game = game[idx];
+							return false;
+						}
 					}
+					return true;
 				})
 			}
 			if (!resp.data.game) {
@@ -450,12 +455,7 @@ export default class InCartController {
 		}
 		return resp;
 	}
-	todayStartTs() {
-		const today = new Date().toLocaleDateString('zh-TW');
-		const tsms = new Date(today).getTime();
-		console.log('todayStartTs', today, tsms);
-		return tsms;
-	}
+
 	private newline(f0='', f1='', f2='', f3='', f4='', f5= ''):scoreLine {
 		const ans:scoreLine = { f0, f1, f2, f3, f4 };
 		if (f5) ans.f5 = f5;

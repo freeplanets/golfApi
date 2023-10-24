@@ -367,6 +367,14 @@ export function createScoreData(gameid:string, players:player[], playerDefaults:
 	})
 	return data;
 }
+/*
+export function getTsWithTimeZone(time:string | number = '', timeZone = 'zh-TW') {
+	const d = new Date(time).toLocaleString(timeZone);
+	const tsms = new Date(d).getTime();
+	console.log('todayStartTs', d, tsms);
+	return tsms;
+}
+*/
 function assignLineData(arr:scoreLine[], key:string, idx:number, value:number){
 	const f = arr.find((itm) => itm.f0 === key);
 	if (f) {

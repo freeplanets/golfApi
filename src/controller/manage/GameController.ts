@@ -5,7 +5,7 @@ import GamesService from "../../database/game/games.service";
 import gameData from "../../models/game/gameData";
 import { assignCartEx, gamePartialReqEx, gameReqEx, getGamesReqEx } from "../../models/examples/game/gameDataEx";
 import { carts, gameKey, games, player, score, teeObject } from "../../database/db.interface";
-import { createTableData, deleteTableData, getTableData, hashKey, tokenCheck, updateTableData } from "../../function/Commands";
+import { createTableData, deleteTableData, getTableData, hashKey, removeUnderLineData, tokenCheck, updateTableData } from "../../function/Commands";
 import gamePartialData from "../../models/game/gamePartialData";
 import gameResponse from "../../models/game/gameResponse";
 import commonResponse from "../../models/common/commonResponse";
@@ -20,6 +20,7 @@ import ZonesService from "../../database/zone/zones.service";
 import CoursesService from "../../database/course/courses.service";
 import gamesInfoResponse from "../../models/game/gamesInfoResponse";
 import { gameStatus } from "../../models/enum";
+import MyDate from "../../class/common/MyDate";
 
 @ApiBearerAuth()
 @ApiTags('Manage')
@@ -37,7 +38,7 @@ export default class GameController {
 	@ApiBody({description:'編組資料', type: gameData, examples: gameReqEx})
 	@ApiResponse({status: 200})
 	async add(@Body() body:games, @Headers('WWW-AUTH') token:Record<string, string>) {
-		body.gameid = hashKey();
+		// body.gameid = hashKey();
 		body = await this.gameDataCheck(body);
 		const resp = await createTableData(String(token), this.gamesService, body);
 		return resp;
@@ -163,8 +164,13 @@ export default class GameController {
 					message: errorMsg('MISS_PARAMETER', missKey),
 				}				
 			} else {
-				const startTime = new Date(`${siteDate.queryDate} 00:00:00`).getTime();
+				/*
+				const timegap = 2*60*60*1000;
+				const startTime = new Date(`${siteDate.queryDate} 00:00:00`).getTime() - timegap;
 				const endTime = new Date(`${siteDate.queryDate} 23:59:59`).getTime();
+				*/
+				const startTime = MyDate.getTime(`${siteDate.queryDate} 00:00:00`);
+				const endTime = MyDate.getTime(`${siteDate.queryDate} 23:59:59`);
 				console.log('queryGame', siteDate, startTime, endTime);
 				const cond = new Condition({siteid: siteDate.siteid}).where('esttimatedStartTime').between(startTime, endTime);
 				if (typeof siteDate.status !== 'undefined') {
@@ -183,10 +189,29 @@ export default class GameController {
 	}
 	async gameDataCheck(game:games):Promise<games> {
 		// if (!game.gameid) game.gameid = hashKey();
-		let isHolesHasData = false;
-		if ((!game.playerDefaults || game.playerDefaults.length === 0) && game.players) {
-			// if (!game.players) game.players = [];
-			// if (game.players && game.players.length > 0) {
+		console.log('gameDataCheck:', game);
+		if (game.gameid) {
+			game = removeUnderLineData(game);
+			const tmp = await this.gamesService.findOne({gameid: game.gameid});
+			if (tmp) {
+				Object.keys(game).forEach((key) => {
+					tmp[key] = game[key];
+				});
+				game = tmp;
+				delete (game as any).createdAt;
+				delete (game as any).updatedAt;	
+			}
+			console.log('gameDataCheck:', game);
+			let isHolesHasData = false;
+			let doAddPD = false;
+			if (game.players) {
+				if (!game.playerDefaults) {
+					doAddPD = true;
+				} else if (game.players.length !== game.playerDefaults.length) {
+					doAddPD = true;
+				}
+			}
+			if (doAddPD) {
 				isHolesHasData = true;
 				game.playerDefaults = game.players.map((player) => {
 					if (isHolesHasData) {
@@ -200,7 +225,7 @@ export default class GameController {
 						hcpRound: true,
 					};
 				});
-			//}
+			}
 			if (!isHolesHasData) {
 				const course = await this.coursesService.findOne({courseid: game.courseid});
 				const outZone = await this.zonesService.findOne({zoneid: game.outZone});
@@ -246,7 +271,9 @@ export default class GameController {
 			}
 			if (game.carts && game.carts.length > 0) {
 				game.status = gameStatus.OnGame;
-			}
+			}			
+		} else {
+			game.gameid = hashKey();
 		}
 		return game;
 	}

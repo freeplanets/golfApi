@@ -30,14 +30,15 @@ export default class LasVegasScoreCombine {
 		});
 		return newa;
 	}
-	newOrders() {
+	newOrders(curOrder:number[]) {
 		const tmp = this.scores.map((score, index) => {
 			return {
 				score,
 				index,
+				orderIdx: curOrder[index]
 			}
 		});
-		tmp.sort((a, b) => a.score - b.score);
+		tmp.sort((a, b) => a.score - b.score + (a.score === b.score ? ( a.orderIdx > b.orderIdx ? 1 : -1 ) : 0));
 		console.log('newOrders', tmp);
 		const orders = [0, 0, 0, 0];
 		tmp.forEach((itm, idx) => {
@@ -56,6 +57,8 @@ export default class LasVegasScoreCombine {
 				this.idxTwo.push(idx);
 			}
 		});
+		console.log('team', this.teamOne, this.teamTwo, 'idx', this.idxOne, this.idxTwo);
+		console.log('parDiff', this.parDiff);
 	}
 	private checkOne() {
 		if (this.idxOne.some((v) => this.parDiff[v] < 0)) { // 有好於birdie的成績，對手翻牌
@@ -67,12 +70,14 @@ export default class LasVegasScoreCombine {
 		else this.numOne = this.smallFirst(this.teamOne[0], this.teamOne[1]);
 	}
 	private checkTwo() {
-		if (this.stopTwo) return;
+		// if (this.stopTwo) return;
 		if (this.idxTwo.some((v) => this.parDiff[v] < 0)) { // 有好於birdie的成績，對手翻牌
 			this.numOne = this.bigerFirst(this.teamOne[0], this.teamOne[1]);
 		}
 		if (this.teamTwo.some((v) => v > 9)) this.numTwo = this.bigerFirst(this.teamTwo[0], this.teamTwo[1]);
-		else this.numTwo = this.smallFirst(this.teamTwo[0], this.teamTwo[1]);
+		else {
+			if (!this.stopTwo) this.numTwo = this.smallFirst(this.teamTwo[0], this.teamTwo[1])
+		};
 	}
 	private bigerFirst(a:number, b:number) {
 		let tmp=`${a}${b}`;
