@@ -84,27 +84,48 @@ export default class HcpAssign {
 		this.sideGameHolesOrder(holes);
 		const hcps = [...this.sampleHcps];
 		// console.log('assignFromHardest', hcp, hcps);
-		let hardstart = 1;
+		let hardstart:number;
 		let ihcp = parseInt(hcp, 10);
-		for (let i=0, n=hcps.length; i <n; i+=1) {
-			if (ihcp === 0) break;
-			// console.log(i, ihcp, hardstart);
-			const founds = holes.filter((itm) => itm.handicap === hardstart);
-			// console.log('founds', founds.map((f) => f.holeNo));
-			founds.every((score) => {
-				if (ihcp > 0) {
-					hcps[score.holeNo-1] -= 1;
-					ihcp -= 1;
-				} else {
+		if (ihcp > 0) {
+			hardstart = 1;
+			for (let i=0, n=hcps.length; i <n; i+=1) {
+				if (ihcp === 0) break;
+				// console.log(i, ihcp, hardstart);
+				const founds = holes.filter((itm) => itm.handicap === hardstart);
+				// console.log('founds', founds.map((f) => f.holeNo));
+				founds.every((score) => {
+					//if (ihcp > 0) {
+						hcps[score.holeNo-1] -= 1;
+						ihcp -= 1;
+					//} else {
+					//	hcps[score.holeNo-1] += 1;
+					//	ihcp += 1;
+					//}
+					// console.log('holeNo', score.holeNo, ihcp);
+					if (ihcp === 0) return false;
+					return true;
+				})
+				hardstart+=1;
+				if (hardstart>9) hardstart = 1;
+			}	
+		} else {
+			hardstart = 9;
+			for (let i=0, n=hcps.length; i <n; i+=1) {
+				if (ihcp === 0) break;
+				// console.log(i, ihcp, hardstart);
+				const founds = holes.filter((itm) => itm.handicap === hardstart);
+				// console.log('founds', founds.map((f) => f.holeNo));
+				const reversed = founds.reverse();
+				reversed.every((score) => {
 					hcps[score.holeNo-1] += 1;
 					ihcp += 1;
-				}
-				// console.log('holeNo', score.holeNo, ihcp);
-				if (ihcp === 0) return false;
-				return true;
-			})
-			hardstart+=1;
-			if (hardstart>9) hardstart = 1;
+					// console.log('holeNo', score.holeNo, ihcp);
+					if (ihcp === 0) return false;
+					return true;
+				})
+				hardstart-=1;
+				if (hardstart < 1) hardstart = 9;
+			}
 		}
 		return hcps;
 	}

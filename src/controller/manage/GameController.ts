@@ -15,12 +15,13 @@ import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
 import assignCartRequest from "../../models/game/assignCartRequest";
 import CartsService from "../../database/cart/carts.service";
-import { CartStatus } from "../../function/func.interface";
+import { CartStatus, DeviceStatus } from "../../function/func.interface";
 import ZonesService from "../../database/zone/zones.service";
 import CoursesService from "../../database/course/courses.service";
 import gamesInfoResponse from "../../models/game/gamesInfoResponse";
 import { gameStatus } from "../../models/enum";
 import MyDate from "../../class/common/MyDate";
+import DevicesService from "../../database/device/devices.service";
 
 @ApiBearerAuth()
 @ApiTags('Manage')
@@ -31,6 +32,7 @@ export default class GameController {
 		private readonly cartsService:CartsService,
 		private readonly zonesService:ZonesService,
 		private readonly coursesService:CoursesService,
+		private readonly devicesService:DevicesService,
 	){}
 
 	@Put('game')
@@ -173,7 +175,7 @@ export default class GameController {
 				const endTime = MyDate.getTime(`${siteDate.queryDate} 23:59:59`);
 				console.log('queryGame', siteDate, startTime, endTime);
 				const cond = new Condition({siteid: siteDate.siteid}).where('esttimatedStartTime').between(startTime, endTime);
-				if (typeof siteDate.status !== 'undefined') {
+				if (typeof siteDate.status === 'number') {
 					cond.and().where('status').eq(siteDate.status);
 				}
 				resp.data = await this.gamesService.query(cond);
@@ -206,7 +208,7 @@ export default class GameController {
 			let doAddPD = false;
 			if (game.players) {
 				if (!game.playerDefaults) {
-					doAddPD = true;
+					if (!game.players[0].holes || game.players[0].holes.length === 0)	doAddPD = true;
 				} else if (game.players.length !== game.playerDefaults.length) {
 					doAddPD = true;
 				}
@@ -256,7 +258,7 @@ export default class GameController {
 					const tmp:player = {
 						playerName: itm.playerName,
 						tee: ctee,
-						hcp: '0',
+						hcp: itm.hcp ? itm.hcp : '0',
 						playerOrder: idx,
 						gross: 0,
 						holes,
@@ -271,6 +273,15 @@ export default class GameController {
 			}
 			if (game.carts && game.carts.length > 0) {
 				game.status = gameStatus.OnGame;
+				game.carts.forEach(async (cartid) => {
+					this.cartsService.update({cartid}, {status: CartStatus.onduty});
+					const cart = await this.cartsService.findOne({cartid});
+					if (cart) {
+						if (cart.deviceid) {
+							this.devicesService.update({deviceid:cart.deviceid}, {status: DeviceStatus.onduty});
+						}
+					}
+				})
 			}			
 		} else {
 			game.gameid = hashKey();

@@ -20,7 +20,10 @@ export default class Skin extends StrokePlay {  //ASideGameScore {
 		super.updateResult(holeNo, scores);
 	}
 	protected ByIndividual(score: number[], isplayed: boolean[]): number[] {
-		const newScore = score.map((v,idx) => isplayed[idx] ? v : 0);
+		const newScore = []
+		score.forEach((v,idx) => {
+			if (isplayed[idx])  newScore.push(v);
+		});
 		const players = isplayed.filter((p) => p).length;  // 參加人數
 		const totalScore = players - 1; // 每同分數 ＝ 參加人數 - 1
 		const newa = [ 0, 0, 0, 0];
@@ -31,18 +34,22 @@ export default class Skin extends StrokePlay {  //ASideGameScore {
 			const carry = this.sg.carryOver ? this.sg.extraInfo.carry[`C${this.curHoleNo}`] : 0;
 			console.log('ByIndividual carry', this.sg.sideGameName, this.curHoleNo, carry);
 			score.forEach((v,idx) => {
-				if (v == min) {
-					newa[idx] = totalScore + carry * totalScore;
+				if (isplayed[idx]){
+					if (v == min) {
+						newa[idx] = totalScore + carry * totalScore;
+					} else {
+						newa[idx] = -1 - carry;
+					}
 				} else {
-					newa[idx] = -1 - carry;
+					newa[idx] = 0;
 				}
 			})
  		} else {
-			if (this.sg.carryOver) {
+			if (this.sg.carryOver && this.curHoleNo < 18) {
 				const tmpCarry = this.sg.extraInfo.carry[`C${this.curHoleNo}`];
 				const curCarry = tmpCarry ? tmpCarry : 0;
 				this.sg.extraInfo.carry[`C${this.curHoleNo+1}`] += 1 + curCarry;
-				console.log('ByIndividual add carry', this.sg.sideGameName, this.sg.extraInfo.carry[`C${this.curHoleNo+1}`]);
+				console.log('ByIndividual add carry', this.sg.sideGameName, this.curHoleNo, this.sg.extraInfo.carry[`C${this.curHoleNo+1}`]);
 			}
 		}
 		return newa;		
@@ -70,7 +77,7 @@ export default class Skin extends StrokePlay {  //ASideGameScore {
 		//const g2 = groups[1];
 		const [g1, g2] = groups;
 		if (g1.betterScore === g2.betterScore) {
-			if (this.sg.carryOver) {
+			if (this.sg.carryOver && this.curHoleNo < 18) {
 				const tmpCarry = this.sg.extraInfo.carry[`C${this.curHoleNo}`];
 				const curCarry = tmpCarry ? tmpCarry : 0;
 				this.sg.extraInfo.carry[`C${this.curHoleNo+1}`] += 1 + curCarry;

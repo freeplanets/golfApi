@@ -14,7 +14,7 @@ export default class StrokePlay extends ASideGameScore {
 		holeScore.scores.forEach((player)=>{
 			if (player.gross>0) {
 				const f = this.sg.playerGameData.find((itm) => itm.playerName === player.playerName);
-				console.log(f.playerName, f.extraInfo.hcp);
+				// console.log(f.playerName, f.extraInfo.hcp, f.selected);
 				if (f) {
 					let points = 0;
 					if (f.selected) {

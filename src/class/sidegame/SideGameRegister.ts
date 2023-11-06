@@ -113,7 +113,7 @@ export default class SideGameRegister {
 				if (!curSG) return false;
 				this.reCalc(game.stepInZone, game.stepInFairway, [ curSG ], game.players);
 				console.log('check5', new Date().toLocaleString(), key);
-				// console.log('sidegameData:', JSON.stringify(game.sideGames));
+				console.log('sidegameData:', JSON.stringify(curSG));
 				if (!curSG.gameid) curSG.gameid = this.gameid;
 				switch(this.action) {
 					case actionValue.NEW:

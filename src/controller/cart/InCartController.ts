@@ -19,7 +19,7 @@ import playerDefaultRequest from "../../models/game/playerDefaultsRequest";
 import ZonesService from "../../database/zone/zones.service";
 import checkInResponse from "../../models/game/checkInResponse";
 import { playerDefaultEx } from "../../models/examples/game/playerDefaultEx";
-import { CartStatus, scoreLine, scoresData, sideGameRes } from "../../function/func.interface";
+import { CartStatus, DeviceStatus, scoreLine, scoresData, sideGameRes } from "../../function/func.interface";
 import DevicesService from "../../database/device/devices.service";
 import _mapLatLong from "../../models/common/_mapLatLong";
 import { locationEx } from "../../models/examples/device/deviceEx";
@@ -299,6 +299,19 @@ export default class InCartController {
 		const data:Partial<games> = {
 			endTime: parseInt(endTime, 10),
 			status: gameStatus.Ended,
+		}
+		const cartInGame = await this.gamesService.query({gameid},['carts']);
+		if (cartInGame.count > 0) {
+			const carts = cartInGame[0].carts;
+			carts.forEach(async (cartid) => {
+				this.cartService.update({cartid}, {status: CartStatus.idle});
+				const cart = await this.cartService.findOne({cartid});
+				if (cart) {
+					if (cart.deviceid) {
+						this.devicesService.update({deviceid:cart.deviceid}, {status: DeviceStatus.idle});
+					}
+				}				
+			})
 		}
 		const resp = await updateTableData(String(token), this.gamesService, data, {gameid});
 		return resp;
