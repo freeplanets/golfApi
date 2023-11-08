@@ -10,7 +10,7 @@ import gamePartialData from "../../models/game/gamePartialData";
 import gameResponse from "../../models/game/gameResponse";
 import commonResponse from "../../models/common/commonResponse";
 import siteDateRequest from "../../models/game/siteDateRequest";
-import siteDateReq, { commonResWithData, gamesInfo } from "../../models/if";
+import  { commonResWithData, siteDateReq, gamesInfo } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
 import assignCartRequest from "../../models/game/assignCartRequest";
@@ -22,6 +22,9 @@ import gamesInfoResponse from "../../models/game/gamesInfoResponse";
 import { gameStatus } from "../../models/enum";
 import MyDate from "../../class/common/MyDate";
 import DevicesService from "../../database/device/devices.service";
+import gameResultRequest from "../../models/game/gameResultRequest";
+import { gameRequestReqEx } from "../../models/examples/game/gameResult";
+
 
 @ApiBearerAuth()
 @ApiTags('Manage')
@@ -90,6 +93,13 @@ export default class GameController {
 	async query(@Body() body:siteDateReq, @Headers('WWW-AUTH') token:Record<string, string>){
 		// console.log('query game', token);
 		const resp = await this.queryGamesByDate(String(token), body);
+		return resp;
+	}
+	@Post('gameResult')
+	@ApiOperation({summary: '成績查詢', description: '成績查詢'})
+	@ApiBody({description: '查詢參數', type: gameResultRequest, examples: gameRequestReqEx})
+	async GameResult(@Body() body:gameResultRequest, @Headers('WWW-AUTH') token:Record<string, string>){
+		const resp = await this.queryGameResult(String(token), body);
 		return resp;
 	}
 
@@ -189,6 +199,47 @@ export default class GameController {
 		}
 		return resp;
 	}
+	async queryGameResult(token:string, filter:gameResultRequest):Promise<commonResWithData<games[]>> {
+		let resp:commonResWithData<games[]> = {
+			errcode: ErrCode.OK,		
+		}		
+		const user = tokenCheck(token);
+		if (user) {
+			/*
+			const timegap = 2*60*60*1000;
+			const startTime = new Date(`${siteDate.queryDate} 00:00:00`).getTime() - timegap;
+			const endTime = new Date(`${siteDate.queryDate} 23:59:59`).getTime();
+			*/
+			const startTime = MyDate.getTime(`${filter.dateStart} 00:00:00`);
+			const endTime = MyDate.getTime(`${filter.dateEnd} 23:59:59`);
+			const cond = new Condition({siteid: filter.siteid}).where('esttimatedStartTime').between(startTime, endTime);
+			if (filter.gameTitle) {
+				cond.and().where('gameTitle').eq(filter.gameTitle);
+			}
+			// if (filter.playerName) {
+			// 	cond.and().where('players').contains({playerName: filter.playerName});
+			// }			
+			// resp.data = await this.gamesService.query(cond);
+			const games = await this.gamesService.query(cond);
+			let res:games[] = [];
+			if (games.count > 0 && filter.playerName) {
+				games.forEach((game) => {
+					const f = game.players.find((player) => player.playerName === filter.playerName);
+					if (f) res.push(game);
+				})
+			} else {
+				res = games;
+			}
+			resp.data = res;
+		} else {
+			resp.errcode = ErrCode.TOKEN_ERROR,
+			resp.error = {
+				message: errorMsg('TOKEN_ERROR'),
+				extra: {token}
+			}		
+		}
+		return resp;
+	}	
 	async gameDataCheck(game:games):Promise<games> {
 		// if (!game.gameid) game.gameid = hashKey();
 		console.log('gameDataCheck:', game);

@@ -1,7 +1,7 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
 import { caddie, games, player, playerDefault, playerGameData, score, sideGame, teeObject } from "../../../database/db.interface";
 import { HcpType, sideGameFormat, sideGameGroup, sideGames } from "../../../models/enum";
-import siteDateReq, { commonResWithData } from "../../../models/if";
+import { siteDateReq, commonResWithData } from "../../../models/if";
 import { scoreLine } from "../../../function/func.interface";
 
 const caddies:caddie[] = [

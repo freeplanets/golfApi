@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsDateString } from "class-validator";
-import siteDateReq from "../if";
+import { siteDateReq } from "../if";
 
 export default class siteDateRequest implements siteDateReq {
 	@ApiProperty({

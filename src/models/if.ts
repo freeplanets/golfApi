@@ -22,10 +22,19 @@ export interface commonResWithData<D> extends commonRes {
 }
 
 // for game search
-export default interface siteDateReq {
-  siteid: string,
-  queryDate: string,
-  status?: number,
+export interface siteDateReq {
+  siteid: string;
+  queryDate: string;
+  status?: number;
+}
+
+// for game result search
+export interface gameResultReq {
+  siteid:string;
+  dateStart:string;
+  dateEnd:string;
+  playerName?:string;
+  gameTitle?:string;
 }
 
 export interface positonReq {
