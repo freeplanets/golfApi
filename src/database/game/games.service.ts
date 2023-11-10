@@ -1,12 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import defaultService from "../common/defaultService";
-import { gameKey, games, playerDefault, playerGameData, score, sideGame } from "../db.interface";
+import { gameKey, games, playerDefault, playerGameData, score } from "../db.interface";
 import { InjectModel, Model } from "nestjs-dynamoose";
 import _partialPlayerObject from "../../models/game/_partialPlayerObject";
 import { HcpType } from "../../models/enum";
-import SideGameCreator from "../../class/sidegame/SideGameCreator";
-import { scoreLine, scoresData, sideGameRes } from "../../function/func.interface";
-import { createScoreData, removeUnderLineData } from "../../function/Commands";
+import { scoreLine, scoresData } from "../../function/func.interface";
+import { createScoreData } from "../../function/Commands";
 
 @Injectable()
 export default class GamesService extends defaultService<games, gameKey> {

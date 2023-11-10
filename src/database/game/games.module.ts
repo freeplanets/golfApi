@@ -9,7 +9,9 @@ import GameController from "../../controller/manage/GameController";
 import CartsModule from "../cart/carts.module";
 import InCartController from "../../controller/cart/InCartController";
 import DevicesModule from "../device/devices.module";
-import ScoresSchema from "./scores.schema";
+// import ScoresSchema from "./scores.schema";
+import PlayerResult from "../playerResult/playerResult.schema";
+import PlayerResultService from "../playerResult/playerResult.service";
 
 @Module({
 	imports: [
@@ -26,16 +28,16 @@ import ScoresSchema from "./scores.schema";
 				}
 			},
 			{
-				name: 'Scores',
-				schema: ScoresSchema,
-				options: {
+				name: 'PlayerResult',
+				schema: PlayerResult,
+				options : {
 					throughput: 'ON_DEMAND',
 				}
 			}
 		])
 	],
 	controllers: [DataTransController, GameController, InCartController],
-	providers: [GamesService],
-	exports: [GamesService],
+	providers: [GamesService, PlayerResultService],
+	exports: [GamesService, PlayerResultService],
 })
 export default class GamesModule {}

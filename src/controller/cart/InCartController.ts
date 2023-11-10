@@ -3,8 +3,8 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } 
 import { Condition } from "dynamoose";
 import GamesService from "../../database/game/games.service";
 import CartsService from "../../database/cart/carts.service";
-import { createScoreData, getResultByGameID, playerDefaultHcpCal, removeUnderLineData, tokenCheck, updateTableData } from "../../function/Commands";
-import { cartKey, carts, devices, gameKey, games, mapLatLong, playerDefault, sideGame, sideGameKey } from "../../database/db.interface";
+import { createScoreData, getResultByGameID, hashKey, playerDefaultHcpCal, removeUnderLineData, tokenCheck, updateTableData } from "../../function/Commands";
+import { cartKey, carts, devices, gameKey, games, mapLatLong, player, playerDefault, playerResult, sideGame, sideGameKey, siteKey } from "../../database/db.interface";
 import { AnyObject, commonRes, commonResWithData, locReq, positonReq } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
@@ -32,6 +32,7 @@ import SideGameRegister from "../../class/sidegame/SideGameRegister";
 import { gameStatus, sideGames } from "../../models/enum";
 import SideGamesService from "../../database/sidegame/sidegames.service";
 import MyDate from "../../class/common/MyDate";
+import PlayerResultService from "../../database/playerResult/playerResult.service";
 
 @ApiBearerAuth()
 @ApiTags('Cart')
@@ -43,7 +44,8 @@ export default class InCartController {
 		private readonly zonesService:ZonesService,
 		private readonly devicesService:DevicesService,
 		private readonly coursesService:CoursesService,
-		private readonly sidegamesService:SideGamesService
+		private readonly sidegamesService:SideGamesService,
+		private readonly playerResultService:PlayerResultService
 	){}
 	@Get('getSideInfo/:siteid')
 	@ApiOperation({summary:'取得整資料 / get golf club complete information', description: '取得球場完整資料 / get golf club complete information'})
@@ -300,9 +302,10 @@ export default class InCartController {
 			endTime: parseInt(endTime, 10),
 			status: gameStatus.Ended,
 		}
-		const cartInGame = await this.gamesService.query({gameid},['carts']);
+		const cartInGame = await this.gamesService.query({gameid});
 		if (cartInGame.count > 0) {
-			const carts = cartInGame[0].carts;
+			const game = cartInGame[0];
+			const carts = game.carts;
 			carts.forEach(async (cartid) => {
 				this.cartService.update({cartid}, {status: CartStatus.idle});
 				const cart = await this.cartService.findOne({cartid});
@@ -311,6 +314,27 @@ export default class InCartController {
 						this.devicesService.update({deviceid:cart.deviceid}, {status: DeviceStatus.idle});
 					}
 				}				
+			});
+			const course = await this.coursesService.findOne({courseid: game.courseid});
+			console.log('get course', JSON.stringify(course));
+			game.players.forEach(async (player) => {
+				const pr:playerResult = {
+					resultid: hashKey(),
+					siteid: game.siteid,
+					gameid: game.gameid,
+					playerName: player.playerName,
+					esttimatedStartTime: game.esttimatedStartTime,
+					courseName: course.courseName,
+					memberID: player.extra.memberId,
+					gameTitle: game.gameTitle,
+					hcp: player.hcp,
+					gross: player.gross,
+				}
+				try {
+					await this.playerResultService.create(pr)
+				} catch(err) {
+					console.log('save playerResult error:', err);
+				}
 			})
 		}
 		const resp = await updateTableData(String(token), this.gamesService, data, {gameid});

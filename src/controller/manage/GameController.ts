@@ -4,13 +4,13 @@ import { Condition } from "dynamoose";
 import GamesService from "../../database/game/games.service";
 import gameData from "../../models/game/gameData";
 import { assignCartEx, gamePartialReqEx, gameReqEx, getGamesReqEx } from "../../models/examples/game/gameDataEx";
-import { carts, gameKey, games, player, score, teeObject } from "../../database/db.interface";
+import { carts, gameKey, games, player, teeObject, score } from "../../database/db.interface";
 import { createTableData, deleteTableData, getTableData, hashKey, removeUnderLineData, tokenCheck, updateTableData } from "../../function/Commands";
 import gamePartialData from "../../models/game/gamePartialData";
 import gameResponse from "../../models/game/gameResponse";
 import commonResponse from "../../models/common/commonResponse";
 import siteDateRequest from "../../models/game/siteDateRequest";
-import  { commonResWithData, siteDateReq, gamesInfo } from "../../models/if";
+import  { commonResWithData, siteDateReq, gamesInfo, AnyObject, gameResultGroup, gameResultPlayer } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
 import assignCartRequest from "../../models/game/assignCartRequest";
@@ -24,6 +24,7 @@ import MyDate from "../../class/common/MyDate";
 import DevicesService from "../../database/device/devices.service";
 import gameResultRequest from "../../models/game/gameResultRequest";
 import { gameRequestReqEx } from "../../models/examples/game/gameResult";
+import PlayerResultService from "../../database/playerResult/playerResult.service";
 
 
 @ApiBearerAuth()
@@ -36,6 +37,7 @@ export default class GameController {
 		private readonly zonesService:ZonesService,
 		private readonly coursesService:CoursesService,
 		private readonly devicesService:DevicesService,
+		private readonly playerResultService:PlayerResultService,
 	){}
 
 	@Put('game')
@@ -199,8 +201,8 @@ export default class GameController {
 		}
 		return resp;
 	}
-	async queryGameResult(token:string, filter:gameResultRequest):Promise<commonResWithData<games[]>> {
-		let resp:commonResWithData<games[]> = {
+	async queryGameResult(token:string, filter:gameResultRequest):Promise<commonResWithData<any>> {
+		let resp:commonResWithData<AnyObject> = {
 			errcode: ErrCode.OK,		
 		}		
 		const user = tokenCheck(token);
@@ -216,21 +218,54 @@ export default class GameController {
 			if (filter.gameTitle) {
 				cond.and().where('gameTitle').eq(filter.gameTitle);
 			}
-			// if (filter.playerName) {
-			// 	cond.and().where('players').contains({playerName: filter.playerName});
-			// }			
+			if (filter.playerName) {
+				//cond.and().where('players').contains({playerName: filter.playerName});
+				cond.and().where('playerName').eq(filter.playerName);
+			}			
 			// resp.data = await this.gamesService.query(cond);
-			const games = await this.gamesService.query(cond);
-			let res:games[] = [];
-			if (games.count > 0 && filter.playerName) {
-				games.forEach((game) => {
-					const f = game.players.find((player) => player.playerName === filter.playerName);
-					if (f) res.push(game);
-				})
+			const prs = await this.playerResultService.query(cond);
+			if (prs.count > 0) {
+				const anyO:AnyObject = {}
+				if (filter.playerName) {
+					prs.forEach((pr) => {
+						const player: gameResultPlayer = {
+							gameid: pr.gameid,
+							date: pr.esttimatedStartTime,
+							team: pr.gameTitle,
+							memberID: pr.memberID,
+							playerName: pr.playerName,
+							courseName: pr.courseName,
+							gross: pr.gross,
+						}
+						anyO[`${pr.gameid}${pr.playerName}`] = player;
+					})
+				} else {	
+					prs.forEach((pr) => {
+						if (!anyO[pr.gameid]) {
+							const tmp:gameResultGroup = {
+								gameid: pr.gameid,
+								date: pr.esttimatedStartTime,
+								team: pr.gameTitle,
+								player: []
+							}							
+							anyO[pr.gameid] = tmp
+						}
+						const player: gameResultPlayer = {
+							gameid: pr.gameid,
+							playerName: pr.playerName,
+							memberID: pr.memberID,
+							courseName: pr.courseName,
+							gross: pr.gross,
+							hcp: pr.hcp,
+							net: pr.gross - parseInt(pr.hcp.replace('+', '-'), 10),
+						}
+						anyO[pr.gameid].player.push(player)
+					})
+				}
+				resp.data = Object.keys(anyO).map((key) => anyO[key]);
 			} else {
-				res = games;
+				resp.data = prs;
 			}
-			resp.data = res;
 		} else {
 			resp.errcode = ErrCode.TOKEN_ERROR,
 			resp.error = {

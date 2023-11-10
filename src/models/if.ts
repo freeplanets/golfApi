@@ -1,4 +1,4 @@
-import { carts, games, mapLatLong, zones } from "../database/db.interface";
+import { carts, games, mapLatLong, player, zones } from "../database/db.interface";
 
 export interface AnyObject {
   modifyid?:string;
@@ -35,6 +35,26 @@ export interface gameResultReq {
   dateEnd:string;
   playerName?:string;
   gameTitle?:string;
+}
+
+// game result
+export interface gameResult {
+  gameid?:string;
+  date?:number;
+  courseName?:string;
+  team?:string;  // gameTitle
+}
+// game result for search playername
+export interface gameResultPlayer extends gameResult {
+  memberID?:string;
+  playerName:string;
+  gross:number;
+  hcp?:string;
+  net?:number;
+}
+// game result for search date range only or gameTitle
+export interface gameResultGroup extends gameResult {
+  player: gameResultPlayer[]
 }
 
 export interface positonReq {

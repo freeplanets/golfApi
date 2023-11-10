@@ -213,6 +213,23 @@ export interface player {
   holes: score[],
   extra?: AnyObject,
 }
+
+export interface siteKey {
+  siteid?: string;
+  gameid?: string;
+  playerName?:string;
+}
+
+export interface playerResult extends siteKey {
+  resultid:string;
+  esttimatedStartTime?: number;
+  gameTitle?:string;
+  memberID?:string;
+  courseName?:string;
+  hcp?:string;
+  gross?:number;
+}
+
 export interface playerDefault {
   playerName: string;
   tee?: string;

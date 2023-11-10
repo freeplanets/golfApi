@@ -77,7 +77,7 @@ const GamesSchema = new Schema({
         type: Object,
         schema: {
           playerName: {
-            type: String
+            type: String,
           },
           hcp: {
             type: String
