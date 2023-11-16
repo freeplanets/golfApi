@@ -83,6 +83,7 @@ export interface scoresData {
 	front?: scoreLine[];
 	back?: scoreLine[];
 	total?: scoreLine[];
+	hole18?: scoreLine[];
 }
 
 export interface sideGameRes {

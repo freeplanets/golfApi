@@ -306,15 +306,17 @@ export default class InCartController {
 		if (cartInGame.count > 0) {
 			const game = cartInGame[0];
 			const carts = game.carts;
-			carts.forEach(async (cartid) => {
-				this.cartService.update({cartid}, {status: CartStatus.idle});
-				const cart = await this.cartService.findOne({cartid});
-				if (cart) {
-					if (cart.deviceid) {
-						this.devicesService.update({deviceid:cart.deviceid}, {status: DeviceStatus.idle});
-					}
-				}				
-			});
+			if (carts && carts.length > 0) {
+				carts.forEach(async (cartid) => {
+					this.cartService.update({cartid}, {status: CartStatus.idle});
+					const cart = await this.cartService.findOne({cartid});
+					if (cart) {
+						if (cart.deviceid) {
+							this.devicesService.update({deviceid:cart.deviceid}, {status: DeviceStatus.idle});
+						}
+					}				
+				});
+			}
 			const course = await this.coursesService.findOne({courseid: game.courseid});
 			console.log('get course', JSON.stringify(course));
 			game.players.forEach(async (player) => {

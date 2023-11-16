@@ -33,6 +33,11 @@ const PlayerResult = new Schema({
                 type: 'global',
                 rangeKey: 'gameid',
             },
+            {
+                name: 'PRsiteidgameTitleGlobalIndex',
+                type: 'global',
+                rangeKey: 'gameTitle',
+            },            
         ]
     },
     gameid: {

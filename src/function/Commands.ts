@@ -346,6 +346,7 @@ export function createScoreData(gameid:string, players:player[], playerDefaults:
 		front:[],
 		back:[],
 		total:[],
+		hole18:[],
 	}
 	// players.forEach((player) => {
 	playerDefaults.forEach((pd) => {
@@ -362,6 +363,7 @@ export function createScoreData(gameid:string, players:player[], playerDefaults:
 					assignLineData(data.back, 'HDCP', hole.fairwayno, hole.handicap);
 					assignLineData(data.back, player.playerName, hole.fairwayno, hole.gross);				
 				}
+				assignLineData(data.hole18, player.playerName, hole.holeNo, hole.gross);
 			})
 		}
 	})

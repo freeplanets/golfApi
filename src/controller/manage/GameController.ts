@@ -216,17 +216,17 @@ export default class GameController {
 			const endTime = MyDate.getTime(`${filter.dateEnd} 23:59:59`);
 			const cond = new Condition({siteid: filter.siteid}).where('esttimatedStartTime').between(startTime, endTime);
 			if (filter.gameTitle) {
-				cond.and().where('gameTitle').eq(filter.gameTitle);
+				cond.and().where('gameTitle').contains(filter.gameTitle);
 			}
 			if (filter.playerName) {
 				//cond.and().where('players').contains({playerName: filter.playerName});
-				cond.and().where('playerName').eq(filter.playerName);
+				cond.and().where('playerName').contains(filter.playerName);
 			}			
 			// resp.data = await this.gamesService.query(cond);
 			const prs = await this.playerResultService.query(cond);
 			if (prs.count > 0) {
 				const anyO:AnyObject = {}
-				if (filter.playerName) {
+				if (filter.playerName || filter.gameTitle) {
 					prs.forEach((pr) => {
 						const player: gameResultPlayer = {
 							gameid: pr.gameid,
@@ -236,6 +236,8 @@ export default class GameController {
 							playerName: pr.playerName,
 							courseName: pr.courseName,
 							gross: pr.gross,
+							hcp: pr.hcp,
+							net: pr.gross - parseInt(pr.hcp.replace('+', '-'), 10),
 						}
 						anyO[`${pr.gameid}${pr.playerName}`] = player;
 					})
@@ -256,8 +258,8 @@ export default class GameController {
 							memberID: pr.memberID,
 							courseName: pr.courseName,
 							gross: pr.gross,
-							hcp: pr.hcp,
-							net: pr.gross - parseInt(pr.hcp.replace('+', '-'), 10),
+							// hcp: pr.hcp,
+							// net: pr.gross - parseInt(pr.hcp.replace('+', '-'), 10),
 						}
 						anyO[pr.gameid].player.push(player)
 					})
