@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { gameResultReq } from "../if"
-import { IsDate, IsString } from "class-validator";
+import { IsDate, IsNumber, IsString } from "class-validator";
 
 export default class gameResultRequest implements gameResultReq {
     @ApiProperty({
@@ -39,4 +39,12 @@ export default class gameResultRequest implements gameResultReq {
     })
     @IsString()
     gameTitle?: string;
+
+    @ApiProperty({
+        description: '完賽洞數',
+        required: false,
+    })
+    @IsNumber()
+    playedHoles?: number;
+    
 }

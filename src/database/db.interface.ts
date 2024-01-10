@@ -3,15 +3,15 @@ import { HcpType, mapAssetObjectType, sideGameFormat, sideGameGroup, sideGames }
 import { AnyObject } from "../models/if";
 import { ConditionInitializer } from "dynamoose/dist/Condition";
 import { CartStatus } from "../function/func.interface";
+import { PlayScoreData } from "../models/transData/ks/ks.interface";
 
 export interface defaultKey {
   siteid?: string;
-  zoneid?: string;
-  // fairwayno?: number;
-  cartid?:string;
-  courseid?:string;
-  deviceid?:string;
-  gameid?:string;
+  // zoneid?: string;
+  // cartid?:string;
+  // courseid?:string;
+  // deviceid?:string;
+  // gameid?:string;
   modifyid?: string;
 }
 export interface defaultMethod<T extends K, K extends defaultKey> {
@@ -112,11 +112,14 @@ export interface zones extends zoneKey {
   tees:teeObject[];
   fairways:fairwayObject[];
   refNo:number;
-  modifyID?:string;
+  refKey?: {
+    KS: string;
+  }
+  // modifyID?:string;
   modifyTime?:number;
 }
 
-export interface cartKey {
+export interface cartKey extends defaultKey {
   cartid?: string;
   deviceid?:string;
 }
@@ -142,7 +145,7 @@ export interface cartHistory extends cartKey {
   ts:number;
 }
 
-export interface deviceKey {
+export interface deviceKey extends defaultKey {
   deviceid: string;
 }
 
@@ -228,6 +231,8 @@ export interface playerResult extends siteKey {
   courseName?:string;
   hcp?:string;
   gross?:number;
+  playedHoles?:number;
+  playerScoreKS?:PlayScoreData, 
 }
 
 export interface playerDefault {
@@ -246,7 +251,7 @@ export interface caddie {
   caddieName?:string,
 }
 
-export interface gameKey {
+export interface gameKey extends defaultKey {
   gameid:string;
 }
 export interface games extends gameKey {
@@ -268,6 +273,8 @@ export interface games extends gameKey {
   playerDefaults: playerDefault[];
   sideGames:sideGame[];
   gameTitle?:string;
+  refKey?:string;
+  extra?:AnyObject;
   status:number;
 }
 
@@ -320,7 +327,7 @@ export interface platformUser extends AnyObject {
   // enable2FA: false,
   group: string; // 'admin',
   uid: string; // '3ZBJab1PfGd9kdkw5PmnqE',
-  active: true,
+  active: true;
   // updatedAt: '2023-07-13T06:28:26.766Z',
   // username: 'admin001',
   // need2fa: false,
@@ -329,6 +336,75 @@ export interface platformUser extends AnyObject {
   // iss: 'api.novaapps.net'
 }
 
+export interface titleKey extends defaultKey {
+  titleid?: string;
+}
+
+export interface notCountingHoles {
+  zoneid: string;
+  fairways: number[];
+}
+
+export interface gameTitle extends titleKey {
+  titleName: string;
+  gameStart: string;
+  gameEnd: string;
+  cfid: string;
+  cfName: string;
+  notCountingHoles?: notCountingHoles[];
+  grossCounter: number;
+  netCounter: number;
+  competitionLocation?: string;
+}
+
+export interface cfKey extends defaultKey {
+  cfid?: string;
+}
+
+export interface competitionFormat extends cfKey {
+  cfName: string;
+  notCountingHoles: number;
+  hcpRate: number;
+  is579: boolean; 
+}
+export interface trKey extends defaultKey {
+  trid: string;
+}
+
+export interface titleRanking extends trKey {
+  titleid: string;
+  titleName: string;
+  memberid: string;
+  memberName: string;
+  gross: number;
+  net: number;
+  grossRanking?: number;
+  netRankgin?: number;
+  tropy?: string;
+}
+
+export interface mbrIdKey extends defaultKey {
+  memberid:string;
+  hhid?:string;
+}
+
+export interface membersHcp extends mbrIdKey {
+  name: string;
+  lastHandicap: number;
+}
+
+export interface handicapHistory extends mbrIdKey {
+  memberName: string;
+  course: string;
+  gross: number;
+  grossAfterAdjust: number;
+  rating: number;
+  slope: number;
+  hcpDiff: number;
+  hcpAvg: number;
+  hcpIndex: number;
+  hcpField: number;
+}
 /*
 export interface ItemObjectFromSchemaSettings {
   type: "toDynamo" | "fromDynamo";

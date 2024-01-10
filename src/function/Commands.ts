@@ -8,7 +8,7 @@ import { ConditionComparisonComparatorName, queryReq, scoreLine, scoresData } fr
 import { Condition } from "dynamoose";
 import _scoreObject from "../models/game/_scoreObject";
 import GamesService from "../database/game/games.service";
-import ZonesService from "src/database/zone/zones.service";
+import ZonesService from "../database/zone/zones.service";
 import { ConditionInitializer } from "dynamoose/dist/Condition";
 
 const jwt = new JwtService();
@@ -201,39 +201,32 @@ export async function updateTableData<D extends K, K extends defaultKey>(token:s
 	return resp;
 }
 
-export async function createTableData<D extends K, K extends defaultKey>(token:string, dbservice:any, data:D):Promise<commonResWithData<D>> {
+export async function createTableData<D extends K, K extends defaultKey>(user:platformUser, dbservice:any, data:D):Promise<commonResWithData<D>> {
 	const resp:commonResWithData<D> = {
 		errcode: ErrCode.OK,		
 	}
-	const user = tokenCheck(token);
-	if (user) {
-		console.log('createTableData:', data);
-		data.modifyid = user.uid;
-		const service = (dbservice as defaultMethod<D, K>);
-		try {
-			if (data.siteid){
-				data = removeUnderLineData(data);
-				console.log('createTableData:', data)
-				resp.data = await service.create(data);
-			} else { 
-				resp.errcode = ErrCode.ERROR_PARAMETER;
-				resp.error = {
-					message: errorMsg('ERROR_PARAMETER', 'siteid'),
-				}
-			}
-		} catch (e) {
-			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
+
+	console.log('createTableData:', data);
+	data.modifyid = user.uid;
+	const service = (dbservice as defaultMethod<D, K>);
+	try {
+		if (data.siteid){
+			data = removeUnderLineData(data);
+			console.log('createTableData:', data)
+			resp.data = await service.create(data);
+		} else { 
+			resp.errcode = ErrCode.ERROR_PARAMETER;
 			resp.error = {
-				message: errorMsg('DATABASE_ACCESS_ERROR'),
-				extra: e,				 
+				message: errorMsg('ERROR_PARAMETER', 'siteid'),
 			}
-			console.log(e);
 		}
-	} else {
-		resp.errcode = ErrCode.TOKEN_ERROR,
+	} catch (e) {
+		resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
 		resp.error = {
-			message: errorMsg('TOKEN_ERROR'),
+			message: errorMsg('DATABASE_ACCESS_ERROR'),
+			extra: e,				 
 		}
+		console.log(e);
 	}
 	return resp;
 }

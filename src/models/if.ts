@@ -1,9 +1,13 @@
-import { carts, games, mapLatLong, player, zones } from "../database/db.interface";
+import { carts, games, mapLatLong, zones } from "../database/db.interface";
 
 export interface AnyObject {
   modifyid?:string;
-  memberid?:string;
+  memberId?:string;
   checkInId?:string;
+  player_id?:string;
+  team?:string;
+  team_id?:string;
+  group_no?:string;
   [key:string]: any;
 }
 
@@ -35,6 +39,7 @@ export interface gameResultReq {
   dateEnd:string;
   playerName?:string;
   gameTitle?:string;
+  playedHoles?:number;
 }
 
 // game result
@@ -51,6 +56,7 @@ export interface gameResultPlayer extends gameResult {
   gross:number;
   hcp?:string;
   net?:number;
+  playedHoles?:number;
 }
 // game result for search date range only or gameTitle
 export interface gameResultGroup extends gameResult {

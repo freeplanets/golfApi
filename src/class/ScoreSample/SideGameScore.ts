@@ -1,4 +1,4 @@
-import { scoreLine } from "src/function/func.interface";
+import { scoreLine } from "../../function/func.interface";
 import { IScoreSample } from "../class.if";
 
 /**

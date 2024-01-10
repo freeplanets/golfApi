@@ -1,5 +1,6 @@
 import { Schema } from "dynamoose";
 import teeObjectSchema from "../zone/common/tee.schema";
+import GameExtra from "./gameExtra.schema";
 
 const GamesSchema = new Schema({
   gameid: {
@@ -26,6 +27,11 @@ const GamesSchema = new Schema({
 				type: 'global',
         // global: true,
         rangeKey: 'status',
+      },
+      {
+        name: 'siteidrefkeyGlobalIndex',
+        type: 'global',
+        rangeKey: 'refKey',
       }      
     ]
   },
@@ -294,8 +300,14 @@ const GamesSchema = new Schema({
   gameTitle: {
     type: String,
   },
+  refKey: {
+    type: String,
+  },
+  extra: {
+    type: Object,
+  },
   status: {
     type: Number,
   }
-}, { timestamps: true, saveUnknown: ["players.**","sideGames.**"] });
+}, { timestamps: true, saveUnknown: ["extra.**", "players.**", "sideGames.**"] });
 export default GamesSchema;

@@ -1,4 +1,4 @@
-import { gameResultReq } from "src/models/if";
+import { gameResultReq } from "../../../models/if";
 import MyDate from "../../../class/common/MyDate";
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
 

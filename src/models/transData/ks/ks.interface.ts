@@ -70,3 +70,46 @@ export interface ksGame {
   startDateTime: number;
   scores: ksScore[];
 }
+
+export interface ksGameNew {
+  key: string;  //"key": "F8FTwpKuMD3IIeMXH4Tn8Nc2ukKVl21q",
+  group_no: string; //"group_no": "26",
+  areas: string[]; //"areas": ["東", "南"],
+  caddie: string[]; //"caddie": ["001", "002"],
+  player: string[]; //"player": ["丁大＊", "于祖＊", "大平＊", "土田＊"],
+  player_id: string[]; //"player_id": ["1001", "1002", "1003", "1004"],
+  team: string; //"team": "吉祥球隊",
+  team_id: string;  //"team_id": "1201"
+}
+
+export interface AreaScore {
+  area:string;
+  score1:number;
+  score2:number;
+  score3:number;
+  score4:number;
+  score5:number;
+  score6:number;
+  score7:number;
+  score8:number;
+  score9:number;
+  total:number;
+}
+export interface PlayScoreData {
+  player_id: string;
+  player_name: string;
+  team_id: string;
+  team:string;
+  start_time:string;  //"2021-03-04 05:46:31",
+  end_time:string;  //"2021-03-04 07:40:01",
+  cart:string;
+  caddie:string[];
+  area_score:AreaScore[];
+}
+export interface PlayScores {
+  success: boolean;
+  v:string; //"1.3",
+  code:number; //1000,
+  message: string; //"Success, Access Type : JSON.",
+  data: PlayScoreData[];
+}

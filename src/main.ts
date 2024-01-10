@@ -8,7 +8,7 @@ async function bootstrap() {
     .setTitle('My Api')
     .setDescription('The Api desc')
     .setVersion('0.001')
-    .addTag('api')
+    // .addTag('api')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

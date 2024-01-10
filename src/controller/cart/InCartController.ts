@@ -4,7 +4,7 @@ import { Condition } from "dynamoose";
 import GamesService from "../../database/game/games.service";
 import CartsService from "../../database/cart/carts.service";
 import { createScoreData, getResultByGameID, hashKey, playerDefaultHcpCal, removeUnderLineData, tokenCheck, updateTableData } from "../../function/Commands";
-import { cartKey, carts, devices, gameKey, games, mapLatLong, player, playerDefault, playerResult, sideGame, sideGameKey, siteKey } from "../../database/db.interface";
+import { cartKey, carts, devices, gameKey, games, mapLatLong, playerDefault, playerResult, sideGame, sideGameKey } from "../../database/db.interface";
 import { AnyObject, commonRes, commonResWithData, locReq, positonReq } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
@@ -33,6 +33,8 @@ import { gameStatus, sideGames } from "../../models/enum";
 import SideGamesService from "../../database/sidegame/sidegames.service";
 import MyDate from "../../class/common/MyDate";
 import PlayerResultService from "../../database/playerResult/playerResult.service";
+import AreaScoreCreator from "../../class/ScoreForKS/areaScoreCreator";
+import { PlayScoreData } from "../../models/transData/ks/ks.interface";
 
 @ApiBearerAuth()
 @ApiTags('Cart')
@@ -227,7 +229,7 @@ export default class InCartController {
 	async setPlayerDefault(@Param('gameid') gameid:string, @Body() body:Partial<games>, @Headers('WWW-AUTH') token:Record<string, string>){
 		console.log('setPlayerDefault', gameid, body);
 		body.playerDefaults = playerDefaultHcpCal(body.playerDefaults);
-		const resp = await updateTableData(String(token), this.gamesService, body, {gameid});
+		const resp = await updateTableData(String(token), this.gamesService, body, {gameid} as gameKey);
 		return resp;		
 	}
 
@@ -285,10 +287,12 @@ export default class InCartController {
 	@ApiParam({name:'startTime', description:'開始擊球時間(timestamp)'})
 	@ApiResponse({status: 200, type: commonResponse})
 	async gameStart(@Param('gameid') gameid:string, @Param('startTime') startTime:string, @Headers('WWW-AUTH') token:Record<string, string>){
+		console.log('time check:',startTime, MyDate.getTime());
 		const data:Partial<games> = {
-			startTime: parseInt(startTime, 10),
+			// startTime: parseInt(startTime, 10),
+			startTime: MyDate.getTime(),
 		}
-		const resp = await updateTableData(String(token), this.gamesService, data, {gameid});
+		const resp = await updateTableData(String(token), this.gamesService, data, {gameid} as gameKey);
 		return resp;
 	}
 
@@ -299,10 +303,12 @@ export default class InCartController {
 	@ApiResponse({status: 200, type: commonResponse})
 	async gameEnd(@Param('gameid') gameid:string, @Param('endTime') endTime:string, @Headers('WWW-AUTH') token:Record<string, string>){
 		const data:Partial<games> = {
-			endTime: parseInt(endTime, 10),
+			// endTime: parseInt(endTime, 10),
+			endTime: MyDate.getTime(),
 			status: gameStatus.Ended,
 		}
 		const cartInGame = await this.gamesService.query({gameid});
+		let cartno = '';
 		if (cartInGame.count > 0) {
 			const game = cartInGame[0];
 			const carts = game.carts;
@@ -311,6 +317,7 @@ export default class InCartController {
 					this.cartService.update({cartid}, {status: CartStatus.idle});
 					const cart = await this.cartService.findOne({cartid});
 					if (cart) {
+						if (!cartno) cartno = cart.cartName;
 						if (cart.deviceid) {
 							this.devicesService.update({deviceid:cart.deviceid}, {status: DeviceStatus.idle});
 						}
@@ -320,6 +327,23 @@ export default class InCartController {
 			const course = await this.coursesService.findOne({courseid: game.courseid});
 			console.log('get course', JSON.stringify(course));
 			game.players.forEach(async (player) => {
+				let playedHoles = 0;
+				const areaScoreCreator = new AreaScoreCreator();
+				player.holes.forEach((hole) => {
+					if (hole.gross>0) playedHoles +=1;
+					areaScoreCreator.addHoleScore(hole);
+				});
+				const pgd:PlayScoreData = {
+					player_id: player.extra.player_id,
+					player_name: player.playerName,
+					team_id: game.extra ? game.extra.team_id : '',
+					team: game.extra ? game.extra.team_id : '',
+					cart: cartno,
+					start_time: MyDate.toLocalString(game.startTime),
+					end_time: MyDate.toLocalString(game.endTime),
+					caddie: game.extra ? game.extra.caddie : [],
+					area_score: areaScoreCreator.Score,
+				}
 				const pr:playerResult = {
 					resultid: hashKey(),
 					siteid: game.siteid,
@@ -331,6 +355,8 @@ export default class InCartController {
 					gameTitle: game.gameTitle,
 					hcp: player.hcp,
 					gross: player.gross,
+					playedHoles,
+					playerScoreKS: pgd,
 				}
 				try {
 					await this.playerResultService.create(pr)
@@ -339,7 +365,7 @@ export default class InCartController {
 				}
 			})
 		}
-		const resp = await updateTableData(String(token), this.gamesService, data, {gameid});
+		const resp = await updateTableData(String(token), this.gamesService, data, {gameid} as gameKey);
 		return resp;
 	}
 

@@ -1,6 +1,6 @@
-import { Body, Controller, Headers, Post, Get, Param, Delete, Put, Patch } from "@nestjs/common";
+import { Body, Controller, Headers, Post, Get, Param, Delete, Put, Patch, Query, Response } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { cartKey, carts, deviceKey, devices } from "../../database/db.interface";
+import { cartKey, carts, deviceKey, devices, platformUser } from "../../database/db.interface";
 import zoneModifyResponse from "../../models/zone/zoneModifyResponse";
 import commonResponse from "../../models/common/commonResponse";
 import zoneResponse from "../../models/zone/zoneResponse";
@@ -30,9 +30,11 @@ export default class CartController {
 	@ApiOperation({summary: '球車資料新增', description: '球車資料新增'})
 	@ApiBody({description: '球車資料新增', type: cartData, examples: cartEx})
 	@ApiResponse({status: 200, description: '回傳物件', type: zoneModifyResponse })
-	async add(@Body() body:carts,@Headers('WWW-AUTH') token: Record<string, string>){
+	async add(@Body() body:carts, @Response({passthrough:true}) res:any){
 		body.cartid = hashKey();
-		const resp = await createTableData<carts, cartKey>(String(token), this.cartsService, body);
+		const user = res.locals.user as platformUser
+		const resp = await createTableData<carts, cartKey>(user, this.cartsService, body);
+		//res.send(JSON.stringify(resp));
 		return resp;
 	}
 
@@ -55,7 +57,7 @@ export default class CartController {
 	@ApiParam({name:'cartid', description:'球車代號'})
 	@ApiResponse({status: 200, description: '回傳物件', type: zoneResponse })
 	async getOne(@Param('cartid') cartid:string,@Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await getTableData(String(token), this.cartsService, {cartid: cartid});
+		const resp = await getTableData(String(token), this.cartsService, {cartid: cartid} as cartKey);
 		return resp;
 	}
 
@@ -64,7 +66,7 @@ export default class CartController {
 	@ApiParam({name:'cartid', description:'球車代號'})
 	@ApiResponse({status: 200, description:'刪除球車回傳物件', type: commonResponse})
 	async delete(@Param('cartid') cartid:string, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await deleteTableData(String(token), this.cartsService, {cartid: cartid});
+		const resp = await deleteTableData(String(token), this.cartsService, {cartid: cartid} as cartKey);
 		return resp;
 	}
 

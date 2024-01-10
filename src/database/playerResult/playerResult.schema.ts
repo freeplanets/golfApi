@@ -1,4 +1,5 @@
 import { Schema } from "dynamoose";
+import PlayScore from "./playScore.schema";
 
 const PlayerResult = new Schema({
     resultid: {
@@ -37,7 +38,12 @@ const PlayerResult = new Schema({
                 name: 'PRsiteidgameTitleGlobalIndex',
                 type: 'global',
                 rangeKey: 'gameTitle',
-            },            
+            },
+            {
+                name: 'PRsiteidplayedHolesGlobalIndex',
+                type: 'global',
+                rangeKey: 'playedHoles'
+            }            
         ]
     },
     gameid: {
@@ -59,10 +65,17 @@ const PlayerResult = new Schema({
         type: String,
     },
     hcp: {
-        type: String
+        type: String,
     },
     gross: {
-        type: Number
+        type: Number,
     },
+    playedHoles: {
+        type: Number,
+    },
+    playerScoreKS: {
+        type: Object,
+        schema: PlayScore,
+    }
 })
 export default PlayerResult;

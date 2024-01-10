@@ -9,9 +9,9 @@ export interface sideGameCreate {
 }
 
 export interface playerScore {
-  playerName: string;
-  playerOrder:number;
-  gross:number;
+	playerName: string;
+	playerOrder:number;
+	gross:number;
 	parDiff:number;
 }
 export interface holesPlayerScore {

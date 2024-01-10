@@ -50,7 +50,7 @@ export default class DeviceController {
 	@ApiParam({name:'deviceid', description:'裝置代號'})
 	@ApiResponse({status: 200, description: '回傳物件', type: deviceReponse })
 	async getOne(@Param('deviceid') deviceid:string,@Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await getTableData(String(token), this.devicesService, {deviceid: deviceid});
+		const resp = await getTableData(String(token), this.devicesService, {deviceid: deviceid} as deviceKey);
 		return resp;
 	}
 
@@ -59,7 +59,7 @@ export default class DeviceController {
 	@ApiParam({name:'deviceid', description:'裝置代號'})
 	@ApiResponse({status: 200, description:'刪除裝置回傳物件', type: commonResponse})
 	async delete(@Param('deviceid') deviceid:string, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await deleteTableData(String(token), this.devicesService, {deviceid: deviceid});
+		const resp = await deleteTableData(String(token), this.devicesService, {deviceid: deviceid} as deviceKey);
 		return resp;
 	}
 

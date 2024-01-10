@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsString } from "class-validator";
-import { devices } from "src/database/db.interface";
+import { devices } from "../../database/db.interface";
 
 export default class deviceData implements devices {
 	@ApiProperty({

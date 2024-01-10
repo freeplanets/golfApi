@@ -4,7 +4,7 @@ import { holesPlayerScore, iScoreLine } from "../class.if";
 import { sideGameFormat, sideGames } from "../../models/enum";
 import recordLine from "../common/recordLine";
 import stringScore from "../common/stringScore";
-import { AnyObject } from "src/models/if";
+import { AnyObject } from "../../models/if";
 
 export interface iGroup {
 	name:string;

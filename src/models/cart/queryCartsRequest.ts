@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNumber, IsString } from "class-validator";
-import { carts } from "src/database/db.interface";
+import { carts } from "../../database/db.interface";
 import { CartStatus } from "../../function/func.interface";
 
 export default class queryCartsRequest implements Partial<carts> {

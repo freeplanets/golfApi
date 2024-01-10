@@ -1,4 +1,4 @@
-import { sideGame } from "src/database/db.interface";
+import { sideGame } from "../../database/db.interface";
 import StrokePlay from "./StrokePlay";
 
 /**

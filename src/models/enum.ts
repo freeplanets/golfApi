@@ -67,3 +67,8 @@ export enum gameStatus {
 	OnGame,
 	Ended,
 }
+
+export enum AreaType {
+	OUT = 'OUT',
+	IN = 'IN',
+}

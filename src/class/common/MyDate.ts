@@ -51,6 +51,11 @@ class MyDate {
 		if (!opt) { opt = this.dOpt; }
 		return d.toLocaleString(lang, opt);
 	}
+	public toLocalStringForKS(time?: string | number, opt?: Intl.DateTimeFormatOptions) {
+		const d = this.getDate(time);
+		if (!opt) { opt = this.dOpt; }
+		return d.toLocaleString('', opt);
+	}
 	public toLocalStringNoYear(time?: string | number, lang?: string, opt?: Intl.DateTimeFormatOptions) {
 		const d = this.getDate(time);
 		if (!lang) { lang = "zh-TW"; }

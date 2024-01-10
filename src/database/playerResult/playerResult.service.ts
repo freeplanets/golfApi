@@ -1,6 +1,6 @@
 import { InjectModel, Model } from "nestjs-dynamoose";
 import defaultService from "../common/defaultService";
-import { defaultKey, playerResult, siteKey } from "../db.interface";
+import { playerResult, siteKey } from "../db.interface";
 import { Injectable } from "@nestjs/common";
 
 @Injectable()

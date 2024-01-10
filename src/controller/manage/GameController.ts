@@ -1,10 +1,10 @@
-import { Body, Controller, Delete, Get, Headers, Param, Patch, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Headers, Param, Patch, Post, Put, Response } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Condition } from "dynamoose";
 import GamesService from "../../database/game/games.service";
 import gameData from "../../models/game/gameData";
 import { assignCartEx, gamePartialReqEx, gameReqEx, getGamesReqEx } from "../../models/examples/game/gameDataEx";
-import { carts, gameKey, games, player, teeObject, score } from "../../database/db.interface";
+import { carts, gameKey, games, player, teeObject, score, platformUser } from "../../database/db.interface";
 import { createTableData, deleteTableData, getTableData, hashKey, removeUnderLineData, tokenCheck, updateTableData } from "../../function/Commands";
 import gamePartialData from "../../models/game/gamePartialData";
 import gameResponse from "../../models/game/gameResponse";
@@ -44,10 +44,11 @@ export default class GameController {
 	@ApiOperation({summary:'新增編組資料/ add game', description:'新增編組資料/ add game'})
 	@ApiBody({description:'編組資料', type: gameData, examples: gameReqEx})
 	@ApiResponse({status: 200})
-	async add(@Body() body:games, @Headers('WWW-AUTH') token:Record<string, string>) {
+	async add(@Body() body:games, @Response({passthrough:true}) res:any) {
 		// body.gameid = hashKey();
 		body = await this.gameDataCheck(body);
-		const resp = await createTableData(String(token), this.gamesService, body);
+		const user = res.locals.user as platformUser;
+		const resp = await createTableData(user, this.gamesService, body);
 		return resp;
 	}
 
@@ -110,7 +111,7 @@ export default class GameController {
 	@ApiParam({name: 'gameid', description: '編組代號'})
 	@ApiBody({description: '球車代號', type: assignCartRequest, examples: assignCartEx})
 	async assignCart(@Param('gameid') gameid:string, @Body() body:Partial<games>, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await updateTableData(String(token), this.gamesService, body, {gameid});
+		const resp = await updateTableData(String(token), this.gamesService, body, {gameid} as gameKey);
 		if (resp.errcode === ErrCode.OK) {
 			const service = this.cartsService;
 			body.carts.forEach(async (cartid) => {
@@ -221,7 +222,10 @@ export default class GameController {
 			if (filter.playerName) {
 				//cond.and().where('players').contains({playerName: filter.playerName});
 				cond.and().where('playerName').contains(filter.playerName);
-			}			
+			}
+			if (filter.playedHoles) {
+				cond.and().where('playedHoles').eq(filter.playedHoles);
+			}
 			// resp.data = await this.gamesService.query(cond);
 			const prs = await this.playerResultService.query(cond);
 			if (prs.count > 0) {
@@ -238,6 +242,7 @@ export default class GameController {
 							gross: pr.gross,
 							hcp: pr.hcp,
 							net: pr.gross - parseInt(pr.hcp.replace('+', '-'), 10),
+							playedHoles: pr.playedHoles,
 						}
 						anyO[`${pr.gameid}${pr.playerName}`] = player;
 					})

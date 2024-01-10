@@ -1,4 +1,4 @@
-import { carts, games, zones } from "src/database/db.interface";
+import { carts, games, zones } from "../../database/db.interface";
 import { checkInRes } from "../if";
 import { ApiProperty } from "@nestjs/swagger";
 import gameData from "./gameData";

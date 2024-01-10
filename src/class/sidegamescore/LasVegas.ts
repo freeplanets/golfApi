@@ -1,7 +1,7 @@
-import { sideGame } from "src/database/db.interface";
+import { sideGame } from "../../database/db.interface";
 import { holesPlayerScore } from "../class.if";
 import Hessein from "./Hessein";
-import { AnyObject } from "src/models/if";
+import { AnyObject } from "../../models/if";
 import LasVegasScoreCombine from "../common/LasVegasScoreCombine";
 import { sideGameFormat } from "../../models/enum";
 

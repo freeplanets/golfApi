@@ -160,6 +160,14 @@ const ZonesSchema = new Schema({
   refNo: {
     type: Number,
   },
+  refKey: {
+    type: Object,
+    schema: {
+      KS: {
+        type: String,
+      }
+    }
+  },
   modifyid: {
 		type: String,
 		required: false,

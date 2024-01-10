@@ -1,6 +1,6 @@
-import { Body, Controller, Headers, Post, Get, Param, Delete, Put, Patch } from "@nestjs/common";
+import { Body, Controller, Headers, Post, Get, Param, Delete, Put, Patch, Response } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { courseKey, courses } from "../../database/db.interface";
+import { courseKey, courses, platformUser } from "../../database/db.interface";
 import coursesData from "../../models/zone/zonesData";
 import commonResponse from "../../models/common/commonResponse";
 import { createTableData, deleteTableData, getTableData, hashKey, queryTable, updateTableData } from "../../function/Commands";
@@ -21,9 +21,11 @@ export default class CourseController {
 	@ApiOperation({summary: '球道組合資料新增', description: '球道組合資料新增'})
 	@ApiBody({description: '球道組合資料新增', type: courseData, examples: courseEx})
 	@ApiResponse({status: 200, description: '回傳物件', type:courseResponse})
-	async add(@Body() body:courses,@Headers('WWW-AUTH') token: Record<string, string>){
+	async add(@Body() body:courses, @Response({passthrough:true}) res: any){
 		if (!body.courseid) body.courseid = hashKey();
-		const resp = await createTableData<courses, courseKey>(String(token), this.courseService, body);
+		const user = res.locals.user as platformUser;
+		const resp = await createTableData<courses, courseKey>(user, this.courseService, body);
+		//res.send(JSON.stringify(resp));
 		return resp;
 	}
 
@@ -46,7 +48,7 @@ export default class CourseController {
 	@ApiParam({name:'courseid', description:'球道組合代號'})
 	@ApiResponse({status: 200, description: '回傳物件', type: courseResponse })
 	async getOne(@Param('courseid') courseid:string,@Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await getTableData(String(token), this.courseService, {courseid: courseid});
+		const resp = await getTableData(String(token), this.courseService, {courseid: courseid} as courseKey);
 		return resp;
 	}
 
@@ -55,7 +57,7 @@ export default class CourseController {
 	@ApiParam({name:'courseid', description:'球道組合代號'})
 	@ApiResponse({status: 200, description:'刪除組合回傳物件', type: commonResponse})
 	async delete(@Param('courseid') courseid:string, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await deleteTableData(String(token), this.courseService, {courseid: courseid});
+		const resp = await deleteTableData(String(token), this.courseService, {courseid: courseid} as courseKey);
 		return resp;
 	}
 

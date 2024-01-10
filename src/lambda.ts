@@ -8,6 +8,7 @@ import { eventContext } from "aws-serverless-express/middleware";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { SecuritySchemeObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
 import { CorsOptions } from "@nestjs/common/interfaces/external/cors-options.interface";
+import MyDate from "./class/common/MyDate";
 
 const authOption: SecuritySchemeObject = {
 	description: 'JWT token authorization',

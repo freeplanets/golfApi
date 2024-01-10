@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsString } from "class-validator";
-import { zones } from "src/database/db.interface";
+import { zones } from "../../database/db.interface";
 import _teeObject from "./fairway/_teeObject";
 
 export default class queryZonesRequest implements Partial<zones> {

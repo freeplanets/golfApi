@@ -1,6 +1,6 @@
-import { Body, Controller, Headers, Post, Get, Param, Delete, Put, Patch } from "@nestjs/common";
+import { Body, Controller, Headers, Post, Get, Param, Delete, Put, Patch, Response } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { zoneKey, zones } from "../../database/db.interface";
+import { platformUser, zoneKey, zones } from "../../database/db.interface";
 import ZoneService from "../../database/zone/zones.service";
 import zoneData from "../../models/zone/zonesData";
 import { zoneEx, zonesResEx } from "../../models/examples/zone/zoneEx";
@@ -22,10 +22,11 @@ export default class ZoneController {
 	@ApiOperation({summary: '球道分區資料新增', description: '球場分區資料新增'})
 	@ApiBody({description: '球道分區資料新增', type: zoneData, examples: zoneEx})
 	@ApiResponse({status: 200, description: '回傳物件', type: zoneModifyResponse })
-	async add(@Body() body:zones,@Headers('WWW-AUTH') token: Record<string, string>){
+	async add(@Body() body:zones,@Response({passthrough:true}) res:any){
 		// console.log('zone Put', body, token);
 		if (!body.zoneid) body.zoneid = hashKey();
-		const resp = await createTableData<zones, zoneKey>(String(token), this.zoneService, body);
+		const user = res.locals.user as platformUser;
+		const resp = await createTableData<zones, zoneKey>(user, this.zoneService, body);
 		return resp;
 	}
 
@@ -48,7 +49,7 @@ export default class ZoneController {
 	@ApiParam({name:'zoneid', description:'球區代號'})
 	@ApiResponse({status: 200, description: '回傳物件', type: zoneResponse })
 	async getOne(@Param('zoneid') zoneid:string,@Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await getTableData(String(token), this.zoneService, {zoneid: zoneid});
+		const resp = await getTableData(String(token), this.zoneService, {zoneid: zoneid} as zoneKey);
 		return resp;
 	}
 
@@ -57,7 +58,7 @@ export default class ZoneController {
 	@ApiParam({name:'zoneid', description:'球區代號'})
 	@ApiResponse({status: 200, description:'刪除分區回傳物件', type: commonResponse})
 	async delete(@Param('zoneid') zoneid:string, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await deleteTableData(String(token), this.zoneService, {zoneid: zoneid});
+		const resp = await deleteTableData(String(token), this.zoneService, {zoneid: zoneid} as zoneKey);
 		return resp;
 	}
 

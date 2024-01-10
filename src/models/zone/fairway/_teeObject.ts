@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { teeObject } from "src/database/db.interface";
+import { teeObject } from "../../../database/db.interface";
 
 export default class _teeObject implements teeObject {
 	@ApiProperty({

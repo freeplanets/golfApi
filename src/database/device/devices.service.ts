@@ -28,7 +28,7 @@ export default class DevicesService extends defaultService<devices, deviceKey> {
 			}
 			// console.log('his:', his);
 			const ans  = await this.historyService.create(his);
-			// console.log('check', ans);
+			//console.log('save to history', ans);
 		}
 		// console.log(data);
 		return super.update(key, data, cond);

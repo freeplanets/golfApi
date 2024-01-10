@@ -1,4 +1,4 @@
-import { courses, teeObject } from "src/database/db.interface";
+import { courses, teeObject } from "../../database/db.interface";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsDate, IsNumber, IsString } from "class-validator";
 import _KeySiteId from "../common/_KeySiteId";

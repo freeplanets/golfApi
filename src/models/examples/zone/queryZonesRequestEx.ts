@@ -1,5 +1,5 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
-import { zones } from "src/database/db.interface";
+import { zones } from "../../../database/db.interface";
 
 const zonesRequestExVal:Partial<zones> = {
 	siteid: 'linkougolf',

@@ -1,5 +1,5 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
-import { games, playerDefault } from "src/database/db.interface";
+import { games, playerDefault } from "../../../database/db.interface";
 
 const player1: playerDefault = {
 	playerName: '李小明',
