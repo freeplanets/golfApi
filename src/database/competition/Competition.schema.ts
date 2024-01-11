@@ -1,7 +1,7 @@
 import { Schema } from "dynamoose";
 import NotCountingHoles from "./NotCountingHoles.schema";
 
-const GameTitle = new Schema({
+const CompetitionSchema = new Schema({
     titleid: {
         type: String,
         hashKey: true,
@@ -57,4 +57,4 @@ const GameTitle = new Schema({
         required: false,
     },
 }, {timestamps: true, saveUnknown: false});
-export default GameTitle;
+export default CompetitionSchema;

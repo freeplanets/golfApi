@@ -1,9 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { gameTitle, notCountingHoles } from "../../database/db.interface";
-import { IsDateString, IsISO8601, IsNumber, IsString } from "class-validator";
-import NotCountingHoles from "../../database/game-title/NotCountingHoles.schema";
+import { competition, notCountingHoles } from "../../database/db.interface";
+import { IsDateString, IsNumber, IsString } from "class-validator";
+import NotCountingHolesModel from "./NotCountingHolesModel";
 
-export default class GameTitleModel implements gameTitle {
+export default class CompetitionModel implements competition {
     @ApiProperty({
         description: 'hashkey',
         required: false,
@@ -43,7 +43,8 @@ export default class GameTitleModel implements gameTitle {
 
     @ApiProperty({
         description: '不計洞號',
-        type: [NotCountingHoles]
+        type: [NotCountingHolesModel],
+        required: false,
     })
     notCountingHoles?: notCountingHoles[];
 

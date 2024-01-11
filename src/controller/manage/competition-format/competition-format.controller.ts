@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Response } from '@nestjs/common';
 import CompetitionFormatService from '../../../database/competition-format/CompetitionFormat.service';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import CompetitionFormatModel from '../../../models/competition-format/CompetitionFormat';
+import CompetitionFormatModel from '../../../models/competition-format/CompetitionFormatModel';
 import { CFEx, CFQueryEx, cfEx } from '../../../models/examples/competition-format/competitionFormatEx';
 import { commonRes, commonResWithData } from '../../../models/if';
 import { ErrCode } from '../../../models/enumError';

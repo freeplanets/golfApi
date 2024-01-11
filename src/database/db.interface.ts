@@ -345,7 +345,7 @@ export interface notCountingHoles {
   fairways: number[];
 }
 
-export interface gameTitle extends titleKey {
+export interface competition extends titleKey {
   titleName: string;
   gameStart: string;
   gameEnd: string;
@@ -371,7 +371,7 @@ export interface trKey extends defaultKey {
   trid: string;
 }
 
-export interface titleRanking extends trKey {
+export interface competitionRanking extends trKey {
   titleid: string;
   titleName: string;
   memberid: string;
@@ -380,7 +380,7 @@ export interface titleRanking extends trKey {
   net: number;
   grossRanking?: number;
   netRankgin?: number;
-  tropy?: string;
+  trophy?: boolean;
 }
 
 export interface mbrIdKey extends defaultKey {

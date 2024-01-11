@@ -1,5 +1,3 @@
-import { sideGame } from "../database/db.interface";
-
 export interface defaultFunc {
 	(args:any, F:Function):any;
 }

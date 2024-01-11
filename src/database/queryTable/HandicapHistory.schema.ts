@@ -1,6 +1,6 @@
 import { Schema } from "dynamoose";
 
-const HandicapHistory = new Schema({
+const HandicapHistorySchema = new Schema({
     hhid: {
         type: String,
         hashKey: true,
@@ -54,4 +54,4 @@ const HandicapHistory = new Schema({
         type: Number,
     }
 }, {timestamps: true,saveUnknown: false});
-export default HandicapHistory;
+export default HandicapHistorySchema;

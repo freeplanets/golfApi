@@ -1,5 +1,5 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
-import CompetitionFormatModel from "../../../models/competition-format/CompetitionFormat";
+import CompetitionFormatModel from "../../competition-format/CompetitionFormatModel";
 import CFQuery from "../../../models/competition-format/CFQuery";
 
 const cfEx = new CompetitionFormatModel();

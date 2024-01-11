@@ -1,6 +1,6 @@
 import { Schema } from "dynamoose";
 
-const MembersHcp = new Schema({
+const MembersHcpSchema = new Schema({
     memberid: {
         type: String,
         hashKey: true,
@@ -21,4 +21,4 @@ const MembersHcp = new Schema({
         type: Number,
     }
 }, {timestamps: true, saveUnknown: false});
-export default MembersHcp;
+export default MembersHcpSchema;

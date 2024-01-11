@@ -14,7 +14,8 @@ import PlayerResult from "../playerResult/playerResult.schema";
 import PlayerResultService from "../playerResult/playerResult.service";
 import CompetitionFormatModule from "../competition-format/CompetitionFormat.module";
 import { PlatformTokenChecker } from "../../class/middleware/platformTokenChecker";
-import GameTitleModule from "../game-title/GameTitle.module";
+import CompetitionModule from "../competition/Competition.module";
+import QuerysModule from "../queryTable/Querys.module";
 
 @Module({
 	imports: [
@@ -23,7 +24,8 @@ import GameTitleModule from "../game-title/GameTitle.module";
 		ZonesModule,
 		CouresModule,
 		CompetitionFormatModule,
-		GameTitleModule,
+		CompetitionModule,
+		QuerysModule,
 		DynamooseModule.forFeature([
 			{
 				name: 'Games',

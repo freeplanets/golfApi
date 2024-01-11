@@ -1,33 +1,36 @@
 import { Schema } from "dynamoose";
 
-const TitleRanking = new Schema({
+const CompetitionRankingSchema = new Schema({
     trid: {
         type:String,
         hashKey: true,
     },
     siteid: {
         type: String,
-        index: {
-            type: 'global',
-        }
+        index:[
+            {
+                name: 'siteidtitleNameGlobalIndex',
+                type: 'global',
+                rangeKey: 'titleName',
+            },
+            {
+                name: 'siteidtrophyGlobalIndex',
+                type: 'global',
+                rangeKey: 'trophy',
+            }
+        ],
     },
     titleid: {
         type: String,
     },
     titleName: {
         type: String,
-        index: {
-            type: 'global',
-        },
     },
     memberid: {
         type: String,
     },
     memberName: {
         type: String,
-        index: {
-            type: 'global',
-        },
     },
     gross: {
         type: Number,
@@ -42,7 +45,7 @@ const TitleRanking = new Schema({
         type: Number,
     },
     trophy: {
-        type: String,
+        type: Boolean,
     }
 }, {timestamps: true, saveUnknown: false});
-export default TitleRanking;
+export default CompetitionRankingSchema;

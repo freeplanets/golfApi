@@ -1,8 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { gameTitle } from "../../database/db.interface";
+import { competition } from "../../database/db.interface";
 import { IsDateString, IsString } from "class-validator";
 
-export default class GTQuery implements Partial<gameTitle> {
+export default class CompetitionQueryRequest implements Partial<competition> {
     @ApiProperty({
         description: '名稱',
     })
