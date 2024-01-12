@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Headers, Param, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Headers, Param, Post, Response } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Condition } from "dynamoose";
 import GamesService from "../../database/game/games.service";
@@ -226,10 +226,11 @@ export default class InCartController {
 	@ApiOperation({summary:'小遊戲參與者資料登錄 / setPlayerDefault', description:'小遊戲參與者資料登錄 / setPlayerDefault'})
 	@ApiParam({name:'gameid', description: '來賓分組代號'})
 	@ApiBody({description: '球員 hcp 預設資料', type:playerDefaultRequest, examples: playerDefaultEx })
-	async setPlayerDefault(@Param('gameid') gameid:string, @Body() body:Partial<games>, @Headers('WWW-AUTH') token:Record<string, string>){
+	async setPlayerDefault(@Param('gameid') gameid:string, @Body() body:Partial<games>, 
+		@Response({passthrough:true}) res:any){
 		console.log('setPlayerDefault', gameid, body);
 		body.playerDefaults = playerDefaultHcpCal(body.playerDefaults);
-		const resp = await updateTableData(String(token), this.gamesService, body, {gameid} as gameKey);
+		const resp = await updateTableData(res.locals.user, this.gamesService, body, {gameid} as gameKey);
 		return resp;		
 	}
 
@@ -286,13 +287,14 @@ export default class InCartController {
 	@ApiParam({name: 'gameid', description: '編組代號'})
 	@ApiParam({name:'startTime', description:'開始擊球時間(timestamp)'})
 	@ApiResponse({status: 200, type: commonResponse})
-	async gameStart(@Param('gameid') gameid:string, @Param('startTime') startTime:string, @Headers('WWW-AUTH') token:Record<string, string>){
+	async gameStart(@Param('gameid') gameid:string, @Param('startTime') startTime:string, 
+		@Response({passthrough:true}) res:any){
 		console.log('time check:',startTime, MyDate.getTime());
 		const data:Partial<games> = {
 			// startTime: parseInt(startTime, 10),
 			startTime: MyDate.getTime(),
 		}
-		const resp = await updateTableData(String(token), this.gamesService, data, {gameid} as gameKey);
+		const resp = await updateTableData(res.locals.user, this.gamesService, data, {gameid} as gameKey);
 		return resp;
 	}
 
@@ -301,7 +303,8 @@ export default class InCartController {
 	@ApiParam({name: 'gameid', description: '編組代號'})
 	@ApiParam({name:'endTime', description:'結束擊球時間(timestamp)'})
 	@ApiResponse({status: 200, type: commonResponse})
-	async gameEnd(@Param('gameid') gameid:string, @Param('endTime') endTime:string, @Headers('WWW-AUTH') token:Record<string, string>){
+	async gameEnd(@Param('gameid') gameid:string, @Param('endTime') endTime:string, 
+		@Response({passthrough:true}) res:any){
 		const data:Partial<games> = {
 			// endTime: parseInt(endTime, 10),
 			endTime: MyDate.getTime(),
@@ -365,7 +368,7 @@ export default class InCartController {
 				}
 			})
 		}
-		const resp = await updateTableData(String(token), this.gamesService, data, {gameid} as gameKey);
+		const resp = await updateTableData(res.locals.user, this.gamesService, data, {gameid} as gameKey);
 		return resp;
 	}
 

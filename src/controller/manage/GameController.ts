@@ -56,13 +56,14 @@ export default class GameController {
 	@ApiOperation({summary:'修改編組資料/ update game', description:'修改編組資料/ update game'})
 	@ApiParam({name:'gameid', description:'編組代號'})
 	@ApiBody({description:'編組資料不含gameid', type: gamePartialData, examples:gamePartialReqEx})
-	async update(@Param('gameid') gameid:string, @Body() body:games, @Headers('WWW-AUTH') token:Record<string, string>){
+	async update(@Param('gameid') gameid:string, @Body() body:games, @Response({passthrough:true}) res:any){
 		const keys:gameKey = {
 			gameid,
 		};
 		body = await this.gameDataCheck(body);
 		if (body.gameid) delete body.gameid;
-		const resp = await updateTableData<games, gameKey>(String(token), this.gamesService, body, keys);
+		const user = res.locals.user as platformUser;
+		const resp = await updateTableData<games, gameKey>(user, this.gamesService, body, keys);
 		return resp;
 	}
 
@@ -70,11 +71,11 @@ export default class GameController {
 	@ApiOperation({summary: '回傳指定編組資料 / get game', description: '回傳指定編組資料 / get game'})
 	@ApiParam({name: 'gameid', description: '編組代號'})
 	@ApiResponse({status: 200, type: gameResponse })
-	async getOne(@Param('gameid') gameid:string,@Headers('WWW-AUTH') token:Record<string, string>){
+	async getOne(@Param('gameid') gameid:string,@Response({passthrough:true}) res:any){
 		const keys:gameKey = {
 			gameid,
 		};
-		const resp = await getTableData<games, gameKey>(String(token), this.gamesService, keys);
+		const resp = await getTableData<games, gameKey>(res.locals.user, this.gamesService, keys);
 		return resp;
 	}
 
@@ -82,11 +83,11 @@ export default class GameController {
 	@ApiOperation({summary: '刪除編組資料 / delete game', description: '刪除編組資料 / delete game'})
 	@ApiParam({name: 'gameid', description: '編組代號'})
 	@ApiResponse({status: 200, type: commonResponse})
-	async delete(@Param('gameid') gameid:string, @Headers('WWW-AUTH') token:Record<string, string>) {
+	async delete(@Param('gameid') gameid:string, @Response({passthrough:true}) res:any) {
 		const keys:gameKey = {
 			gameid,
 		};		
-		const resp = await deleteTableData(String(token), this.gamesService, keys);
+		const resp = await deleteTableData(res.locals.user, this.gamesService, keys);
 		return resp;
 	}
 
@@ -110,8 +111,8 @@ export default class GameController {
 	@ApiOperation({summary: '指派球車/ assign cart for game', description: '指派球車/ assign cart for game'})
 	@ApiParam({name: 'gameid', description: '編組代號'})
 	@ApiBody({description: '球車代號', type: assignCartRequest, examples: assignCartEx})
-	async assignCart(@Param('gameid') gameid:string, @Body() body:Partial<games>, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await updateTableData(String(token), this.gamesService, body, {gameid} as gameKey);
+	async assignCart(@Param('gameid') gameid:string, @Body() body:Partial<games>, @Response({passthrough:true}) res:any){
+		const resp = await updateTableData(res.locals.user, this.gamesService, body, {gameid} as gameKey);
 		if (resp.errcode === ErrCode.OK) {
 			const service = this.cartsService;
 			body.carts.forEach(async (cartid) => {

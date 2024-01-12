@@ -10,7 +10,7 @@ export default class MembersHcpModel implements membersHcp {
     @ApiProperty({
         description: '會員名稱',
     })
-    name: string;
+    memberName: string;
 
     @ApiProperty({
         description: '最近差點',

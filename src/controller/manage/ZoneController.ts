@@ -35,12 +35,12 @@ export default class ZoneController {
 	@ApiParam({name:'zoneid', description:'球區代號'})
 	@ApiBody({description: '球道分區資料新增', type: zoneData, examples: zoneEx})
 	@ApiResponse({status: 200, description: '回傳物件', type: zoneModifyResponse, schema: {examples: zonesResEx} })
-	async update(@Param('zoneid') zoneid:string, @Body() body:Partial<zones>,@Headers('WWW-AUTH') token: Record<string, string>){
+	async update(@Param('zoneid') zoneid:string, @Body() body:Partial<zones>,@Response({passthrough:true}) res:any){
 		const keys = {
 			zoneid: zoneid,
 		}
 		if (body.zoneid) delete body.zoneid;
-		const resp = await updateTableData<zones, zoneKey>(String(token), this.zoneService, body, keys);
+		const resp = await updateTableData<zones, zoneKey>(res.locals.user, this.zoneService, body, keys);
 		return resp;
 	}
 
@@ -48,8 +48,8 @@ export default class ZoneController {
 	@ApiOperation({ summary: '回傳單筆球場分區資料', description: '回傳單筆球場分區資料'})
 	@ApiParam({name:'zoneid', description:'球區代號'})
 	@ApiResponse({status: 200, description: '回傳物件', type: zoneResponse })
-	async getOne(@Param('zoneid') zoneid:string,@Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await getTableData(String(token), this.zoneService, {zoneid: zoneid} as zoneKey);
+	async getOne(@Param('zoneid') zoneid:string, @Response({passthrough:true}) res:any){
+		const resp = await getTableData(res.locals.user, this.zoneService, {zoneid: zoneid} as zoneKey);
 		return resp;
 	}
 
@@ -57,8 +57,8 @@ export default class ZoneController {
 	@ApiOperation({ summary: '刪除分區資料', description: '刪除分區資料'})
 	@ApiParam({name:'zoneid', description:'球區代號'})
 	@ApiResponse({status: 200, description:'刪除分區回傳物件', type: commonResponse})
-	async delete(@Param('zoneid') zoneid:string, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await deleteTableData(String(token), this.zoneService, {zoneid: zoneid} as zoneKey);
+	async delete(@Param('zoneid') zoneid:string, @Response({passthrough:true}) res:any){
+		const resp = await deleteTableData(res.locals.user, this.zoneService, {zoneid: zoneid} as zoneKey);
 		return resp;
 	}
 
@@ -66,8 +66,8 @@ export default class ZoneController {
 	@ApiOperation({ summary: '回傳球場分區資料', description: '回傳球場分區資料'})
 	@ApiBody({description: '查詢球區修件', type: queryZonesRequest, examples: queryZonesRequestEx})
 	@ApiResponse({status: 200, description:'球區回傳物件', type: zonesResponse})
-	async query(@Body() body:Partial<zones>, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await queryTable(String(token), this.zoneService, body);
+	async query(@Body() body:Partial<zones>, @Response({passthrough:true}) res:any){
+		const resp = await queryTable(res.locals.user, this.zoneService, body);
 		return resp;
 	}
 }

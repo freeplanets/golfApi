@@ -40,5 +40,5 @@ export default class CompetitionRankingModel implements Partial<competitionRanki
     @ApiProperty({
         description: '是否得獎',
     })
-    tropy?: boolean;
+    trophy?: boolean;
 }

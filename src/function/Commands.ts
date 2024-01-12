@@ -40,43 +40,35 @@ export async function FuncWithTockenCheck<D>(token:string, P:Promise<D>) {
 	}
 	return resp;
 }
-export async function deleteTableData<D extends defaultKey>(token:string, dbservice:any, keys:defaultKey) {
+export async function deleteTableData<D extends defaultKey>(user:platformUser, dbservice:any, keys:defaultKey) {
 	let resp:commonRes = {
 		errcode: ErrCode.OK,		
 	}	
 	if (keys) {
-		const user = tokenCheck(token);
-		if (user) {
-			const service = dbservice as defaultMethod<D, defaultKey>;
-			try {
-				const f = await service.findOne(keys);
-				if (f) {
-					if (isMyClub(user, f.siteid)) {
-						await service.delete(keys);
-					} else {
-						resp.errcode = ErrCode.ERROR_PARAMETER;
-						resp.error = {
-							message: errorMsg('ERROR_PARAMETER', 'siteid'),
-						}					
-					}
+		const service = dbservice as defaultMethod<D, defaultKey>;
+		try {
+			const f = await service.findOne(keys);
+			if (f) {
+				if (isMyClub(user, f.siteid)) {
+					await service.delete(keys);
 				} else {
-					resp.errcode = ErrCode.ITEM_NOT_FOUND;
+					resp.errcode = ErrCode.ERROR_PARAMETER;
 					resp.error = {
-						message: errorMsg('ITEM_NOT_FOUND'),
-					}
-				}	
-			} catch(e) {
-				resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
-				resp.error = {
-					message: errorMsg('DATABASE_ACCESS_ERROR'),
-					extra: e,
+						message: errorMsg('ERROR_PARAMETER', 'siteid'),
+					}					
 				}
-			}
-		} else {
-			resp.errcode = ErrCode.TOKEN_ERROR,
+			} else {
+				resp.errcode = ErrCode.ITEM_NOT_FOUND;
+				resp.error = {
+					message: errorMsg('ITEM_NOT_FOUND'),
+				}
+			}	
+		} catch(e) {
+			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
 			resp.error = {
-				message: errorMsg('TOKEN_ERROR'),
-			}		
+				message: errorMsg('DATABASE_ACCESS_ERROR'),
+				extra: e,
+			}
 		}
 	} else {
 		resp.errcode = ErrCode.MISS_PARAMETER;
@@ -86,118 +78,102 @@ export async function deleteTableData<D extends defaultKey>(token:string, dbserv
 	}
 	return resp;	
 }
-export async function queryTable<D extends K, K>(token:string, dbservice:any, key: Partial<D> | queryReq) {
+export async function queryTable<D extends K, K>(user:platformUser, dbservice:any, key: Partial<D> | queryReq) {
 	console.log('queryTable:', key);
 	let resp:commonResWithData<D[]> = {
 		errcode: ErrCode.OK,		
 	}	
-	const user = tokenCheck(token);
-	if (user) {
-		const service  = (dbservice as defaultMethod<D, K>);
-		try {
-			// if (addClubid) key.siteid = user.siteid;
-			if ((key as queryReq).queryKey) {
-				const cond = createCondition(key as queryReq);
-				resp.data = await service.query(cond);
-			} else {
-				resp.data = await service.query(key as Partial<D>);
-			}
-		} catch(e) {
-			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
-			resp.error = {
-				message: errorMsg('DATABASE_ACCESS_ERROR'),
-				extra: e,
-			}
+	const service  = (dbservice as defaultMethod<D, K>);
+	try {
+		// if (addClubid) key.siteid = user.siteid;
+		if ((key as queryReq).queryKey) {
+			const cond = createCondition(key as queryReq);
+			resp.data = await service.query(cond);
+		} else {
+			resp.data = await service.query(key as Partial<D>);
 		}
-	} else {
-		resp.errcode = ErrCode.TOKEN_ERROR,
+	} catch(e) {
+		resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
 		resp.error = {
-			message: errorMsg('TOKEN_ERROR'),
-		}		
+			message: errorMsg('DATABASE_ACCESS_ERROR'),
+			extra: e,
+		}
 	}
 	return resp;
 }
-export async function getTableData<D extends K, K extends defaultKey>(token:string, dbservice:any, keys:K):Promise<commonResWithData<D>> {
+export async function getTableData<D extends K, K extends defaultKey>(user:platformUser, dbservice:any, keys:K):Promise<commonResWithData<D>> {
 	const resp:commonResWithData<D> = {
 		errcode: ErrCode.OK,		
 	}
-	const user = tokenCheck(token);
-	if (user) {
-		const service = (dbservice as defaultMethod<D, K>);
-		try {
-			console.log('findkey', keys);
-			const f = await service.findOne(keys);
-			if (f) {
-				// 更改資料時檢查是否為同球場
-					resp.data = f;
-			} else {
-				resp.errcode = ErrCode.ITEM_NOT_FOUND;
-				resp.error = {
-					message: errorMsg('ITEM_NOT_FOUND'),
-				}
-			}
-		} catch (e) {
-			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
+	const service = (dbservice as defaultMethod<D, K>);
+	try {
+		console.log('findkey', keys);
+		const f = await service.findOne(keys);
+		if (f) {
+			// 更改資料時檢查是否為同球場
+				resp.data = f;
+		} else {
+			resp.errcode = ErrCode.ITEM_NOT_FOUND;
 			resp.error = {
-				message: errorMsg('DATABASE_ACCESS_ERROR'),
-				extra: e,				 
+				message: errorMsg('ITEM_NOT_FOUND'),
 			}
-			console.log(e);
 		}
-	} else {
-		resp.errcode = ErrCode.TOKEN_ERROR,
+	} catch (e) {
+		resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
 		resp.error = {
-			message: errorMsg('TOKEN_ERROR'),
+			message: errorMsg('DATABASE_ACCESS_ERROR'),
+			extra: e,				 
 		}
+		console.log(e);
 	}
 	return resp;	
 }
-export async function updateTableData<D extends K, K extends defaultKey>(token:string, dbservice:any, data:Partial<D>, keys:K, filter?:Partial<D>):Promise<commonResWithData<D>> {
+export async function updateTableData<D extends K, K extends defaultKey>(user:platformUser, dbservice:any, 
+	data:Partial<D>, keys:K, filter?:Partial<D>):Promise<commonResWithData<D>> {
 	const resp:commonResWithData<D> = {
 		errcode: ErrCode.OK,		
 	}
-	const user = tokenCheck(token);
-	if (user) {
-		console.log('updateTableData:')
-		// console.dir(data, {	depth: 8 });
-		data.modifyid = user.uid;
-		const service = (dbservice as defaultMethod<D, K>);
-		try {
-			console.log('findkey', keys);
-			const f = await service.findOne(keys);
-			if (f) {
-				// 更改資料時檢查是否為同球場
-				if (isMyClub(user, f.siteid)) {
-					data = removeUnderLineData(data);
-					// console.log('removeUnderLineData:', JSON.stringify(data));
-					// console.log('service:', service);
-					resp.data = await service.update(keys, data, filter);
-				} else { 
-					resp.errcode = ErrCode.ERROR_PARAMETER;
-					resp.error = {
-						message: errorMsg('ERROR_PARAMETER', 'siteid'),
-					}
-				}
+	console.log('updateTableData:')
+	// console.dir(data, {	depth: 8 });
+	data.modifyid = user.uid;
+	const service = (dbservice as defaultMethod<D, K>);
+	try {
+		console.log('findkey', keys);
+		const f = await service.findOne(keys);
+		if (f) {
+			// 更改資料時檢查是否為同球場, 不含球場代號的跳過
+			let isMyClubData = false;
+			if (f.siteid) {
+				isMyClubData = isMyClub(user, f.siteid);
 			} else {
-				resp.errcode = ErrCode.ITEM_NOT_FOUND;
+				isMyClubData = true;
+			}
+			if (isMyClubData) {
+				data = removeUnderLineData(data);
+				// console.log('removeUnderLineData:', JSON.stringify(data));
+				// console.log('service:', service);
+				resp.data = await service.update(keys, data, filter);	
+			} else { 
+				resp.errcode = ErrCode.ERROR_PARAMETER;
 				resp.error = {
-					message: errorMsg('ITEM_NOT_FOUND'),
+					message: errorMsg('ERROR_PARAMETER', 'siteid'),
 				}
 			}
-		} catch (e) {
-			resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
+		} else {
+			resp.errcode = ErrCode.ITEM_NOT_FOUND;
 			resp.error = {
-				message: errorMsg('DATABASE_ACCESS_ERROR'),
-				extra: e,				 
+				message: errorMsg('ITEM_NOT_FOUND'),
 			}
-			console.log(e);
 		}
-	} else {
-		resp.errcode = ErrCode.TOKEN_ERROR,
+	} catch (e) {
+		resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
 		resp.error = {
-			message: errorMsg('TOKEN_ERROR'),
+			message: errorMsg('DATABASE_ACCESS_ERROR'),
+			extra: e,				 
 		}
+		console.log(e);
 	}
+
 	return resp;
 }
 
@@ -210,16 +186,16 @@ export async function createTableData<D extends K, K extends defaultKey>(user:pl
 	data.modifyid = user.uid;
 	const service = (dbservice as defaultMethod<D, K>);
 	try {
-		if (data.siteid){
+		// if (data.siteid){
 			data = removeUnderLineData(data);
 			console.log('createTableData:', data)
 			resp.data = await service.create(data);
-		} else { 
-			resp.errcode = ErrCode.ERROR_PARAMETER;
-			resp.error = {
-				message: errorMsg('ERROR_PARAMETER', 'siteid'),
-			}
-		}
+		// } else { 
+		// 	resp.errcode = ErrCode.ERROR_PARAMETER;
+		// 	resp.error = {
+		// 		message: errorMsg('ERROR_PARAMETER', 'siteid'),
+		// 	}
+		// }
 	} catch (e) {
 		resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
 		resp.error = {

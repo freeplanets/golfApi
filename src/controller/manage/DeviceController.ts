@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, Post, Get, Param, Delete, Put, Patch } from "@nestjs/common";
+import { Body, Controller, Headers, Post, Get, Param, Delete, Put, Patch, Response } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { deviceKey, devices, mapLatLong } from "../../database/db.interface";
 import commonResponse from "../../models/common/commonResponse";
@@ -36,12 +36,13 @@ export default class DeviceController {
 	@ApiParam({name:'deviceid', description:'裝置代號'})
 	@ApiBody({description: '裝置資料新增', type: deviceData, examples: deviceEx})
 	@ApiResponse({status: 200, description: '回傳物件', type: deviceData, schema: {examples: deviceResEx} })
-	async update(@Param('deviceid') deviceid:string, @Body() body:Partial<devices>,@Headers('WWW-AUTH') token: Record<string, string>){
+	async update(@Param('deviceid') deviceid:string, @Body() body:Partial<devices>,
+		@Response({passthrough:true}) res:any){
 		const keys = {
 			deviceid: deviceid,
 		}
 		if (body.deviceid) delete body.deviceid;
-		const resp = await updateTableData<devices, deviceKey>(String(token), this.devicesService, body, keys);
+		const resp = await updateTableData<devices, deviceKey>(res.locals.user, this.devicesService, body, keys);
 		return resp;
 	}
 
@@ -49,8 +50,8 @@ export default class DeviceController {
 	@ApiOperation({ summary: '回傳單筆裝置資料', description: '回傳單筆裝置資料'})
 	@ApiParam({name:'deviceid', description:'裝置代號'})
 	@ApiResponse({status: 200, description: '回傳物件', type: deviceReponse })
-	async getOne(@Param('deviceid') deviceid:string,@Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await getTableData(String(token), this.devicesService, {deviceid: deviceid} as deviceKey);
+	async getOne(@Param('deviceid') deviceid:string,@Response({passthrough:true}) res:any){
+		const resp = await getTableData(res.locals.user, this.devicesService, {deviceid: deviceid} as deviceKey);
 		return resp;
 	}
 
@@ -58,8 +59,8 @@ export default class DeviceController {
 	@ApiOperation({ summary: '刪除裝置資料', description: '刪除裝置資料'})
 	@ApiParam({name:'deviceid', description:'裝置代號'})
 	@ApiResponse({status: 200, description:'刪除裝置回傳物件', type: commonResponse})
-	async delete(@Param('deviceid') deviceid:string, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await deleteTableData(String(token), this.devicesService, {deviceid: deviceid} as deviceKey);
+	async delete(@Param('deviceid') deviceid:string, @Response({passthrough:true}) res:any){
+		const resp = await deleteTableData(res.locals.user, this.devicesService, {deviceid: deviceid} as deviceKey);
 		return resp;
 	}
 
@@ -67,8 +68,8 @@ export default class DeviceController {
 	@ApiOperation({ summary: '回傳裝置資料', description: '回傳裝置資料'})
 	@ApiBody({description: '查詢裝置物件', type: queryDevicesRequest, examples: queryDeviceRequestEx})
 	@ApiResponse({status: 200, description:'裝置回傳物件', type: deviceReponse})
-	async query(@Body() body:Partial<devices>, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await queryTable(String(token), this.devicesService, body);
+	async query(@Body() body:Partial<devices>, @Response({passthrough:true}) res:any){
+		const resp = await queryTable(res.locals.user, this.devicesService, body);
 		return resp;
 	}
 	async addDevice(token:string, device:devices){

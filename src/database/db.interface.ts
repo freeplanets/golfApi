@@ -389,7 +389,7 @@ export interface mbrIdKey extends defaultKey {
 }
 
 export interface membersHcp extends mbrIdKey {
-  name: string;
+  memberName: string;
   lastHandicap: number;
 }
 

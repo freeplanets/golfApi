@@ -43,12 +43,13 @@ export default class CartController {
 	@ApiParam({name:'cartid', description:'球車代號'})
 	@ApiBody({description: '球車資料新增', type: cartData, examples: cartEx})
 	@ApiResponse({status: 200, description: '回傳物件', type: cartResponse, schema: {examples: cartResEx} })
-	async update(@Param('cartid') cartid:string, @Body() body:Partial<carts>,@Headers('WWW-AUTH') token: Record<string, string>){
+	async update(@Param('cartid') cartid:string, @Body() body:Partial<carts>, @Response({passthrough:true}) res:any){
 		const keys = {
 			cartid: cartid,
 		}
 		if (body.cartid) delete body.cartid;
-		const resp = await updateTableData<carts, cartKey>(String(token), this.cartsService, body, keys);
+		const user = res.locals.user as platformUser;
+		const resp = await updateTableData<carts, cartKey>(user, this.cartsService, body, keys);
 		return resp;
 	}
 
@@ -56,8 +57,8 @@ export default class CartController {
 	@ApiOperation({ summary: '回傳單筆球車資料', description: '回傳單筆球車資料'})
 	@ApiParam({name:'cartid', description:'球車代號'})
 	@ApiResponse({status: 200, description: '回傳物件', type: zoneResponse })
-	async getOne(@Param('cartid') cartid:string,@Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await getTableData(String(token), this.cartsService, {cartid: cartid} as cartKey);
+	async getOne(@Param('cartid') cartid:string,@Response({passthrough:true}) res:any){
+		const resp = await getTableData(res.locals.user, this.cartsService, {cartid: cartid} as cartKey);
 		return resp;
 	}
 
@@ -65,8 +66,8 @@ export default class CartController {
 	@ApiOperation({ summary: '刪除球車資料', description: '刪除球車資料'})
 	@ApiParam({name:'cartid', description:'球車代號'})
 	@ApiResponse({status: 200, description:'刪除球車回傳物件', type: commonResponse})
-	async delete(@Param('cartid') cartid:string, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await deleteTableData(String(token), this.cartsService, {cartid: cartid} as cartKey);
+	async delete(@Param('cartid') cartid:string, @Response({passthrough:true}) res:any){
+		const resp = await deleteTableData(res.locals.user, this.cartsService, {cartid: cartid} as cartKey);
 		return resp;
 	}
 
@@ -74,9 +75,9 @@ export default class CartController {
 	@ApiOperation({ summary: '查詢球車資料', description: '查詢球車資料'})
 	@ApiBody({description: '查詢球車資料', type: queryCartsRequest, examples: cartQueryEx})
 	@ApiResponse({status: 200, description:'球車回傳物件', type: cartsResponse})
-	async query(@Body() body:Partial<carts>, @Headers('WWW-AUTH') token:Record<string, string>){
+	async query(@Body() body:Partial<carts>, @Response({passthrough:true}) res:any){
 		// console.log('cart query', body);
-		const resp = await queryTable(String(token), this.cartsService, body);
+		const resp = await queryTable(res.locals.user, this.cartsService, body);
 		return resp;
 	}
 

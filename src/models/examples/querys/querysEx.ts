@@ -15,7 +15,7 @@ membersQueryEx.name = '李大大';
 
 const memberEx:membersHcp = {
     memberid: 'M0001',
-    name: '李大大',
+    memberName: '李大大',
     lastHandicap: 10,
 }
 const membersEx = [memberEx];

@@ -34,12 +34,13 @@ export default class CourseController {
 	@ApiParam({name:'courseid', description:'球道組合代號'})
 	@ApiBody({description: '球道組合資料新增', type: coursesData, examples: courseEx})
 	@ApiResponse({status: 200, description: '回傳物件', type: courseResponse })
-	async update(@Param('courseid') courseid:string, @Body() body:Partial<courses>,@Headers('WWW-AUTH') token: Record<string, string>){
+	async update(@Param('courseid') courseid:string, @Body() body:Partial<courses>,
+		@Response({passthrough:true}) res:any){
 		const keys = {
 			courseid: courseid,
 		}
 		if (body.courseid) delete body.courseid;
-		const resp = await updateTableData<courses, courseKey>(String(token), this.courseService, body, keys);
+		const resp = await updateTableData<courses, courseKey>(res.locals.user, this.courseService, body, keys);
 		return resp;
 	}
 
@@ -47,8 +48,8 @@ export default class CourseController {
 	@ApiOperation({ summary: '回傳單筆球道組合資料', description: '回傳單筆球道組合資料'})
 	@ApiParam({name:'courseid', description:'球道組合代號'})
 	@ApiResponse({status: 200, description: '回傳物件', type: courseResponse })
-	async getOne(@Param('courseid') courseid:string,@Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await getTableData(String(token), this.courseService, {courseid: courseid} as courseKey);
+	async getOne(@Param('courseid') courseid:string,@Response({passthrough:true}) res:any){
+		const resp = await getTableData(res.locals.user, this.courseService, {courseid: courseid} as courseKey);
 		return resp;
 	}
 
@@ -56,8 +57,8 @@ export default class CourseController {
 	@ApiOperation({ summary: '刪除組合資料', description: '刪除組合資料'})
 	@ApiParam({name:'courseid', description:'球道組合代號'})
 	@ApiResponse({status: 200, description:'刪除組合回傳物件', type: commonResponse})
-	async delete(@Param('courseid') courseid:string, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await deleteTableData(String(token), this.courseService, {courseid: courseid} as courseKey);
+	async delete(@Param('courseid') courseid:string, @Response({passthrough:true}) res:any){
+		const resp = await deleteTableData(res.locals.user, this.courseService, {courseid: courseid} as courseKey);
 		return resp;
 	}
 
@@ -65,8 +66,8 @@ export default class CourseController {
 	@ApiOperation({ summary: '回傳球道組合資料', description: '回傳球道組合資料'})
 	@ApiBody({description: '查詢球道組合', type: queryCoursesRequest, examples: queryCoursesRequestEx})
 	@ApiResponse({status: 200, description:'球道組合回傳物件', type: coursesResponse})
-	async query(@Body() body:Partial<courses>, @Headers('WWW-AUTH') token:Record<string, string>){
-		const resp = await queryTable(String(token), this.courseService, body);
+	async query(@Body() body:Partial<courses>, @Response({passthrough:true}) res:any){
+		const resp = await queryTable(res.locals.user, this.courseService, body);
 		return resp;
 	}
 }

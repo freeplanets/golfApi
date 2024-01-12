@@ -27,7 +27,7 @@ export default class CompetitionFormatModel extends CFKeyModel implements compet
 
     @ApiProperty({
         description: '是否5.7.9制',
-        type: Number,
+        type: Boolean,
     })
     @IsBoolean()
     is579: boolean;
