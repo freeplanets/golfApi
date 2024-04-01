@@ -4,7 +4,7 @@ import { cfKey } from "../../database/db.interface";
 
 export default class CFKeyModel implements cfKey {
     @ApiProperty({
-        description: '賽制代號',
+        description: '賽制hashkey',
         type: String,
         required: false,
     })

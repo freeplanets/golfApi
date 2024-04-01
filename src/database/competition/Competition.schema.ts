@@ -12,6 +12,12 @@ const CompetitionSchema = new Schema({
             type: 'global',
         }
     },
+    siteid: {
+        type: String,
+        index: {
+            type: 'global',
+        }
+    },
     gameStart: {
         type: String,
         index: {
@@ -24,17 +30,14 @@ const CompetitionSchema = new Schema({
             type: 'global',
         }
     },
-    cfid: {
-        type: String,
-        index: {
-            type: 'global',
-        }
-    },
     cfName: {
         type: String,
         index: {
             type: 'global',
         }
+    },
+    cfType: {
+        type: String,
     },
     notCountingHoles: {
         type: Array,

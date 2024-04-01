@@ -12,7 +12,6 @@ import DevicesModule from "../device/devices.module";
 // import ScoresSchema from "./scores.schema";
 import PlayerResult from "../playerResult/playerResult.schema";
 import PlayerResultService from "../playerResult/playerResult.service";
-import CompetitionFormatModule from "../competition-format/CompetitionFormat.module";
 import { PlatformTokenChecker } from "../../class/middleware/platformTokenChecker";
 import CompetitionModule from "../competition/Competition.module";
 import QuerysModule from "../queryTable/Querys.module";
@@ -23,7 +22,6 @@ import QuerysModule from "../queryTable/Querys.module";
 		CartsModule,
 		ZonesModule,
 		CouresModule,
-		CompetitionFormatModule,
 		CompetitionModule,
 		QuerysModule,
 		DynamooseModule.forFeature([

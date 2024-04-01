@@ -18,5 +18,6 @@ import CompetitionFormatService from "./CompetitionFormat.service";
     ],
     controllers: [CompetitionFormatController],
     providers: [CompetitionFormatService],
+    exports: [CompetitionFormatService],
 })
 export default class CompetitionFormatModule {}

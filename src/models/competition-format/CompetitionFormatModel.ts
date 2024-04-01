@@ -12,23 +12,8 @@ export default class CompetitionFormatModel extends CFKeyModel implements compet
     cfName: string;
 
     @ApiProperty({
-        description: '不計分洞數',
-        type: Number,
+        description: '賽制代號',
     })
-    @IsNumber()
-    notCountingHoles: number;
-
-    @ApiProperty({
-        description: '差點%',
-        type: Number,
-    })
-    @IsNumber()
-    hcpRate: number;
-
-    @ApiProperty({
-        description: '是否5.7.9制',
-        type: Boolean,
-    })
-    @IsBoolean()
-    is579: boolean;
+    @IsString()
+    cfType: string;
 }

@@ -8,13 +8,14 @@ const MembersHcpSchema = new Schema({
     siteid: {
         type: String,
         index: {
-            name: 'siteidmemberNameGlobalIndex',
             type: 'global',
-            rangeKey: 'memberName'
         }
-    },
+    },    
     memberName: {
         type: String,
+        index: {
+            type: 'global',
+        }
     },
     lastHandicap: {
         type: Number,

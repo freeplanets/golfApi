@@ -90,7 +90,12 @@ export async function queryTable<D extends K, K>(user:platformUser, dbservice:an
 			const cond = createCondition(key as queryReq);
 			resp.data = await service.query(cond);
 		} else {
-			resp.data = await service.query(key as Partial<D>);
+			const objMembers = Object.keys(key);
+			if (objMembers.length > 0) {
+				resp.data = await service.query(key as Partial<D>);
+			} else {
+				resp.data = await service.findAll();
+			}
 		}
 	} catch(e) {
 		resp.errcode = ErrCode.DATABASE_ACCESS_ERROR;
@@ -133,7 +138,7 @@ export async function updateTableData<D extends K, K extends defaultKey>(user:pl
 	const resp:commonResWithData<D> = {
 		errcode: ErrCode.OK,		
 	}
-	console.log('updateTableData:')
+	console.log('updateTableData:', JSON.stringify(data));
 	// console.dir(data, {	depth: 8 });
 	data.modifyid = user.uid;
 	const service = (dbservice as defaultMethod<D, K>);
@@ -153,7 +158,7 @@ export async function updateTableData<D extends K, K extends defaultKey>(user:pl
 				// console.log('removeUnderLineData:', JSON.stringify(data));
 				// console.log('service:', service);
 				resp.data = await service.update(keys, data, filter);	
-			} else { 
+			} else {
 				resp.errcode = ErrCode.ERROR_PARAMETER;
 				resp.error = {
 					message: errorMsg('ERROR_PARAMETER', 'siteid'),
@@ -171,9 +176,9 @@ export async function updateTableData<D extends K, K extends defaultKey>(user:pl
 			message: errorMsg('DATABASE_ACCESS_ERROR'),
 			extra: e,				 
 		}
-		console.log(e);
+		console.log('check err:', e);
 	}
-
+	// console.log('check end:');
 	return resp;
 }
 
@@ -377,4 +382,15 @@ function isAllowedData(data:any) {
 	if (data === undefined) return false;
 	if (typeof(data) === 'number' &&  isNaN(data)) return false;
 	return true;
+}
+export function deleteEmptyMember(anyO:AnyObject):void {
+	if (typeof(anyO) === 'object') {
+		Object.keys(anyO).forEach((key) => {
+			if ((typeof(anyO[key]) === 'string' && !anyO[key]) || typeof(anyO[key]) === undefined) {
+				delete anyO[key];
+			}
+		})
+	} else {
+		anyO = {};
+	}
 }

@@ -7,6 +7,10 @@ const NotCountingHoles = new Schema({
     fairways: {
         type: Array,
         schema: [Number],
-    },    
+    },
+    pars: {
+        type: Array,
+        schema: [Number],
+    }   
 });
 export default NotCountingHoles;

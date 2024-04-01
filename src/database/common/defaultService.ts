@@ -35,7 +35,7 @@ export default class defaultService<T extends K, K extends defaultKey> implement
 	findAll(): Promise<T[]> {
 		return this.model.scan().exec();
 	}
-	query(key: Partial<T> | ConditionInitializer, field?:string[], index:string=''): Promise<QueryResponse<T>> {
+	query(key: Partial<T> | ConditionInitializer, field?:string[], index:string='') {
 		 const query = this.model.query(key);
 		 if (field && field.length > 0) query.attributes(field);
 		 if (index) {

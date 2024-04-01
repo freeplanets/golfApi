@@ -36,5 +36,6 @@ import CompetitionRankingService from "./CompetitionRanking.service";
     ],
     controllers: [QueryController],
     providers:[MembersHcpService, HandicapHistoryService, CompetitionRankingService],
+    exports:[MembersHcpService, HandicapHistoryService, CompetitionRankingService],
 })
 export default class QuerysModule {}

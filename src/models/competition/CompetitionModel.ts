@@ -1,9 +1,14 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { competition, notCountingHoles } from "../../database/db.interface";
+import { competition, notCountingHole } from "../../database/db.interface";
 import { IsDateString, IsNumber, IsString } from "class-validator";
 import NotCountingHolesModel from "./NotCountingHolesModel";
 
 export default class CompetitionModel implements competition {
+    @ApiProperty({
+        description: '球場代號',
+    })
+    siteid?: string;
+
     @ApiProperty({
         description: 'hashkey',
         required: false,
@@ -30,7 +35,7 @@ export default class CompetitionModel implements competition {
     gameEnd: string;
 
     @ApiProperty({
-        description: '賽制代號',
+        description: '賽制hashkey',
     })
     @IsString()
     cfid: string;
@@ -42,11 +47,16 @@ export default class CompetitionModel implements competition {
     cfName: string;
 
     @ApiProperty({
+        description: '賽制代號',
+    })
+    cfType: string;
+
+    @ApiProperty({
         description: '不計洞號',
         type: [NotCountingHolesModel],
         required: false,
     })
-    notCountingHoles?: notCountingHoles[];
+    notCountingHoles?: notCountingHole[];
 
     @ApiProperty({
         description: '總桿獎數',

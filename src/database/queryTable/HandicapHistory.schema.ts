@@ -9,6 +9,11 @@ const HandicapHistorySchema = new Schema({
         type: String,
         index: [
             {
+                name: 'siteidgameidGlobalIndex',
+                type: 'global',
+                rangeKey: 'gameid',
+            },
+            {
                 name: 'siteidmemberidGlobalIndex',
                 type: 'global',
                 rangeKey: 'memberid',
@@ -17,8 +22,16 @@ const HandicapHistorySchema = new Schema({
                 name: 'siteidmemberNameGlobalIndex',
                 type: 'global',
                 rangeKey: 'memberName',
+            },
+            {
+                name: 'siteidcreatedAtGlobalIndex',
+                type: 'global',
+                rangeKey: 'createdAt',
             }
         ]
+    },
+    gameid: {
+        type: String,
     },
     memberid: {
         type: String,
@@ -52,6 +65,10 @@ const HandicapHistorySchema = new Schema({
     },
     hcpField: {
         type: Number,
+    },
+    unCalcMark: {
+        type: Boolean,
+        default: false,
     }
 }, {timestamps: true,saveUnknown: false});
 export default HandicapHistorySchema;

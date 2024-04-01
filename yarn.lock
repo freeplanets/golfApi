@@ -3320,6 +3320,11 @@ acorn@^8.4.1, acorn@^8.7.1, acorn@^8.8.0, acorn@^8.8.2:
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.9.0.tgz#78a16e3b2bcc198c10822786fa6679e245db5b59"
   integrity sha512-jaVNAFBHNLXspO543WnNNPZFRtavh3skAkITqD0/2aeMkKZTN+254PyhwxFYrk3vQ1xfY+2wbesJMs/JC8/PwQ==
 
+adm-zip@^0.5.10:
+  version "0.5.12"
+  resolved "https://registry.yarnpkg.com/adm-zip/-/adm-zip-0.5.12.tgz#87786328e91d54b37358d8a50f954c4cd73ba60b"
+  integrity sha512-6TVU49mK6KZb4qG6xWaaM4C7sA/sgUMLy/JYMOzkcp3BvVLpW0fXDFQiIzAuxFCt/2+xD7fNIiPFAoLZPhVNLQ==
+
 adm-zip@^0.5.5:
   version "0.5.10"
   resolved "https://registry.yarnpkg.com/adm-zip/-/adm-zip-0.5.10.tgz#4a51d5ab544b1f5ce51e1b9043139b639afff45b"
@@ -3592,6 +3597,22 @@ aws-sdk@^2.1389.0, aws-sdk@^2.1404.0, aws-sdk@^2.814.0:
     util "^0.12.4"
     uuid "8.0.0"
     xml2js "0.5.0"
+
+aws-sdk@^2.402.0:
+  version "2.1581.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1581.0.tgz#dea12e848aaf619fe96ec54c2901819dde3fc5b1"
+  integrity sha512-lWvpj36dL0HC8i4l8N0NnV2ljedOrij1Ox0SjHwQTIvePes4lNm+khOLV0T7NDA1C6igsGozBO+8OcNGPDhfAw==
+  dependencies:
+    buffer "4.9.2"
+    events "1.1.1"
+    ieee754 "1.1.13"
+    jmespath "0.16.0"
+    querystring "0.2.0"
+    sax "1.2.1"
+    url "0.10.3"
+    util "^0.12.4"
+    uuid "8.0.0"
+    xml2js "0.6.2"
 
 aws-sdk@^2.7.0:
   version "2.1405.0"
@@ -4824,6 +4845,11 @@ es6-iterator@^2.0.3, es6-iterator@~2.0.3:
     d "1"
     es5-ext "^0.10.35"
     es6-symbol "^3.1.1"
+
+es6-promisify@^6.0.1:
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/es6-promisify/-/es6-promisify-6.1.1.tgz#46837651b7b06bf6fff893d03f29393668d01621"
+  integrity sha512-HBL8I3mIki5C1Cc9QjKUenHtnG0A5/xA8Q/AllRcfiwl2CZFXGK7ddBiCoRwAix4i2KxcQfjtIVcrVbB3vbmwg==
 
 es6-set@^0.1.6:
   version "0.1.6"
@@ -8394,6 +8420,15 @@ serverless-dynamodb-local@^0.2.40:
     dynamodb-localhost "0.0.9"
     lodash "^4.17.0"
 
+serverless-localstack@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/serverless-localstack/-/serverless-localstack-1.2.0.tgz#40d4ed94763bc46725cb3d8092a075a632fb1d0f"
+  integrity sha512-JXdh1QeaSKmHU57VvfIOEEuANdaUi9J0Y86L0N+BRy04uxu8F22Mup/LxVQnzPl12eolc0Xi5HmtbZGv/H2ufQ==
+  dependencies:
+    adm-zip "^0.5.10"
+    aws-sdk "^2.402.0"
+    es6-promisify "^6.0.1"
+
 serverless-offline@^12.0.4:
   version "12.0.4"
   resolved "https://registry.yarnpkg.com/serverless-offline/-/serverless-offline-12.0.4.tgz#93f60be0423867a5ebcf1cbc8d278e7bfa24e210"
@@ -9618,6 +9653,14 @@ xml2js@0.5.0:
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.5.0.tgz#d9440631fbb2ed800203fad106f2724f62c493b7"
   integrity sha512-drPFnkQJik/O+uPKpqSgr22mpuFHqKdbS835iAQrUC73L2F5WkboIRd63ai/2Yg6I1jzifPFKH2NTK+cfglkIA==
+  dependencies:
+    sax ">=0.6.0"
+    xmlbuilder "~11.0.0"
+
+xml2js@0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.6.2.tgz#dd0b630083aa09c161e25a4d0901e2b2a929b499"
+  integrity sha512-T4rieHaC1EXcES0Kxxj4JWgaUQHDk+qwHcYOCFHfiwKz7tOVPLq7Hjq9dM1WCMhylqMEfP7hMcOIChvotiZegA==
   dependencies:
     sax ">=0.6.0"
     xmlbuilder "~11.0.0"

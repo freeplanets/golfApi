@@ -1,16 +1,14 @@
 import { ExampleObject } from "@nestjs/swagger/dist/interfaces/open-api-spec.interface";
 import CompetitionFormatModel from "../../competition-format/CompetitionFormatModel";
 import CFQuery from "../../../models/competition-format/CFQuery";
+import { CompetitionFormatType } from "../../../models/enum";
 
 const cfEx = new CompetitionFormatModel();
-cfEx.cfName = '貝利亞';
-cfEx.hcpRate = 80;
-cfEx.is579 = true;
-cfEx.notCountingHoles = 6;
+cfEx.cfName = '新貝利亞';
+cfEx.cfType = CompetitionFormatType.NEW_PEORIA;
 
 const cfQueryEx = new CFQuery();
-cfQueryEx.cfName = '貝利亞';
-cfQueryEx.is579 = true;
+cfQueryEx.cfName = '新貝利亞';
 
 export const CFEx:Record<'Request', ExampleObject> = {
     Request: {

@@ -8,7 +8,7 @@ import { cfKey, competitionFormat, platformUser } from '../../../database/db.int
 import CFResGet from '../../../models/competition-format/CFResGet';
 import CFResQuery from '../../../models/competition-format/CFResQuery';
 import CFQuery from '../../../models/competition-format/CFQuery';
-import { createTableData, deleteTableData, getTableData, hashKey, queryTable, updateTableData } from '../../../function/Commands';
+import { createTableData, deleteEmptyMember, deleteTableData, getTableData, hashKey, queryTable, updateTableData } from '../../../function/Commands';
 
 @ApiBearerAuth()
 @ApiTags('Manage')
@@ -94,6 +94,7 @@ export default class CompetitionFormatController {
             data: [cfEx],
         }
         */
+        deleteEmptyMember(body);
         const resp = await queryTable(res.locals.user, this.competitionFormatService, body);
         return resp;        
     }

@@ -11,14 +11,8 @@ const CompetitionFormatSchema =  new Schema({
             type: 'global',
         }
     },
-    notCountingHoles: {
-        type: Number,
-    },
-    hcpRate: {
-        type: Number,
-    },
-    is579: {
-        type: Boolean,
+    cfType: {
+        type: String,
     },
     modifyid: {
         type: String,

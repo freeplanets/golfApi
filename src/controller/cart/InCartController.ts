@@ -4,7 +4,7 @@ import { Condition } from "dynamoose";
 import GamesService from "../../database/game/games.service";
 import CartsService from "../../database/cart/carts.service";
 import { createScoreData, getResultByGameID, hashKey, playerDefaultHcpCal, removeUnderLineData, tokenCheck, updateTableData } from "../../function/Commands";
-import { cartKey, carts, devices, gameKey, games, mapLatLong, playerDefault, playerResult, sideGame, sideGameKey } from "../../database/db.interface";
+import { cartKey, carts, competition, competitionRanking, devices, gameKey, games, handicapHistory, mapLatLong, mbrIdKey, membersHcp, player, playerDefault, playerResult, sideGame, sideGameKey } from "../../database/db.interface";
 import { AnyObject, commonRes, commonResWithData, locReq, positonReq } from "../../models/if";
 import { ErrCode } from "../../models/enumError";
 import { errorMsg } from "../../function/Errors";
@@ -35,6 +35,12 @@ import MyDate from "../../class/common/MyDate";
 import PlayerResultService from "../../database/playerResult/playerResult.service";
 import AreaScoreCreator from "../../class/ScoreForKS/areaScoreCreator";
 import { PlayScoreData } from "../../models/transData/ks/ks.interface";
+import CompetitionService from "../../database/competition/Competition.service";
+import HandicapCalculater from "../../class/Handicap/HandicapCalculater";
+import HandicapHistoryService from "../../database/queryTable/HandicapHistory.service";
+import ScoreCalculater from "../../class/Score/ScoreCalculater";
+import CompetitionRankingService from "../../database/queryTable/CompetitionRanking.service";
+import MembersHcpService from "../../database/queryTable/MembersHcp.service";
 
 @ApiBearerAuth()
 @ApiTags('Cart')
@@ -47,7 +53,11 @@ export default class InCartController {
 		private readonly devicesService:DevicesService,
 		private readonly coursesService:CoursesService,
 		private readonly sidegamesService:SideGamesService,
-		private readonly playerResultService:PlayerResultService
+		private readonly playerResultService:PlayerResultService,
+		private readonly competitionService:CompetitionService,
+		private readonly handicapHisService:HandicapHistoryService,
+		private readonly competitionRankingService:CompetitionRankingService,
+		private readonly membersHcpService:MembersHcpService,
 	){}
 	@Get('getSideInfo/:siteid')
 	@ApiOperation({summary:'取得整資料 / get golf club complete information', description: '取得球場完整資料 / get golf club complete information'})
@@ -329,8 +339,29 @@ export default class InCartController {
 			}
 			const course = await this.coursesService.findOne({courseid: game.courseid});
 			console.log('get course', JSON.stringify(course));
-			game.players.forEach(async (player) => {
+			// 檢查是否為賽事
+			let comp:competition;
+			let scoreCalc:ScoreCalculater;
+			if (game.gameTitle) {
+				const ans = await this.competitionService.query({siteid: game.siteid, titleName: game.gameTitle});
+				if (ans.count > 0) {
+					comp = ans[0];
+					scoreCalc = new ScoreCalculater(comp.notCountingHoles);
+				}
+			}
+			console.log("competition:",{siteid: game.siteid, titleName: game.gameTitle});
+			if (comp) {
+				console.log("competition:", JSON.stringify(comp));	
+			}
+			let player = game.players.pop();
+			while(player) {
 				let playedHoles = 0;
+				if (scoreCalc) {
+					const res = await this.scoreCalculate(game.siteid, course.courseName, player, scoreCalc, comp);
+					console.log('after scoreCalculate', JSON.stringify(res));
+				}
+				const hcres = await this.hcpCalc(game.siteid, gameid, player, game.rating, game.slope, course.courseName);
+				console.log('HC save:', JSON.stringify(hcres));
 				const areaScoreCreator = new AreaScoreCreator();
 				player.holes.forEach((hole) => {
 					if (hole.gross>0) playedHoles +=1;
@@ -365,10 +396,60 @@ export default class InCartController {
 					await this.playerResultService.create(pr)
 				} catch(err) {
 					console.log('save playerResult error:', err);
-				}
-			})
+				}				
+				player = game.players.pop();	
+			}
+			if (comp) {
+				await this.scoreRanking(comp);
+			}
+			// game.players.forEach(async (player) => {
+			// 	let playedHoles = 0;
+			// 	if (scoreCalc) {
+			// 		const res = await this.scoreCalculate(game.siteid, course.courseName, player, scoreCalc, comp);
+			// 		console.log('after scoreCalculate', JSON.stringify(res));
+			// 	}
+			// 	const hcres = await this.hcpCalc(game.siteid, gameid, player, game.rating, game.slope);
+			// 	console.log('HC save:', JSON.stringify(hcres));
+			// 	const areaScoreCreator = new AreaScoreCreator();
+			// 	player.holes.forEach((hole) => {
+			// 		if (hole.gross>0) playedHoles +=1;
+			// 		areaScoreCreator.addHoleScore(hole);
+			// 	});
+			// 	const pgd:PlayScoreData = {
+			// 		player_id: player.extra.player_id,
+			// 		player_name: player.playerName,
+			// 		team_id: game.extra ? game.extra.team_id : '',
+			// 		team: game.extra ? game.extra.team_id : '',
+			// 		cart: cartno,
+			// 		start_time: MyDate.toLocalString(game.startTime),
+			// 		end_time: MyDate.toLocalString(game.endTime),
+			// 		caddie: game.extra ? game.extra.caddie : [],
+			// 		area_score: areaScoreCreator.Score,
+			// 	}
+			// 	const pr:playerResult = {
+			// 		resultid: hashKey(),
+			// 		siteid: game.siteid,
+			// 		gameid: game.gameid,
+			// 		playerName: player.playerName,
+			// 		esttimatedStartTime: game.esttimatedStartTime,
+			// 		courseName: course.courseName,
+			// 		memberID: player.extra.memberId,
+			// 		gameTitle: game.gameTitle,
+			// 		hcp: player.hcp,
+			// 		gross: player.gross,
+			// 		playedHoles,
+			// 		playerScoreKS: pgd,
+			// 	}
+			// 	try {
+			// 		await this.playerResultService.create(pr)
+			// 	} catch(err) {
+			// 		console.log('save playerResult error:', err);
+			// 	}
+			// });
 		}
+		console.log('check before update');
 		const resp = await updateTableData(res.locals.user, this.gamesService, data, {gameid} as gameKey);
+		console.log('check after update');
 		return resp;
 	}
 
@@ -650,21 +731,21 @@ export default class InCartController {
 		return resp;
 	}
 	async updatePlayerGamePoint(token:string, data:scoresData){
-		console.log(new Date().toLocaleString());
+		console.log('gameid:', data.gameid, new Date().toLocaleString());
 		const resp:commonResWithData<scoresData> = {
 			errcode: ErrCode.OK,
 		}
 		const user = tokenCheck(token);
-		console.log(new Date().toLocaleString());
+		//console.log(new Date().toLocaleString());
 		if (user) {
 			data = removeUnderLineData(data);
-			console.log(new Date().toLocaleString());
+			//console.log(new Date().toLocaleString());
 			// console.log(data);
 			const key:gameKey = {
 				gameid: data.gameid,
 			};
 			const f = await this.gamesService.query(key, ['players', 'playerDefaults']);
-			console.log('get data:', new Date().toLocaleString(), f.count);
+			//console.log('get data:', new Date().toLocaleString(), f.count);
 			if (f.count > 0) {
 					const oldPlayers = f[0].players;
 					let playerDefaults = f[0].playerDefaults;
@@ -715,7 +796,7 @@ export default class InCartController {
 					// update score
 					await this.gamesService.update(key, {players:oldPlayers, playerDefaults});
 					console.log('after save data', new Date().toLocaleString());
-					resp.data = createScoreData(data.gameid, oldPlayers, playerDefaults);	
+					resp.data = createScoreData(data.gameid, oldPlayers, playerDefaults);
 
 					// console.dir(sideGames, {depth: 8});
 					sideGames.forEach(async (sg) => {
@@ -748,6 +829,7 @@ export default class InCartController {
 				message: errorMsg('TOKEN_ERROR'),
 			}
 		}
+		// console.log(JSON.stringify(resp));
 		return resp;	
 	}
 	private hadAffectNextGame(sgs:sideGame[]):boolean {
@@ -759,5 +841,151 @@ export default class InCartController {
 			f = sgs.find((sg) => sg.sideGameName === sideGames.HESSEIN);	
 		}
 		return !!f;
+	}
+	private async hcpCalc(siteid:string, gameid:string, player:player, rating:number, slope:number, course:string) {
+		console.log('hcpCalc start');
+		let hhid = '';
+		let hcpC:HandicapCalculater;
+		let hcpHis:handicapHistory[] = [];
+		const ans = await this.handicapHisService.query({
+			siteid,
+			memberid: player.extra.memberId,
+			unCalcMark: false,
+		});
+		console.log('existed check ans', ans.length, ans.sort((a, b) => a.createdAt - b.createdAt));
+		hcpHis = ans.map((itm) => itm);
+		const fIdx = hcpHis.findIndex((itm) => itm.gameid === gameid);
+		if (fIdx > -1) {
+			hhid = hcpHis[fIdx].hhid;
+			hcpHis.splice(fIdx, 1);
+		}		
+		while(hcpHis.length > 9) {
+			const p = hcpHis.shift();
+			const key:mbrIdKey = {
+				hhid: p.hhid,
+			}
+			console.log(`update hhid:${p.hhid}`);
+			await this.handicapHisService.update(key, {unCalcMark: true});
+		}
+		// if (ans.length > 9) {
+		// 	const start = ans.length -1
+		// 	for (let i = start; i>=0; i-=1) {
+		// 		if (ans[i].gameid === gameid) {
+		// 			hhid = ans[i].hhid;
+		// 			console.log('existed check hhid', hhid);
+		// 		} else {
+		// 			hcpHis.push(ans[i]);
+		// 		}
+		// 	}
+		// }
+		hcpC = new HandicapCalculater(hcpHis);
+		hcpC.addScore(player, gameid, rating, slope);
+		const curHcp = hcpC.CurHcpData;
+		curHcp.siteid = siteid;
+		curHcp.course = course;
+		let res:any;
+		if (hhid) {
+			console.log('existed check hhid2', hhid);
+			res = await this.handicapHisService.update({hhid}, curHcp);
+		} else {
+			curHcp.hhid = hashKey();
+			res = await this.handicapHisService.create(curHcp as handicapHistory);
+		}
+		console.log('HH Save:', JSON.stringify(res));
+		const mHcp:membersHcp = {
+			memberid: player.extra.memberId,
+			siteid,
+			memberName: player.playerName,
+			lastHandicap: curHcp.hcpField,
+		}
+		return this.membersHcpService.create(mHcp);
+	}
+	private async scoreCalculate(siteid:string, courseName:string, player:player,calc:ScoreCalculater, comp:competition) {
+		console.log('scoreCalculate start');
+		try {
+			const chk = await this.competitionRankingService.query({
+				siteid,
+				//titleid: comp.titleid,
+				titleName: comp.titleName,
+				memberName: player.playerName,
+				memberid: player.extra.memberId,
+			});
+			calc.process(player.holes);
+			if (chk.count > 0) {
+				const compdata = chk[0];
+				const trid = compdata.trid;
+				const data:Partial<competitionRanking> = {
+					course: courseName,
+					gross: player.gross,
+					net: calc.Net,
+				}
+				player.holes.forEach((hole) => data[`hole${hole.holeNo}`] = hole.gross );
+				return this.competitionRankingService.update({trid}, data);
+			} else {
+				const sc:competitionRanking = {
+					trid: hashKey(),
+					siteid,
+					titleid: comp.titleid,
+					titleName: comp.titleName,
+					memberid: player.extra.memberId,
+					memberName: player.playerName,
+					course: courseName,
+					gross: player.gross,
+					net: calc.Net,
+					//grossRanking?: number;
+					//netRankgin?: number;
+					//trophy?: boolean;
+				}
+				player.holes.forEach((hole) => sc[`hole${hole.holeNo}`] = hole.gross );
+				return this.competitionRankingService.create(sc);
+			}
+		} catch(err) {
+			console.log('scoreCalculate err:', err);
+		}
+		// console.log('scoreCalculate res:', JSON.stringify(res));	
+	}
+	async scoreRanking(comp:competition) {
+		// const totalTrophy = comp.grossCounter + comp.netCounter;
+		console.log('ranking start');
+		const key = {
+			siteid: comp.siteid,
+			// titleid: comp.titleid,
+			titleName: comp.titleName,
+		}
+		const ans = await this.competitionRankingService.query(key);
+		const data:competitionRanking[] = ans.map((crk) => {
+			crk.netRanking = 0;
+			crk.grossRanking = 0;
+			return crk;
+		} );
+		data.sort((a, b) => a.gross - b.gross);
+		let n = data.length > comp.grossCounter ? comp.grossCounter : data.length;
+		for (let i=0; i< n; i ++) {
+			data[i].grossRanking = i + 1;
+		}
+		data.sort((a, b) => a.net - b.net);
+		// let conuter = comp.netCounter;
+		n = data.length;
+		let rank = 1;
+		for (let i=0; i< n; i++) {
+			if (!data[i].grossRanking) {
+				data[1].netRanking = rank;
+				rank += 1;
+				if (rank > comp.netCounter) break;
+			}
+		}
+		const model =  this.competitionRankingService.getModel();
+		let arr20:competitionRanking[]=[];
+		for(let i=0; i<data.length; i++) {
+			arr20.push(data[i]);
+			if (arr20.length>=20) {
+				await model.batchPut(arr20);
+				arr20 = [];	
+			}
+		}
+		if (arr20.length > 0) {
+			await model.batchPut(arr20);
+		}
+		console.log('ranking end');		
 	}
 }	

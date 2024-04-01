@@ -191,6 +191,7 @@ export interface playerGameData {
 export interface sideGameKey extends defaultKey {
   sidegameid:string;
 }
+
 export interface sideGame extends sideGameKey { 
   gameid:string;
   sideGameName:sideGames;
@@ -340,18 +341,19 @@ export interface titleKey extends defaultKey {
   titleid?: string;
 }
 
-export interface notCountingHoles {
+export interface notCountingHole {
   zoneid: string;
   fairways: number[];
+  pars?:number[];
 }
 
 export interface competition extends titleKey {
   titleName: string;
   gameStart: string;
   gameEnd: string;
-  cfid: string;
   cfName: string;
-  notCountingHoles?: notCountingHoles[];
+  cfType: string;
+  notCountingHoles?: notCountingHole[];
   grossCounter: number;
   netCounter: number;
   competitionLocation?: string;
@@ -363,9 +365,7 @@ export interface cfKey extends defaultKey {
 
 export interface competitionFormat extends cfKey {
   cfName: string;
-  notCountingHoles: number;
-  hcpRate: number;
-  is579: boolean; 
+  cfType: string;
 }
 export interface trKey extends defaultKey {
   trid: string;
@@ -376,15 +376,34 @@ export interface competitionRanking extends trKey {
   titleName: string;
   memberid: string;
   memberName: string;
+  course: string;
+  hole1?: number;
+  hole2?: number;
+  hole3?: number;
+  hole4?: number;
+  hole5?: number;
+  hole6?: number;
+  hole7?: number;
+  hole8?: number;
+  hole9?: number;
+  hole10?: number;
+  hole11?: number;
+  hole12?: number;
+  hole13?: number;
+  hole14?: number;
+  hole15?: number;
+  hole16?: number;
+  hole17?: number;
+  hole18?: number;
   gross: number;
   net: number;
   grossRanking?: number;
-  netRankgin?: number;
+  netRanking?: number;
   trophy?: boolean;
 }
 
 export interface mbrIdKey extends defaultKey {
-  memberid:string;
+  memberid?:string;
   hhid?:string;
 }
 
@@ -394,6 +413,8 @@ export interface membersHcp extends mbrIdKey {
 }
 
 export interface handicapHistory extends mbrIdKey {
+  gameid: string;
+  memberid:string;
   memberName: string;
   course: string;
   gross: number;
@@ -404,6 +425,8 @@ export interface handicapHistory extends mbrIdKey {
   hcpAvg: number;
   hcpIndex: number;
   hcpField: number;
+  createdAt?:number;
+  unCalcMark?:boolean;
 }
 /*
 export interface ItemObjectFromSchemaSettings {

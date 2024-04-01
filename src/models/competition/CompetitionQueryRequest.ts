@@ -10,6 +10,11 @@ export default class CompetitionQueryRequest implements Partial<competition> {
     titleName?: string;
 
     @ApiProperty({
+        description: '球場代號',
+    })
+    siteid?: string;
+    
+    @ApiProperty({
         description:'開始日期',
     })
     @IsDateString()

@@ -1,8 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsArray, IsString } from "class-validator";
-import { notCountingHoles } from "../../database/db.interface";
+import { notCountingHole } from "../../database/db.interface";
 
-export default class NotCountingHolesModel implements notCountingHoles {
+export default class NotCountingHolesModel implements notCountingHole {
     @ApiProperty({
         description: '球場分區代號',
     })

@@ -7,11 +7,11 @@ import { ErrCode } from "../../../models/enumError";
 
 const competitionRankingQueryEx = new CompetitionRankingQueryModel();
 competitionRankingQueryEx.titleName = '林口杯錦標賽';
-competitionRankingQueryEx.trophy = true;
+competitionRankingQueryEx.siteid = 'linkougolf';
 
 const membersQueryEx = new MembersQueryModel();
-membersQueryEx.memberid = 'M0001';
-membersQueryEx.name = '李大大';
+membersQueryEx.siteid = 'linkougolf';
+membersQueryEx.memberid = 'M00019';
 
 const memberEx:membersHcp = {
     memberid: 'M0001',

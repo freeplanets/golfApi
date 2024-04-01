@@ -8,10 +8,4 @@ export default class CFQuery implements Partial<competitionFormat> {
     })
     @IsString()
     cfName?: string;
-
-    @ApiProperty({
-        description: '是否5.7.9制',
-    })
-    @IsBoolean()
-    is579?: boolean;
 }

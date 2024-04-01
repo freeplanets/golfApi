@@ -1,7 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { handicapHistory } from "src/database/db.interface";
+import { handicapHistory } from "../../database/db.interface";
 
 export default class HandicapHistoryModel implements handicapHistory {
+    @ApiProperty({
+        description: '球場代號',
+    })
+    gameid: string;
+
     @ApiProperty({
         description: '會員編號',
     })

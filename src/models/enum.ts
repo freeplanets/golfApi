@@ -72,3 +72,17 @@ export enum AreaType {
 	OUT = 'OUT',
 	IN = 'IN',
 }
+
+export enum CompetitionFormatType {
+	// PEORIA = 'peoria',
+	// DOUBLE_PEORIA = 'doublePeoria',
+	NEW_PEORIA = 'newPeoria',
+	NEW_NEW_PEORIA = 'newNewPeoria',
+	// OTHERS = 'others',
+}
+
+export enum CompetitionFormatName {
+	newPeoria = '新貝利亞',
+	newNewPeoria = '新新貝利亞',
+
+}
