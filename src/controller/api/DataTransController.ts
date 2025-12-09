@@ -42,7 +42,7 @@ export default class DataTransController {
 		const resp:commonRes = {
 			errcode: ErrCode.OK,
 		}
-		const eds:EncDecString = new EncDecString(process.env.API_KEY);
+		const eds:EncDecString = new EncDecString(process.env.);
 		const { siteid } = JSON.parse(eds.Decrypted(apiKey));
 		if (siteid) {
 			//try {
@@ -76,7 +76,7 @@ export default class DataTransController {
 			errcode: ErrCode.OK,
 		}
 		// console.log('body', body);
-		//console.log('siteid:', siteid, process.env.API_KEY);
+		//console.log('siteid:', siteid, process.env.);
 		const eds:EncDecString = new EncDecString(process.env.API_KEY);
 		const { siteid } = JSON.parse(eds.Decrypted(apiKey));
 		// console.log('siteid:', siteid, apiKey);
